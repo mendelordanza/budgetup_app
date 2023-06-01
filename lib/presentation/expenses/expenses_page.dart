@@ -24,49 +24,50 @@ class ExpensesPage extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final item = state.expenseCategories[index];
                         return GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                RouteStrings.transactions,
-                                arguments: item,
-                              );
-                            },
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Text(item.title ?? "hello"),
-                                        Text("${item.getTotal()}"),
-                                      ],
-                                    ),
-                                    IconButton(
-                                      onPressed: () {
-                                        context.read<ExpenseBloc>().add(
-                                              RemoveExpenseCategory(
-                                                  expenseCategory: item),
-                                            );
-                                      },
-                                      icon: Icon(Icons.delete),
-                                    ),
-                                    IconButton(
-                                      onPressed: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          RouteStrings.addExpense,
-                                          arguments: item,
-                                        );
-                                      },
-                                      icon: Icon(Icons.edit),
-                                    ),
-                                  ],
-                                ),
-                                LinearProgressIndicator(
-                                  value: item.getTotalPercentage(),
-                                )
-                              ],
-                            ));
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              RouteStrings.transactions,
+                              arguments: item,
+                            );
+                          },
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Column(
+                                    children: [
+                                      Text(item.title ?? "hello"),
+                                      Text("${item.getTotal()}"),
+                                    ],
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      context.read<ExpenseBloc>().add(
+                                            RemoveExpenseCategory(
+                                                expenseCategory: item),
+                                          );
+                                    },
+                                    icon: Icon(Icons.delete),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        RouteStrings.addExpense,
+                                        arguments: item,
+                                      );
+                                    },
+                                    icon: Icon(Icons.edit),
+                                  ),
+                                ],
+                              ),
+                              LinearProgressIndicator(
+                                value: item.getTotalPercentage(),
+                              )
+                            ],
+                          ),
+                        );
                       },
                     );
                   }

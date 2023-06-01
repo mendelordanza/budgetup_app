@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -35,6 +34,37 @@ class ExpenseTxnBloc extends Bloc<ExpenseTxnEvent, ExpenseTxnState> {
             expenseTxns: List.from(state.expenseTxns)..add(event.expenseTxn),
           ),
         );
+      }
+    });
+    on<EditExpenseTxn>((event, emit) async {
+      if (state is ExpenseTxnLoaded) {
+        final state = this.state as ExpenseTxnLoaded;
+
+        expensesRepository.editTransaction(event.expenseTxn);
+
+        emit(
+          ExpenseTxnLoaded(
+            expenseTxns: List.from(state.expenseTxns)..add(event.expenseTxn),
+          ),
+        );
+      }
+    });
+    on<RemoveExpenseTxn>((event, emit) async {
+      if (state is ExpenseTxnLoaded) {
+        final state = this.state as ExpenseTxnLoaded;
+
+        //Remove from DB
+        if (event.expenseTxn.id != null) {
+          expensesRepository.deleteTransaction(event.expenseTxn.id!);
+
+          //Emit state
+          emit(
+            ExpenseTxnLoaded(
+              expenseTxns: List.from(state.expenseTxns)
+                ..remove(event.expenseTxn),
+            ),
+          );
+        }
       }
     });
   }

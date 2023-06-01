@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -60,15 +59,15 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
         //Remove from DB
         if (event.expenseCategory.id != null) {
           expensesRepository.deleteCategory(event.expenseCategory.id!);
-        }
 
-        //Emit state
-        emit(
-          ExpenseCategoryLoaded(
-            expenseCategories: List.from(state.expenseCategories)
-              ..remove(event.expenseCategory),
-          ),
-        );
+          //Emit state
+          emit(
+            ExpenseCategoryLoaded(
+              expenseCategories: List.from(state.expenseCategories)
+                ..remove(event.expenseCategory),
+            ),
+          );
+        }
       }
     });
   }

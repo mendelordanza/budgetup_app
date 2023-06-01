@@ -1,5 +1,8 @@
+import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
 import 'package:budgetup_app/domain/expense_txn.dart';
 import 'package:equatable/equatable.dart';
+
+import '../data/local/entities/expense_category_entity.dart';
 
 class ExpenseCategory extends Equatable {
   final int? id;
@@ -32,6 +35,18 @@ class ExpenseCategory extends Equatable {
     final currentBudget = budget ?? 0.0;
     var percentage = (getTotal() / currentBudget);
     return percentage;
+  }
+
+  ExpenseCategoryEntity toIsar(ExpenseTxnEntity expenseTxnEntity) {
+    final isarObject = ExpenseCategoryEntity()
+      ..id = id!
+      ..title = title
+      ..budget = budget
+      ..icon = icon
+      ..expenseTransactions.add(expenseTxnEntity)
+      ..createdAt = createdAt
+      ..updatedAt = updatedAt;
+    return isarObject;
   }
 
   factory ExpenseCategory.fromJson(Map<dynamic, dynamic> json) =>

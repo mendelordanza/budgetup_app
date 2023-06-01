@@ -1,5 +1,6 @@
 import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
+import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -28,8 +29,10 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) =>
-          getIt<ExpenseBloc>()
-            ..add(LoadExpenseCategories()),
+              getIt<ExpenseBloc>()..add(LoadExpenseCategories()),
+        ),
+        BlocProvider(
+          create: (context) => getIt<ExpenseTxnBloc>(),
         ),
       ],
       child: MaterialApp(

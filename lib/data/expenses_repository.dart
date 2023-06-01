@@ -3,6 +3,7 @@ import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
 import 'package:budgetup_app/data/local/isar_service.dart';
 import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/domain/expense_txn.dart';
+import 'package:isar/isar.dart';
 
 class ExpensesRepository {
   final IsarService _isarService;
@@ -38,7 +39,7 @@ class ExpensesRepository {
 
   Future<void> saveCategory(ExpenseCategory category) async {
     final isarObject = ExpenseCategoryEntity()
-      ..id = category.id!
+      ..id = category.id != null ? category.id! : Isar.autoIncrement
       ..title = category.title
       ..budget = category.budget
       ..createdAt = category.createdAt
@@ -51,20 +52,28 @@ class ExpensesRepository {
     final txnObject = ExpenseTxnEntity()
       ..notes = expenseTxn.notes
       ..amount = expenseTxn.amount
-      ..createdAt = category.createdAt
-      ..updatedAt = category.updatedAt;
+      ..createdAt = expenseTxn.createdAt
+      ..updatedAt = expenseTxn.updatedAt;
 
     if (category.id != null) {
-      final categoryObject = ExpenseCategoryEntity()
-        ..id = category.id!
-        ..title = category.title
-        ..budget = category.budget
-        ..icon = category.icon
-        ..expenseTransactions.add(txnObject)
-        ..createdAt = category.createdAt
-        ..updatedAt = category.updatedAt;
-
-      _isarService.addTransaction(categoryObject);
+      _isarService.addTransaction(category.toIsar(txnObject));
     }
+  }
+
+  Future<void> editTransaction(ExpenseTxn expenseTxn) async {
+    final txnObject = ExpenseTxnEntity()
+      ..id = expenseTxn.id!
+      ..notes = expenseTxn.notes
+      ..amount = expenseTxn.amount
+      ..createdAt = expenseTxn.createdAt
+      ..updatedAt = expenseTxn.updatedAt;
+
+    if (expenseTxn.id != null) {
+      _isarService.editTransaction(txnObject);
+    }
+  }
+
+  Future<void> deleteTransaction(int txnId) async {
+    _isarService.deleteTransaction(txnId);
   }
 }

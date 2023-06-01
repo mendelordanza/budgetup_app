@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:budgetup_app/data/local/entities/expense_category_entity.dart';
 import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
 import 'package:isar/isar.dart';
@@ -43,6 +41,19 @@ class IsarService {
     final isar = await db;
     isar.writeTxnSync<int>(
         () => isar.expenseCategoryEntitys.putSync(expenseCategory));
+  }
+
+  Future<void> editTransaction(ExpenseTxnEntity expenseTxn) async {
+    final isar = await db;
+    isar.writeTxnSync<int>(() => isar.expenseTxnEntitys.putSync(expenseTxn));
+  }
+
+  Future<void> deleteTransaction(int txnId) async {
+    final isar = await db;
+    await isar.writeTxn(() async {
+      final success = await isar.expenseTxnEntitys.delete(txnId);
+      print('deleted: $success');
+    });
   }
 
   Future<List<ExpenseCategoryEntity>> getAllExpenseCategories() async {

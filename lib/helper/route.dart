@@ -4,13 +4,10 @@ import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/presentation/expenses/add_expense_category_page.dart';
 import 'package:budgetup_app/presentation/expenses/expenses_page.dart';
-import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
+import 'package:budgetup_app/presentation/transactions/add_expense_txn_page.dart';
 import 'package:budgetup_app/presentation/transactions/expense_txn_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../injection_container.dart';
 
 class RouteGenerator {
   static Route<dynamic>? generateRoute(RouteSettings settings) {
@@ -35,16 +32,22 @@ class RouteGenerator {
         if (args is ExpenseCategory) {
           if (args.id != null) {
             return _navigate(
-              builder: (_) => BlocProvider(
-                create: (context) => getIt<ExpenseTxnBloc>()
-                  ..add(LoadExpenseTxns(categoryId: args.id!)),
-                child: ExpenseTxnPage(
-                  expenseCategory: args,
-                ),
+              builder: (_) => ExpenseTxnPage(
+                expenseCategory: args,
               ),
             );
           }
           return _errorRoute();
+        } else {
+          return _errorRoute();
+        }
+      case RouteStrings.addTransaction:
+        if (args is ExpenseTxnArgs) {
+          return _navigate(
+            builder: (_) => AddExpenseTxnPage(
+              args: args,
+            ),
+          );
         } else {
           return _errorRoute();
         }

@@ -19,3 +19,17 @@ class AddExpenseTxn extends ExpenseTxnEvent {
 
   AddExpenseTxn({required this.expenseCategory, required this.expenseTxn});
 }
+
+//Edit Transaction
+class EditExpenseTxn extends ExpenseTxnEvent {
+  final ExpenseTxn expenseTxn;
+
+  EditExpenseTxn({required this.expenseTxn});
+}
+
+//Remove Transaction
+class RemoveExpenseTxn extends ExpenseTxnEvent {
+  final ExpenseTxn expenseTxn;
+
+  RemoveExpenseTxn({required this.expenseTxn});
+}

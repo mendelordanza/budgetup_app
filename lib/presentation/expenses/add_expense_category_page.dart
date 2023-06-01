@@ -8,8 +8,7 @@ import 'bloc/expense_bloc.dart';
 class AddExpenseCategoryPage extends HookWidget {
   final ExpenseCategory? expenseCategory;
 
-  const AddExpenseCategoryPage({this.expenseCategory, Key? key})
-      : super(key: key);
+  AddExpenseCategoryPage({this.expenseCategory, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +16,16 @@ class AddExpenseCategoryPage extends HookWidget {
         text: expenseCategory != null ? expenseCategory!.title : "");
     final budgetTextController = useTextEditingController(
         text: expenseCategory != null ? "${expenseCategory!.budget}" : "");
+
+    final added = useState<bool>(false);
+
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (added.value) {
+          Navigator.pop(context);
+        }
+      });
+    }, [added.value]);
 
     return Scaffold(
       body: SafeArea(
@@ -52,6 +61,9 @@ class AddExpenseCategoryPage extends HookWidget {
                       .add(AddExpenseCategory(expenseCategory: newCategory));
                 }
                 context.read<ExpenseBloc>().add(LoadExpenseCategories());
+
+                //Pop page
+                added.value = true;
               },
               child: Text(
                 expenseCategory != null ? "Edit" : "Add",
