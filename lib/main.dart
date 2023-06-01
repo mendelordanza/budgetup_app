@@ -28,8 +28,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) =>
-              getIt<ExpenseBloc>()..add(LoadExpenseCategories()),
+          create: (context) => getIt<ExpenseBloc>(),
         ),
         BlocProvider(
           create: (context) => getIt<ExpenseTxnBloc>(),
