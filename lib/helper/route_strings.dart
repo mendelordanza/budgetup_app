@@ -3,4 +3,5 @@ class RouteStrings {
   static const String transactions = '/transactions';
   static const String addTransaction = '/addTransaction';
   static const String addCategory = '/addCategory';
+  static const String recurringBills = '/recurringBills';
 }

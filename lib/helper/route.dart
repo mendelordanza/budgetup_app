@@ -30,14 +30,11 @@ class RouteGenerator {
         }
       case RouteStrings.transactions:
         if (args is ExpenseCategory) {
-          if (args.id != null) {
-            return _navigate(
-              builder: (_) => ExpenseTxnPage(
-                expenseCategory: args,
-              ),
-            );
-          }
-          return _errorRoute();
+          return _navigate(
+            builder: (_) => ExpenseTxnPage(
+              expenseCategory: args,
+            ),
+          );
         } else {
           return _errorRoute();
         }

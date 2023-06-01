@@ -1,5 +1,7 @@
 import 'package:budgetup_app/data/local/entities/expense_category_entity.dart';
 import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
+import 'package:budgetup_app/data/local/entities/recurring_bill_entity.dart';
+import 'package:budgetup_app/data/local/entities/recurring_bill_txn_entity.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -8,6 +10,11 @@ class IsarService {
 
   IsarService() {
     db = openDB();
+  }
+
+  Future<List<ExpenseCategoryEntity>> getAllExpenseCategories() async {
+    final isar = await db;
+    return await isar.expenseCategoryEntitys.where().findAll();
   }
 
   Future<void> saveExpenseCategory(
@@ -56,14 +63,12 @@ class IsarService {
     });
   }
 
-  Future<List<ExpenseCategoryEntity>> getAllExpenseCategories() async {
+  Future<List<ExpenseTxnEntity>> getExpenseTxnFor(int categoryId) async {
     final isar = await db;
-    return await isar.expenseCategoryEntitys.where().findAll();
-  }
-
-  Future<List<ExpenseTxnEntity>> getAllExpenseTxns() async {
-    final isar = await db;
-    return await isar.expenseTxnEntitys.where().findAll();
+    return await isar.expenseTxnEntitys
+        .filter()
+        .category((q) => q.idEqualTo(categoryId))
+        .findAll();
   }
 
   Future<double> getTotal(int categoryId) async {
@@ -76,24 +81,45 @@ class IsarService {
         .sum();
   }
 
+  Future<List<RecurringBillEntity>> getAllRecurringBills() async {
+    final isar = await db;
+    return await isar.recurringBillEntitys.where().findAll();
+  }
+
+  Future<void> addRecurringBill(RecurringBillEntity recurringBillEntity) async {
+    final isar = await db;
+    isar.writeTxnSync<int>(
+        () => isar.recurringBillEntitys.putSync(recurringBillEntity));
+  }
+
+  Future<void> editRecurringBill(ExpenseTxnEntity expenseTxn) async {
+    final isar = await db;
+    isar.writeTxnSync<int>(() => isar.expenseTxnEntitys.putSync(expenseTxn));
+  }
+
+  Future<void> deleteRecurringBill(int txnId) async {
+    final isar = await db;
+    await isar.writeTxn(() async {
+      final success = await isar.expenseTxnEntitys.delete(txnId);
+      print('deleted: $success');
+    });
+  }
+
   Future<void> cleanDb() async {
     final isar = await db;
     await isar.writeTxn(() => isar.clear());
-  }
-
-  Future<List<ExpenseTxnEntity>> getExpenseTxnFor(int categoryId) async {
-    final isar = await db;
-    return await isar.expenseTxnEntitys
-        .filter()
-        .category((q) => q.idEqualTo(categoryId))
-        .findAll();
   }
 
   Future<Isar> openDB() async {
     if (Isar.instanceNames.isEmpty) {
       final dir = await getApplicationDocumentsDirectory();
       return await Isar.open(
-        [ExpenseCategoryEntitySchema, ExpenseTxnEntitySchema],
+        [
+          ExpenseCategoryEntitySchema,
+          ExpenseTxnEntitySchema,
+          RecurringBillEntitySchema,
+          RecurringBillTxnEntitySchema,
+        ],
         inspector: true,
         directory: dir.path,
       );

@@ -1,4 +1,3 @@
-import 'package:budgetup_app/data/local/entities/expense_category_entity.dart';
 import 'package:equatable/equatable.dart';
 
 import 'expense_category.dart';
