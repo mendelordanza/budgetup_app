@@ -26,9 +26,9 @@ class RecurringBillsPage extends HookWidget {
                 Spacer(),
                 TextButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, RouteStrings.addCategory);
+                    Navigator.pushNamed(context, RouteStrings.addRecurringBill);
                   },
-                  child: Text("Add Category"),
+                  child: Text("Add Recurring Bill"),
                 ),
               ],
             ),
@@ -51,26 +51,34 @@ class RecurringBillsPage extends HookWidget {
                             onTap: () {
                               Navigator.pushNamed(
                                 context,
-                                RouteStrings.transactions,
+                                RouteStrings.addRecurringBill,
                                 arguments: item,
                               );
                             },
                             child: Column(
                               children: [
                                 Checkbox(
-                                  value: txn != null ? txn.isPaid : false,
-                                  onChanged: (value) {
-                                    //When user tick, add a recurring bill txn
-                                    final newRecurringTxn = RecurringBillTxn(
-                                      isPaid: value ?? false,
-                                      datePaid: DateTime.now(),
-                                    );
-                                    context.read<RecurringBillBloc>().add(
-                                          AddRecurringBillTxn(
-                                            recurringBill: item,
-                                            recurringBillTxn: newRecurringTxn,
-                                          ),
-                                        );
+                                  value: txn != null ? true : false,
+                                  onChanged: (checked) async {
+                                    if (txn != null) {
+                                      context.read<RecurringBillBloc>().add(
+                                            RemoveRecurringBillTxn(
+                                              recurringBill: item,
+                                              recurringBillTxn: txn,
+                                            ),
+                                          );
+                                    } else {
+                                      final newRecurringTxn = RecurringBillTxn(
+                                        isPaid: checked ?? false,
+                                        datePaid: DateTime.now(),
+                                      );
+                                      context.read<RecurringBillBloc>().add(
+                                            AddRecurringBillTxn(
+                                              recurringBill: item,
+                                              recurringBillTxn: newRecurringTxn,
+                                            ),
+                                          );
+                                    }
                                   },
                                 ),
                                 Text(item.title ?? "hello"),

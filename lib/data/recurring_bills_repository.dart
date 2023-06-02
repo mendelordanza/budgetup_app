@@ -2,6 +2,7 @@ import 'package:budgetup_app/data/local/entities/recurring_bill_entity.dart';
 import 'package:budgetup_app/data/local/entities/recurring_bill_txn_entity.dart';
 import 'package:budgetup_app/domain/recurring_bill.dart';
 import 'package:budgetup_app/domain/recurring_bill_txn.dart';
+import 'package:isar/isar.dart';
 
 import 'local/isar_service.dart';
 
@@ -19,6 +20,19 @@ class RecurringBillsRepository {
     }).toList();
   }
 
+  Future<void> saveRecurringBill(
+    RecurringBill recurringBill,
+  ) async {
+    final newRecurringBill = RecurringBillEntity()
+      ..id = recurringBill.id != null ? recurringBill.id! : Isar.autoIncrement
+      ..title = recurringBill.title
+      ..amount = recurringBill.amount
+      ..reminderDate = recurringBill.reminderDate
+      ..createdAt = recurringBill.createdAt
+      ..updatedAt = recurringBill.updatedAt;
+    _isarService.saveRecurringBill(newRecurringBill);
+  }
+
   Future<void> addRecurringBillTxn(
     RecurringBill recurringBill,
     RecurringBillTxn recurringBillTxn,
@@ -31,10 +45,19 @@ class RecurringBillsRepository {
       ..id = recurringBill.id!
       ..title = recurringBill.title
       ..amount = recurringBill.amount
+      ..reminderDate = recurringBill.reminderDate
       ..recurringBillTxns.add(txnObject)
       ..createdAt = recurringBill.createdAt
       ..updatedAt = DateTime.now();
 
-    _isarService.addRecurringBill(newRecurringBill);
+    _isarService.saveRecurringBill(newRecurringBill);
+  }
+
+  Future<void> deleteRecurringBillTxn(
+    RecurringBillTxn recurringBillTxn,
+  ) async {
+    if (recurringBillTxn.id != null) {
+      _isarService.deleteRecurringBillTxn(recurringBillTxn.id!);
+    }
   }
 }

@@ -11,16 +11,6 @@ class AddRecurringBill extends RecurringBillEvent {
   AddRecurringBill({required this.recurringBill});
 }
 
-class AddRecurringBillTxn extends RecurringBillEvent {
-  final RecurringBill recurringBill;
-  final RecurringBillTxn recurringBillTxn;
-
-  AddRecurringBillTxn({
-    required this.recurringBill,
-    required this.recurringBillTxn,
-  });
-}
-
 class EditRecurringBill extends RecurringBillEvent {
   final RecurringBill recurringBill;
 
@@ -31,4 +21,24 @@ class RemoveRecurringBill extends RecurringBillEvent {
   final RecurringBill recurringBill;
 
   RemoveRecurringBill({required this.recurringBill});
+}
+
+class AddRecurringBillTxn extends RecurringBillEvent {
+  final RecurringBill recurringBill;
+  final RecurringBillTxn recurringBillTxn;
+
+  AddRecurringBillTxn({
+    required this.recurringBill,
+    required this.recurringBillTxn,
+  });
+}
+
+class RemoveRecurringBillTxn extends RecurringBillEvent {
+  final RecurringBill recurringBill;
+  final RecurringBillTxn recurringBillTxn;
+
+  RemoveRecurringBillTxn({
+    required this.recurringBill,
+    required this.recurringBillTxn,
+  });
 }

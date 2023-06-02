@@ -86,21 +86,17 @@ class IsarService {
     return await isar.recurringBillEntitys.where().findAll();
   }
 
-  Future<void> addRecurringBill(RecurringBillEntity recurringBillEntity) async {
+  Future<void> saveRecurringBill(
+      RecurringBillEntity recurringBillEntity) async {
     final isar = await db;
     isar.writeTxnSync<int>(
         () => isar.recurringBillEntitys.putSync(recurringBillEntity));
   }
 
-  Future<void> editRecurringBill(ExpenseTxnEntity expenseTxn) async {
-    final isar = await db;
-    isar.writeTxnSync<int>(() => isar.expenseTxnEntitys.putSync(expenseTxn));
-  }
-
-  Future<void> deleteRecurringBill(int txnId) async {
+  Future<void> deleteRecurringBillTxn(int txnId) async {
     final isar = await db;
     await isar.writeTxn(() async {
-      final success = await isar.expenseTxnEntitys.delete(txnId);
+      final success = await isar.recurringBillTxnEntitys.delete(txnId);
       print('deleted: $success');
     });
   }

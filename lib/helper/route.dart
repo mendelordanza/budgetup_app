@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:budgetup_app/domain/expense_category.dart';
+import 'package:budgetup_app/domain/recurring_bill.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/presentation/expenses/add_expense_category_page.dart';
 import 'package:budgetup_app/presentation/home_page.dart';
+import 'package:budgetup_app/presentation/recurring/add_recurring_bill_page.dart';
 import 'package:budgetup_app/presentation/transactions/add_expense_txn_page.dart';
 import 'package:budgetup_app/presentation/transactions/expense_txn_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -43,6 +45,16 @@ class RouteGenerator {
           return _navigate(
             builder: (_) => AddExpenseTxnPage(
               args: args,
+            ),
+          );
+        } else {
+          return _errorRoute();
+        }
+      case RouteStrings.addRecurringBill:
+        if (args is RecurringBill?) {
+          return _navigate(
+            builder: (_) => AddRecurringBillPage(
+              recurringBill: args,
             ),
           );
         } else {

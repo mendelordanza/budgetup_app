@@ -28,13 +28,18 @@ const RecurringBillEntitySchema = CollectionSchema(
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
-    r'title': PropertySchema(
+    r'reminderDate': PropertySchema(
       id: 2,
+      name: r'reminderDate',
+      type: IsarType.dateTime,
+    ),
+    r'title': PropertySchema(
+      id: 3,
       name: r'title',
       type: IsarType.string,
     ),
     r'updatedAt': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -83,8 +88,9 @@ void _recurringBillEntitySerialize(
 ) {
   writer.writeDouble(offsets[0], object.amount);
   writer.writeDateTime(offsets[1], object.createdAt);
-  writer.writeString(offsets[2], object.title);
-  writer.writeDateTime(offsets[3], object.updatedAt);
+  writer.writeDateTime(offsets[2], object.reminderDate);
+  writer.writeString(offsets[3], object.title);
+  writer.writeDateTime(offsets[4], object.updatedAt);
 }
 
 RecurringBillEntity _recurringBillEntityDeserialize(
@@ -97,8 +103,9 @@ RecurringBillEntity _recurringBillEntityDeserialize(
   object.amount = reader.readDoubleOrNull(offsets[0]);
   object.createdAt = reader.readDateTimeOrNull(offsets[1]);
   object.id = id;
-  object.title = reader.readStringOrNull(offsets[2]);
-  object.updatedAt = reader.readDateTimeOrNull(offsets[3]);
+  object.reminderDate = reader.readDateTimeOrNull(offsets[2]);
+  object.title = reader.readStringOrNull(offsets[3]);
+  object.updatedAt = reader.readDateTimeOrNull(offsets[4]);
   return object;
 }
 
@@ -114,8 +121,10 @@ P _recurringBillEntityDeserializeProp<P>(
     case 1:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 2:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 3:
+      return (reader.readStringOrNull(offset)) as P;
+    case 4:
       return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -426,6 +435,80 @@ extension RecurringBillEntityQueryFilter on QueryBuilder<RecurringBillEntity,
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'id',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      reminderDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'reminderDate',
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      reminderDateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'reminderDate',
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      reminderDateEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'reminderDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      reminderDateGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'reminderDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      reminderDateLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'reminderDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      reminderDateBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'reminderDate',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -762,6 +845,20 @@ extension RecurringBillEntityQuerySortBy
   }
 
   QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      sortByReminderDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reminderDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      sortByReminderDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reminderDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
       sortByTitle() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.asc);
@@ -835,6 +932,20 @@ extension RecurringBillEntityQuerySortThenBy
   }
 
   QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      thenByReminderDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reminderDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      thenByReminderDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reminderDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
       thenByTitle() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.asc);
@@ -880,6 +991,13 @@ extension RecurringBillEntityQueryWhereDistinct
   }
 
   QueryBuilder<RecurringBillEntity, RecurringBillEntity, QDistinct>
+      distinctByReminderDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'reminderDate');
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QDistinct>
       distinctByTitle({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'title', caseSensitive: caseSensitive);
@@ -913,6 +1031,13 @@ extension RecurringBillEntityQueryProperty
       createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, DateTime?, QQueryOperations>
+      reminderDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'reminderDate');
     });
   }
 

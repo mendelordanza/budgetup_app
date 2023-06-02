@@ -19,6 +19,32 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
       final recurringBills = await recurringBillsRepo.getRecurringBills();
       emit(RecurringBillsLoaded(recurringBills: recurringBills));
     });
+    on<AddRecurringBill>((event, emit) async {
+      if (state is RecurringBillsLoaded) {
+        recurringBillsRepo.saveRecurringBill(event.recurringBill);
+
+        final recurringBills = await recurringBillsRepo.getRecurringBills();
+
+        emit(
+          RecurringBillsLoaded(
+            recurringBills: recurringBills,
+          ),
+        );
+      }
+    });
+    on<EditRecurringBill>((event, emit) async {
+      if (state is RecurringBillsLoaded) {
+        recurringBillsRepo.saveRecurringBill(event.recurringBill);
+
+        final recurringBills = await recurringBillsRepo.getRecurringBills();
+
+        emit(
+          RecurringBillsLoaded(
+            recurringBills: recurringBills,
+          ),
+        );
+      }
+    });
     on<AddRecurringBillTxn>((event, emit) async {
       if (state is RecurringBillsLoaded) {
         recurringBillsRepo.addRecurringBillTxn(
@@ -26,9 +52,27 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
 
         final recurringBills = await recurringBillsRepo.getRecurringBills();
 
+        emit(RecurringBillsLoaded(recurringBills: recurringBills));
+      }
+    });
+    on<RemoveRecurringBillTxn>((event, emit) async {
+      if (state is RecurringBillsLoaded) {
+        final currentState = state as RecurringBillsLoaded;
+
+        recurringBillsRepo.deleteRecurringBillTxn(event.recurringBillTxn);
+
+        final index = currentState.recurringBills
+            .indexWhere((element) => element.id == event.recurringBill.id);
+
+        final newRecurringBill = event.recurringBill.copy(
+            recurringBillTxns: event.recurringBill.recurringBillTxns
+              ?..removeWhere(
+                  (element) => element.id == event.recurringBillTxn.id));
+        currentState.recurringBills[index] = newRecurringBill;
+
         emit(
           RecurringBillsLoaded(
-            recurringBills: recurringBills,
+            recurringBills: List.from(currentState.recurringBills),
           ),
         );
       }

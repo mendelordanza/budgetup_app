@@ -9,6 +9,7 @@ class RecurringBillEntity {
 
   String? title;
   double? amount;
+  DateTime? reminderDate;
   DateTime? createdAt;
   DateTime? updatedAt;
   final recurringBillTxns = IsarLinks<RecurringBillTxnEntity>();
@@ -18,6 +19,7 @@ class RecurringBillEntity {
       'id': id,
       'title': title,
       'amount': amount,
+      'reminderDate': reminderDate,
       'recurringBillTxns': recurringBillTxns,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
