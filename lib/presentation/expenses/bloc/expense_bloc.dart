@@ -1,4 +1,3 @@
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../data/expenses_repository.dart';
@@ -15,7 +14,8 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     required this.expensesRepository,
   }) : super(ExpenseCategoryInitial()) {
     on<LoadExpenseCategories>((event, emit) async {
-      final categories = await expensesRepository.getExpenseCategories();
+      final categories =
+          await expensesRepository.getExpenseCategories(event.selectedDate);
 
       emit(ExpenseCategoryLoaded(
         expenseCategories: categories,

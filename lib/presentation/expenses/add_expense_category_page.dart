@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../domain/expense_category.dart';
+import '../../helper/shared_prefs.dart';
+import '../../injection_container.dart';
 import 'bloc/expense_bloc.dart';
 
 class AddExpenseCategoryPage extends HookWidget {
@@ -12,6 +14,8 @@ class AddExpenseCategoryPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sharedPrefs = getIt<SharedPrefs>();
+    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
     final titleTextController = useTextEditingController(
         text: expenseCategory != null ? expenseCategory!.title : "");
     final budgetTextController = useTextEditingController(
@@ -60,7 +64,9 @@ class AddExpenseCategoryPage extends HookWidget {
                       .read<ExpenseBloc>()
                       .add(AddExpenseCategory(expenseCategory: newCategory));
                 }
-                context.read<ExpenseBloc>().add(LoadExpenseCategories());
+                context
+                    .read<ExpenseBloc>()
+                    .add(LoadExpenseCategories(currentSelectedDate));
 
                 //Pop page
                 added.value = true;

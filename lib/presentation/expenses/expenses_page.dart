@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
+import '../../helper/shared_prefs.dart';
+import '../../injection_container.dart';
 import '../custom/custom_floating_button.dart';
 import 'bloc/expense_bloc.dart';
 
@@ -11,8 +13,12 @@ class ExpensesPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sharedPrefs = getIt<SharedPrefs>();
+    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
     useEffect(() {
-      context.read<ExpenseBloc>().add(LoadExpenseCategories());
+      context
+          .read<ExpenseBloc>()
+          .add(LoadExpenseCategories(currentSelectedDate));
     }, []);
 
     return Scaffold(

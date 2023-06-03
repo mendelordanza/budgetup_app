@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
+import '../../helper/shared_prefs.dart';
+import '../../injection_container.dart';
+
 class ExpenseTxnArgs {
   final ExpenseCategory expenseCategory;
   final ExpenseTxn? expenseTxn;
@@ -20,6 +23,8 @@ class AddExpenseTxnPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sharedPrefs = getIt<SharedPrefs>();
+    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
     final notesTextController = useTextEditingController(
         text: args.expenseTxn != null ? args.expenseTxn!.notes : "");
     final amountTextController = useTextEditingController(
@@ -31,7 +36,9 @@ class AddExpenseTxnPage extends HookWidget {
         context
             .read<ExpenseTxnBloc>()
             .add(LoadExpenseTxns(categoryId: args.expenseCategory.id!));
-        context.read<ExpenseBloc>().add(LoadExpenseCategories());
+        context
+            .read<ExpenseBloc>()
+            .add(LoadExpenseCategories(currentSelectedDate));
       }
     }, [added.value]);
 
