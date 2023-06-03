@@ -2,13 +2,13 @@ import 'package:budgetup_app/presentation/expenses/expenses_page.dart';
 import 'package:budgetup_app/presentation/recurring/recurring_bills_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../helper/colors.dart';
+import 'date_bottom_sheet.dart';
 
 class HomePage extends HookWidget {
   HomePage({Key? key}) : super(key: key);
-
-  final tabs = ["Expenses", "Recurring Bills"];
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +26,12 @@ class HomePage extends HookWidget {
         title: Text("BudgetUp"),
         elevation: 0,
         backgroundColor: Colors.transparent,
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Iconsax.setting),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -33,14 +39,25 @@ class HomePage extends HookWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text("This Month"),
-              SizedBox(
-                height: 8,
+              TextButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    backgroundColor: Colors.transparent,
+                    context: context,
+                    builder: (context) {
+                      return DateBottomSheet();
+                    },
+                  );
+                },
+                child: Text(
+                  "This Month",
+                ),
               ),
               Material(
                 shape: ContinuousRectangleBorder(
-                  borderRadius: BorderRadius.circular(28.0),
+                  borderRadius: BorderRadius.circular(40.0),
                 ),
+                color: Theme.of(context).cardColor,
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
@@ -66,30 +83,57 @@ class HomePage extends HookWidget {
               SizedBox(
                 height: 32.0,
               ),
-              // Tabs(
-              //   tabController: tabController,
-              //   tabs: [
-              //     "Expenses",
-              //     "Recurring Bills"
-              //   ],
-              // ),
-              TabBar(
-                controller: tabController,
-                tabs: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: Text("Expenses"),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: Text("Recurring Bills"),
-                  ),
-                ],
-                unselectedLabelColor:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                indicator: BoxDecoration(
+              Container(
+                height: 45,
+                decoration: BoxDecoration(
+                  color: Color(0xFFB7B7B7),
                   borderRadius: BorderRadius.circular(30.0),
-                  color: Theme.of(context).primaryColor,
+                ),
+                child: TabBar(
+                  controller: tabController,
+                  tabs: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Iconsax.money_send,
+                          size: 18,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          " Expenses",
+                          style: TextStyle(
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Iconsax.money_send,
+                          size: 18,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          "Recurring",
+                          style: TextStyle(
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  unselectedLabelColor: Colors.white,
+                  indicator: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30.0),
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
               ),
               SizedBox(

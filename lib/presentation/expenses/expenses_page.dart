@@ -2,8 +2,8 @@ import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:iconsax/iconsax.dart';
 
+import '../custom/custom_floating_button.dart';
 import 'bloc/expense_bloc.dart';
 
 class ExpensesPage extends HookWidget {
@@ -104,18 +104,8 @@ class ExpensesPage extends HookWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        elevation: 0,
-        onPressed: () {
-          //TODO Add transaction with category dropdown
-        },
-        shape: ContinuousRectangleBorder(
-          borderRadius: BorderRadius.circular(40.0),
-        ),
-        child: Icon(
-          Iconsax.add,
-          color: Colors.white,
-        ),
+      floatingActionButton: CustomFloatingButton(
+        onPressed: () {},
       ),
     );
   }

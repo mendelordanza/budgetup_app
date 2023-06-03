@@ -33,6 +33,12 @@ class RecurringBillsRepository {
     _isarService.saveRecurringBill(newRecurringBill);
   }
 
+  Future<void> deleteRecurringBill(int recurringBillId) async {
+    _isarService.deleteAllRecurringBillTxns(recurringBillId).then((value) {
+      _isarService.deleteRecurringBill(recurringBillId);
+    });
+  }
+
   Future<void> addRecurringBillTxn(
     RecurringBill recurringBill,
     RecurringBillTxn recurringBillTxn,

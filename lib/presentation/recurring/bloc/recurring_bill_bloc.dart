@@ -45,6 +45,21 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
         );
       }
     });
+    on<RemoveRecurringBill>((event, emit) async {
+      if (state is RecurringBillsLoaded) {
+        final state = this.state as RecurringBillsLoaded;
+
+        if (event.recurringBill.id != null) {
+          recurringBillsRepo.deleteRecurringBill(event.recurringBill.id!);
+          emit(
+            RecurringBillsLoaded(
+              recurringBills: List.from(state.recurringBills)
+                ..remove(event.recurringBill),
+            ),
+          );
+        }
+      }
+    });
     on<AddRecurringBillTxn>((event, emit) async {
       if (state is RecurringBillsLoaded) {
         recurringBillsRepo.addRecurringBillTxn(

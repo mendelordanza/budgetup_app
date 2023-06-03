@@ -3,7 +3,6 @@ import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:collection/collection.dart';
 
 import '../../domain/recurring_bill_txn.dart';
@@ -55,7 +54,7 @@ class RecurringBillsPage extends HookWidget {
                                 arguments: item,
                               );
                             },
-                            child: Column(
+                            child: Row(
                               children: [
                                 Checkbox(
                                   value: txn != null ? true : false,
@@ -81,8 +80,16 @@ class RecurringBillsPage extends HookWidget {
                                     }
                                   },
                                 ),
-                                Text(item.title ?? "hello"),
-                                Text("${item.amount}")
+                                Expanded(child: Text(item.title ?? "hello")),
+                                Text("${item.amount}"),
+                                IconButton(
+                                  onPressed: () {
+                                    context.read<RecurringBillBloc>().add(
+                                        RemoveRecurringBill(
+                                            recurringBill: item));
+                                  },
+                                  icon: Icon(Icons.delete),
+                                ),
                               ],
                             ),
                           );
@@ -99,19 +106,6 @@ class RecurringBillsPage extends HookWidget {
               ),
             ),
           ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        elevation: 0,
-        onPressed: () {
-          //TODO Add transaction with category dropdown
-        },
-        shape: ContinuousRectangleBorder(
-          borderRadius: BorderRadius.circular(40.0),
-        ),
-        child: Icon(
-          Iconsax.add,
-          color: Colors.white,
         ),
       ),
     );
