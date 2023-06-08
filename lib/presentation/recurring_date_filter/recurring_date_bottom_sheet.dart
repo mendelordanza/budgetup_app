@@ -2,7 +2,7 @@ import 'package:budgetup_app/helper/colors.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/date_filter/bloc/date_filter_bloc.dart';
-import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
+import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -10,26 +10,15 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../helper/date_helper.dart';
+import 'bloc/recurring_date_filter_bloc.dart';
 
-class DateBottomSheet extends HookWidget {
-  DateBottomSheet({Key? key}) : super(key: key);
+class RecurringDateBottomSheet extends HookWidget {
+  RecurringDateBottomSheet({Key? key}) : super(key: key);
 
   final types = [
     DateSelection(
-      "Daily",
-      DateFilterType.daily,
-    ),
-    DateSelection(
-      "Weekly",
-      DateFilterType.weekly,
-    ),
-    DateSelection(
       "Monthly",
       DateFilterType.monthly,
-    ),
-    DateSelection(
-      "Yearly",
-      DateFilterType.yearly,
     ),
   ];
 
@@ -38,10 +27,10 @@ class DateBottomSheet extends HookWidget {
     final sharedPrefs = getIt<SharedPrefs>();
 
     final _selectedFilterType = useState<DateFilterType>(
-        enumFromString(sharedPrefs.getSelectedDateFilterType()));
+        enumFromString(sharedPrefs.getRecurringSelectedDateFilterType()));
     final _selectedDate = useState<DateTime>(
-      sharedPrefs.getExpenseSelectedDate().isNotEmpty
-          ? DateTime.parse(sharedPrefs.getExpenseSelectedDate())
+      sharedPrefs.getRecurringSelectedDate().isNotEmpty
+          ? DateTime.parse(sharedPrefs.getRecurringSelectedDate())
           : DateTime.now(),
     );
 
@@ -69,11 +58,12 @@ class DateBottomSheet extends HookWidget {
                           isSelected: _selectedFilterType.value == element.type,
                           onSelect: () {
                             _selectedFilterType.value = element.type;
-                            context.read<DateFilterBloc>().add(
-                                SelectDate(element.type, _selectedDate.value));
+                            context.read<RecurringDateFilterBloc>().add(
+                                RecurringSelectDate(
+                                    element.type, _selectedDate.value));
                             context
-                                .read<ExpenseBloc>()
-                                .add(LoadExpenseCategories());
+                                .read<RecurringBillBloc>()
+                                .add(LoadRecurringBills());
                           },
                         );
                       }).toList(),
@@ -102,11 +92,11 @@ class DateBottomSheet extends HookWidget {
                       },
                       onDaySelected: (selectedDay, focusedDay) {
                         _selectedDate.value = selectedDay;
-                        context.read<DateFilterBloc>().add(
-                            SelectDate(_selectedFilterType.value, selectedDay));
+                        context.read<RecurringDateFilterBloc>().add(
+                            RecurringSelectDate(_selectedFilterType.value, selectedDay));
                         context
-                            .read<ExpenseBloc>()
-                            .add(LoadExpenseCategories());
+                            .read<RecurringBillBloc>()
+                            .add(LoadRecurringBills());
                       },
                       startingDayOfWeek: StartingDayOfWeek.monday,
                       calendarBuilders: CalendarBuilders(

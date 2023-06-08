@@ -14,9 +14,7 @@ class IsarService {
 
   Future<List<ExpenseCategoryEntity>> getAllExpenseCategories() async {
     final isar = await db;
-    final list = await isar.expenseCategoryEntitys
-        .where()
-        .findAll();
+    final list = await isar.expenseCategoryEntitys.where().findAll();
     return list;
   }
 
@@ -87,6 +85,16 @@ class IsarService {
   Future<List<RecurringBillEntity>> getAllRecurringBills() async {
     final isar = await db;
     return await isar.recurringBillEntitys.where().findAll();
+  }
+
+  Future<List<RecurringBillEntity>> getPaidRecurringBills(
+      DateTime datePaid) async {
+    final isar = await db;
+    return await isar.recurringBillEntitys
+        .where()
+        .filter()
+        .recurringBillTxns((q) => q.datePaidLessThan(datePaid))
+        .findAll();
   }
 
   Future<void> saveRecurringBill(

@@ -1,7 +1,5 @@
 import 'package:intl/intl.dart';
 
-import '../presentation/date_filter/date_bottom_sheet.dart';
-
 removeTimeFromDate(DateTime date) {
   return DateTime(date.year, date.month, date.day);
 }
@@ -56,7 +54,7 @@ String getMonthText(DateFilterType dateFilterType, DateTime date) {
       if (date.month == DateTime.now().month) {
         return "This month";
       } else {
-        return getMonthFromDate(date);
+        return "${formatDate(date, 'MMMM yyyy')}";
       }
     case DateFilterType.yearly:
       if (date.year == DateTime.now().year) {
@@ -65,4 +63,23 @@ String getMonthText(DateFilterType dateFilterType, DateTime date) {
         return getYearFromDate(date);
       }
   }
+}
+
+enum DateFilterType {
+  daily,
+  weekly,
+  monthly,
+  yearly,
+}
+
+class DateSelection {
+  final String label;
+  final DateFilterType type;
+
+  DateSelection(this.label, this.type);
+}
+
+DateFilterType enumFromString(String value) {
+  return DateFilterType.values
+      .firstWhere((e) => e.toString().split('.').last == value);
 }

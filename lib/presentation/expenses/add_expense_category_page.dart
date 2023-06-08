@@ -8,6 +8,7 @@ import 'bloc/expense_bloc.dart';
 
 class AddExpenseCategoryPage extends HookWidget {
   final ExpenseCategory? expenseCategory;
+  final _formKey = GlobalKey<FormState>();
 
   AddExpenseCategoryPage({this.expenseCategory, Key? key}) : super(key: key);
 
@@ -32,41 +33,60 @@ class AddExpenseCategoryPage extends HookWidget {
       body: SafeArea(
         child: Column(
           children: [
-            TextField(
-              controller: titleTextController,
-            ),
-            TextField(
-              controller: budgetTextController,
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: titleTextController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: budgetTextController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
             ),
             ElevatedButton(
               onPressed: () {
-                if (expenseCategory != null) {
-                  //Edit
-                  final editedCategory = expenseCategory!.copy(
-                    title: titleTextController.text,
-                    budget: double.parse(budgetTextController.text),
-                    updatedAt: removeTimeFromDate(DateTime.now()),
-                  );
-                  context.read<ExpenseBloc>().add(
-                      EditExpenseCategory(expenseCategory: editedCategory));
-                } else {
-                  //Add
-                  final newCategory = ExpenseCategory(
-                    title: titleTextController.text,
-                    budget: double.parse(budgetTextController.text),
-                    createdAt: removeTimeFromDate(DateTime.now()),
-                    updatedAt: removeTimeFromDate(DateTime.now()),
-                  );
-                  context
-                      .read<ExpenseBloc>()
-                      .add(AddExpenseCategory(expenseCategory: newCategory));
-                }
-                context
-                    .read<ExpenseBloc>()
-                    .add(LoadExpenseCategories());
+                if (_formKey.currentState!.validate()) {
+                  if (expenseCategory != null) {
+                    //Edit
+                    final editedCategory = expenseCategory!.copy(
+                      title: titleTextController.text,
+                      budget: double.parse(budgetTextController.text),
+                      updatedAt: removeTimeFromDate(DateTime.now()),
+                    );
+                    context.read<ExpenseBloc>().add(
+                        EditExpenseCategory(expenseCategory: editedCategory));
+                  } else {
+                    //Add
+                    final newCategory = ExpenseCategory(
+                      title: titleTextController.text,
+                      budget: double.parse(budgetTextController.text),
+                      createdAt: removeTimeFromDate(DateTime.now()),
+                      updatedAt: removeTimeFromDate(DateTime.now()),
+                    );
+                    context
+                        .read<ExpenseBloc>()
+                        .add(AddExpenseCategory(expenseCategory: newCategory));
+                  }
+                  context.read<ExpenseBloc>().add(LoadExpenseCategories());
 
-                //Pop page
-                added.value = true;
+                  //Pop page
+                  added.value = true;
+                }
               },
               child: Text(
                 expenseCategory != null ? "Edit" : "Add",

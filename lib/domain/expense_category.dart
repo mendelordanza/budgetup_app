@@ -1,7 +1,6 @@
 import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
 import 'package:budgetup_app/domain/expense_txn.dart';
 import 'package:budgetup_app/helper/date_helper.dart';
-import 'package:budgetup_app/presentation/date_filter/date_bottom_sheet.dart';
 import 'package:equatable/equatable.dart';
 
 import '../data/local/entities/expense_category_entity.dart';
@@ -32,25 +31,25 @@ class ExpenseCategory extends Equatable {
     switch (dateFilterType) {
       case DateFilterType.daily:
         filteredList = expenseTransactions?.where((element) {
-          return removeTimeFromDate(element.createdAt!) ==
+          return removeTimeFromDate(element.updatedAt!) ==
               removeTimeFromDate(selectedDate);
         }).toList();
         break;
       case DateFilterType.weekly:
         filteredList = expenseTransactions?.where((element) {
-          return element.createdAt!.isAfter(getStartDate(selectedDate)) &&
-              element.createdAt!.isBefore(getEndDate(selectedDate));
+          return element.updatedAt!.isAfter(getStartDate(selectedDate)) &&
+              element.updatedAt!.isBefore(getEndDate(selectedDate));
         }).toList();
         break;
       case DateFilterType.monthly:
         filteredList = expenseTransactions?.where((element) {
-          return getMonthFromDate(element.createdAt!) ==
+          return getMonthFromDate(element.updatedAt!) ==
               getMonthFromDate(selectedDate);
         }).toList();
         break;
       case DateFilterType.yearly:
         filteredList = expenseTransactions?.where((element) {
-          return getYearFromDate(element.createdAt!) ==
+          return getYearFromDate(element.updatedAt!) ==
               getYearFromDate(selectedDate);
         }).toList();
         break;

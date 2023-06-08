@@ -20,6 +20,13 @@ class RecurringBillsRepository {
     }).toList();
   }
 
+  Future<List<RecurringBill>> getPaidRecurringBills(DateTime datePaid) async {
+    final objects = await _isarService.getPaidRecurringBills(datePaid);
+    return objects.map((category) {
+      return RecurringBill.fromJson(category.toJson());
+    }).toList();
+  }
+
   Future<void> saveRecurringBill(
     RecurringBill recurringBill,
   ) async {

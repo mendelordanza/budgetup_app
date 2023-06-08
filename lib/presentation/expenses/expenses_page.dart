@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
+import '../../helper/colors.dart';
+import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
-import '../custom/custom_floating_button.dart';
+import '../date_filter/date_bottom_sheet.dart';
 import 'bloc/expense_bloc.dart';
 
 class ExpensesPage extends HookWidget {
@@ -15,6 +17,11 @@ class ExpensesPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sharedPrefs = getIt<SharedPrefs>();
+    final currentSelectedDate =
+        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
+    final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
+
     useEffect(() {
       context.read<ExpenseBloc>().add(LoadExpenseCategories());
     }, []);
@@ -22,7 +29,57 @@ class ExpensesPage extends HookWidget {
     return Scaffold(
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            TextButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  backgroundColor: Colors.transparent,
+                  context: context,
+                  builder: (context) {
+                    return DateBottomSheet();
+                  },
+                );
+              },
+              child: BlocBuilder<DateFilterBloc, DateFilterState>(
+                builder: (context, state) {
+                  if (state is DateFilterSelected) {
+                    return Text(
+                        getMonthText(state.dateFilterType, state.selectedDate));
+                  }
+                  return Text(getMonthText(
+                      enumFromString(currentDateFilterType),
+                      currentSelectedDate));
+                },
+              ),
+            ),
+            Material(
+              shape: ContinuousRectangleBorder(
+                borderRadius: BorderRadius.circular(40.0),
+              ),
+              color: Theme.of(context).cardColor,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Total Expenses"),
+                    Text("PHP 1,000.00"),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 4.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: red.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: Text("PHP 30.00 higher than last month"),
+                    )
+                  ],
+                ),
+              ),
+            ),
             Row(
               children: [
                 Spacer(),
@@ -62,9 +119,6 @@ class ExpensesPage extends HookWidget {
           ],
         ),
       ),
-      floatingActionButton: CustomFloatingButton(
-        onPressed: () {},
-      ),
     );
   }
 
@@ -73,7 +127,8 @@ class ExpensesPage extends HookWidget {
     ExpenseCategory item,
   ) {
     final sharedPrefs = getIt<SharedPrefs>();
-    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
+    final currentSelectedDate =
+        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
     final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
 
     return GestureDetector(

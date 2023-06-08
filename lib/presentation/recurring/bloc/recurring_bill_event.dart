@@ -5,6 +5,8 @@ abstract class RecurringBillEvent {}
 
 class LoadRecurringBills extends RecurringBillEvent {}
 
+class LoadPaidRecurringBills extends RecurringBillEvent {}
+
 class AddRecurringBill extends RecurringBillEvent {
   final RecurringBill recurringBill;
 
