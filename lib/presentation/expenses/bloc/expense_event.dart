@@ -5,11 +5,7 @@ abstract class ExpenseEvent {
 }
 
 //Load Categories
-class LoadExpenseCategories extends ExpenseEvent {
-  final DateTime selectedDate;
-
-  LoadExpenseCategories(this.selectedDate);
-}
+class LoadExpenseCategories extends ExpenseEvent {}
 
 //Add Expense Category
 class AddExpenseCategory extends ExpenseEvent {

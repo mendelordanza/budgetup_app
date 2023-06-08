@@ -12,11 +12,12 @@ class IsarService {
     db = openDB();
   }
 
-  Future<List<ExpenseCategoryEntity>> getAllExpenseCategories(
-      DateTime selectedDate) async {
-    print(selectedDate);
+  Future<List<ExpenseCategoryEntity>> getAllExpenseCategories() async {
     final isar = await db;
-    return await isar.expenseCategoryEntitys.where().findAll();
+    final list = await isar.expenseCategoryEntitys
+        .where()
+        .findAll();
+    return list;
   }
 
   Future<void> saveExpenseCategory(

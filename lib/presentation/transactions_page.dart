@@ -1,17 +1,25 @@
+import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:budgetup_app/presentation/expenses/expenses_page.dart';
 import 'package:budgetup_app/presentation/recurring/recurring_bills_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../helper/colors.dart';
+import '../helper/shared_prefs.dart';
+import '../injection_container.dart';
+import 'date_filter/bloc/date_filter_bloc.dart';
 import 'date_filter/date_bottom_sheet.dart';
 
-class HomePage extends HookWidget {
-  HomePage({Key? key}) : super(key: key);
+class TransactionsPage extends HookWidget {
+  TransactionsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final sharedPrefs = getIt<SharedPrefs>();
+    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
+    final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
     final tabController = useTabController(initialLength: 2);
     final _currentIndex = useState<int>(0);
 
@@ -49,8 +57,15 @@ class HomePage extends HookWidget {
                     },
                   );
                 },
-                child: Text(
-                  "This Month",
+                child: BlocBuilder<DateFilterBloc, DateFilterState>(
+                  builder: (context, state) {
+                    if (state is DateFilterSelected) {
+                      return Text(
+                          getMonthText(state.dateFilterType, state.selectedDate));
+                    }
+                    return Text(
+                        getMonthText(enumFromString(currentDateFilterType), currentSelectedDate));
+                  },
                 ),
               ),
               Material(

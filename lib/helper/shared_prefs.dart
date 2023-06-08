@@ -1,4 +1,3 @@
-
 import 'package:budgetup_app/presentation/date_filter/date_bottom_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,12 +22,14 @@ class SharedPrefs {
     await _preferences?.setString(KEY_SELECTED_DATE, dateString);
   }
 
-  String getSelectedDate() => _preferences?.getString(KEY_SELECTED_DATE) ?? "";
+  String getSelectedDate() =>
+      _preferences?.getString(KEY_SELECTED_DATE) ??
+      DateTime.now().toIso8601String();
 
   Future setSelectedDateFilterType(DateFilterType dateFilterType) async {
     await _preferences?.setString(KEY_DATE_FILTER, dateFilterType.name);
   }
 
   String getSelectedDateFilterType() =>
-      _preferences?.getString(KEY_DATE_FILTER) ?? "";
+      _preferences?.getString(KEY_DATE_FILTER) ?? DateFilterType.monthly.name;
 }

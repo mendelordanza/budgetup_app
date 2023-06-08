@@ -1,8 +1,5 @@
-
 import 'package:bloc/bloc.dart';
 import 'package:budgetup_app/presentation/date_filter/date_bottom_sheet.dart';
-import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
-import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:meta/meta.dart';
 
 import '../../../helper/shared_prefs.dart';
@@ -17,23 +14,13 @@ DateFilterType enumFromString(String value) {
 }
 
 class DateFilterBloc extends Bloc<DateFilterEvent, DateFilterState> {
-  final ExpenseBloc expenseBloc;
-  final RecurringBillBloc recurringBillBloc;
   final SharedPrefs sharedPrefs;
 
-  DateFilterBloc({
-    required this.sharedPrefs,
-    required this.expenseBloc,
-    required this.recurringBillBloc,
-  }) : super(DateFilterInitial()) {
-    on<SelectDateFilterType>((event, emit) {
-      sharedPrefs.setSelectedDateFilterType(event.dateFilterType);
-    });
+  DateFilterBloc({required this.sharedPrefs}) : super(DateFilterInitial()) {
     on<SelectDate>((event, emit) {
+      sharedPrefs.setSelectedDateFilterType(event.dateFilterType);
       sharedPrefs.setSelectedDate(event.selectedDate.toIso8601String());
-
-      expenseBloc.add(LoadExpenseCategories(event.selectedDate));
-      recurringBillBloc.add(LoadRecurringBills());
+      emit(DateFilterSelected(event.dateFilterType, event.selectedDate));
     });
   }
 }

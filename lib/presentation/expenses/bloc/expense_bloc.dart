@@ -14,8 +14,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     required this.expensesRepository,
   }) : super(ExpenseCategoryInitial()) {
     on<LoadExpenseCategories>((event, emit) async {
-      final categories =
-          await expensesRepository.getExpenseCategories(event.selectedDate);
+      final categories = await expensesRepository.getExpenseCategories();
 
       emit(ExpenseCategoryLoaded(
         expenseCategories: categories,

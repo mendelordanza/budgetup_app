@@ -1,10 +1,9 @@
+import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../domain/expense_category.dart';
-import '../../helper/shared_prefs.dart';
-import '../../injection_container.dart';
 import 'bloc/expense_bloc.dart';
 
 class AddExpenseCategoryPage extends HookWidget {
@@ -14,8 +13,6 @@ class AddExpenseCategoryPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sharedPrefs = getIt<SharedPrefs>();
-    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
     final titleTextController = useTextEditingController(
         text: expenseCategory != null ? expenseCategory!.title : "");
     final budgetTextController = useTextEditingController(
@@ -48,7 +45,7 @@ class AddExpenseCategoryPage extends HookWidget {
                   final editedCategory = expenseCategory!.copy(
                     title: titleTextController.text,
                     budget: double.parse(budgetTextController.text),
-                    updatedAt: DateTime.now(),
+                    updatedAt: removeTimeFromDate(DateTime.now()),
                   );
                   context.read<ExpenseBloc>().add(
                       EditExpenseCategory(expenseCategory: editedCategory));
@@ -57,8 +54,8 @@ class AddExpenseCategoryPage extends HookWidget {
                   final newCategory = ExpenseCategory(
                     title: titleTextController.text,
                     budget: double.parse(budgetTextController.text),
-                    createdAt: DateTime.now(),
-                    updatedAt: DateTime.now(),
+                    createdAt: removeTimeFromDate(DateTime.now()),
+                    updatedAt: removeTimeFromDate(DateTime.now()),
                   );
                   context
                       .read<ExpenseBloc>()
@@ -66,7 +63,7 @@ class AddExpenseCategoryPage extends HookWidget {
                 }
                 context
                     .read<ExpenseBloc>()
-                    .add(LoadExpenseCategories(currentSelectedDate));
+                    .add(LoadExpenseCategories());
 
                 //Pop page
                 added.value = true;

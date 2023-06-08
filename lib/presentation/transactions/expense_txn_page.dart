@@ -1,7 +1,5 @@
 import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
-import 'package:budgetup_app/helper/shared_prefs.dart';
-import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/transactions/add_expense_txn_page.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +16,6 @@ class ExpenseTxnPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sharedPrefs = getIt<SharedPrefs>();
-    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
     final modifySuccess = useState<bool>(false);
 
     useEffect(() {
@@ -33,9 +29,7 @@ class ExpenseTxnPage extends HookWidget {
         context
             .read<ExpenseTxnBloc>()
             .add(LoadExpenseTxns(categoryId: expenseCategory.id!));
-        context
-            .read<ExpenseBloc>()
-            .add(LoadExpenseCategories(currentSelectedDate));
+        context.read<ExpenseBloc>().add(LoadExpenseCategories());
       }
     }, [modifySuccess.value]);
 

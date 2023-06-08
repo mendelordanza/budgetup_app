@@ -22,11 +22,7 @@ Future<void> setup() async {
     () => RecurringBillBloc(recurringBillsRepo: getIt()),
   );
   getIt.registerFactory(
-    () => DateFilterBloc(
-      sharedPrefs: getIt(),
-      expenseBloc: getIt(),
-      recurringBillBloc: getIt(),
-    ),
+    () => DateFilterBloc(sharedPrefs: getIt()),
   );
 
   //Repository

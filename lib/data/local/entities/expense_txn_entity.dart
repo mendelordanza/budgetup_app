@@ -10,7 +10,10 @@ class ExpenseTxnEntity {
 
   String? notes;
   double? amount;
+
+  @Index()
   DateTime? createdAt;
+
   DateTime? updatedAt;
 
   @Backlink(to: "expenseTransactions")

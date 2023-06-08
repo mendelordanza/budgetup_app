@@ -1,4 +1,6 @@
+import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
+import 'package:budgetup_app/presentation/date_filter/bloc/date_filter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -13,12 +15,8 @@ class ExpensesPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sharedPrefs = getIt<SharedPrefs>();
-    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
     useEffect(() {
-      context
-          .read<ExpenseBloc>()
-          .add(LoadExpenseCategories(currentSelectedDate));
+      context.read<ExpenseBloc>().add(LoadExpenseCategories());
     }, []);
 
     return Scaffold(
@@ -46,53 +44,7 @@ class ExpensesPage extends HookWidget {
                         itemCount: state.expenseCategories.length,
                         itemBuilder: (context, index) {
                           final item = state.expenseCategories[index];
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.pushNamed(
-                                context,
-                                RouteStrings.transactions,
-                                arguments: item,
-                              );
-                            },
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Flexible(
-                                      child: Column(
-                                        children: [
-                                          Text(item.title ?? "hello"),
-                                          Text("${item.getTotal()}"),
-                                        ],
-                                      ),
-                                    ),
-                                    IconButton(
-                                      onPressed: () {
-                                        context.read<ExpenseBloc>().add(
-                                              RemoveExpenseCategory(
-                                                  expenseCategory: item),
-                                            );
-                                      },
-                                      icon: Icon(Icons.delete),
-                                    ),
-                                    IconButton(
-                                      onPressed: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          RouteStrings.addCategory,
-                                          arguments: item,
-                                        );
-                                      },
-                                      icon: Icon(Icons.edit),
-                                    ),
-                                  ],
-                                ),
-                                LinearProgressIndicator(
-                                  value: item.getTotalPercentage(),
-                                )
-                              ],
-                            ),
-                          );
+                          return _categoryItem(context, item);
                         },
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2),
@@ -112,6 +64,83 @@ class ExpensesPage extends HookWidget {
       ),
       floatingActionButton: CustomFloatingButton(
         onPressed: () {},
+      ),
+    );
+  }
+
+  Widget _categoryItem(
+    BuildContext context,
+    ExpenseCategory item,
+  ) {
+    final sharedPrefs = getIt<SharedPrefs>();
+    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
+    final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          RouteStrings.transactions,
+          arguments: item,
+        );
+      },
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Flexible(
+                child: Column(
+                  children: [
+                    Text(item.title ?? "hello"),
+                    Text("${item.budget}"),
+                    BlocBuilder<DateFilterBloc, DateFilterState>(
+                      builder: (context, state) {
+                        if (state is DateFilterSelected) {
+                          return Text(
+                              "${item.getTotal(state.dateFilterType, state.selectedDate)}");
+                        }
+                        return Text(
+                            "${item.getTotal(enumFromString(currentDateFilterType), currentSelectedDate)}");
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  context.read<ExpenseBloc>().add(
+                        RemoveExpenseCategory(expenseCategory: item),
+                      );
+                },
+                icon: Icon(Icons.delete),
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    RouteStrings.addCategory,
+                    arguments: item,
+                  );
+                },
+                icon: Icon(Icons.edit),
+              ),
+            ],
+          ),
+          BlocBuilder<DateFilterBloc, DateFilterState>(
+            builder: (context, state) {
+              if (state is DateFilterSelected) {
+                return LinearProgressIndicator(
+                  value: item.getTotalPercentage(
+                      state.dateFilterType, state.selectedDate),
+                );
+              }
+              return LinearProgressIndicator(
+                value: item.getTotalPercentage(
+                    enumFromString(currentDateFilterType), currentSelectedDate),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

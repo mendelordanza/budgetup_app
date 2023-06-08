@@ -2,6 +2,7 @@ import 'package:budgetup_app/helper/colors.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/date_filter/bloc/date_filter_bloc.dart';
+import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -49,10 +50,10 @@ class DateBottomSheet extends HookWidget {
     final sharedPrefs = getIt<SharedPrefs>();
     final _selectedFilterType = useState<DateFilterType>(
         enumFromString(sharedPrefs.getSelectedDateFilterType()));
-    final _selectedDate = useState<DateTime?>(
+    final _selectedDate = useState<DateTime>(
       sharedPrefs.getSelectedDate().isNotEmpty
           ? DateTime.parse(sharedPrefs.getSelectedDate())
-          : null,
+          : DateTime.now(),
     );
 
     return Container(
@@ -62,107 +63,86 @@ class DateBottomSheet extends HookWidget {
         color: Theme.of(context).cardColor,
         borderRadius: const BorderRadius.all(Radius.circular(16.0)),
       ),
-      child: BlocProvider(
-        create: (context) => getIt<DateFilterBloc>(),
-        child: BlocBuilder<DateFilterBloc, DateFilterState>(
-          builder: (context, state) {
-            return Column(
-              children: [
-                _buildHandle(context),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: types.map((element) {
-                          return _tab(
-                            context,
-                            label: element.label,
-                            isSelected:
-                                _selectedFilterType.value == element.type,
-                            onSelect: () {
-                              _selectedFilterType.value = element.type;
-                              context
-                                  .read<DateFilterBloc>()
-                                  .add(SelectDateFilterType(element.type));
-                            },
-                          );
-                        }).toList(),
-                      ),
-                      // ElevatedButton(
-                      //   onPressed: () {
-                      //     _selectedDate.value = DateTime.now();
-                      //     context
-                      //         .read<DateFilterBloc>()
-                      //         .add(SelectDate(DateTime.now()));
-                      //   },
-                      //   child: Text("Today"),
-                      // ),
-                      TableCalendar(
-                        firstDay: DateTime.utc(2010, 10, 16),
-                        lastDay: DateTime.utc(2030, 3, 14),
-                        focusedDay: _selectedDate.value ?? DateTime.now(),
-                        headerStyle: HeaderStyle(
-                          titleCentered: true,
-                          formatButtonVisible: false,
-                        ),
-                        availableGestures: AvailableGestures.all,
-                        locale: "en_US",
-                        selectedDayPredicate: (day) {
-                          return isSameDay(day, _selectedDate.value);
-                        },
-                        onDaySelected: (selectedDay, focusedDay) {
-                          _selectedDate.value = selectedDay;
-
-                          context
-                              .read<DateFilterBloc>()
-                              .add(SelectDate(selectedDay));
-
-                          print(getStartDate(selectedDay));
-                          print(getEndDate(selectedDay));
-                        },
-                        startingDayOfWeek: StartingDayOfWeek.monday,
-                        calendarBuilders: CalendarBuilders(
-                          dowBuilder: (context, day) {
-                            if (day.weekday == DateTime.sunday) {
-                              final text = DateFormat.E().format(day);
-
-                              return Center(
-                                child: Text(
-                                  text,
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              );
-                            }
+      child: BlocBuilder<DateFilterBloc, DateFilterState>(
+        builder: (context, state) {
+          return Column(
+            children: [
+              _buildHandle(context),
+              Expanded(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: types.map((element) {
+                        return _tab(
+                          context,
+                          label: element.label,
+                          isSelected: _selectedFilterType.value == element.type,
+                          onSelect: () {
+                            _selectedFilterType.value = element.type;
+                            context.read<DateFilterBloc>().add(
+                                SelectDate(element.type, _selectedDate.value));
+                            context
+                                .read<ExpenseBloc>()
+                                .add(LoadExpenseCategories());
                           },
-                        ),
+                        );
+                      }).toList(),
+                    ),
+                    // ElevatedButton(
+                    //   onPressed: () {
+                    //     _selectedDate.value = DateTime.now();
+                    //     context
+                    //         .read<DateFilterBloc>()
+                    //         .add(SelectDate(DateTime.now()));
+                    //   },
+                    //   child: Text("Today"),
+                    // ),
+                    TableCalendar(
+                      firstDay: DateTime.utc(2010, 10, 16),
+                      lastDay: DateTime.utc(2030, 3, 14),
+                      focusedDay: _selectedDate.value,
+                      headerStyle: HeaderStyle(
+                        titleCentered: true,
+                        formatButtonVisible: false,
                       ),
-                    ],
-                  ),
+                      availableGestures: AvailableGestures.all,
+                      locale: "en_US",
+                      selectedDayPredicate: (day) {
+                        return isSameDay(day, _selectedDate.value);
+                      },
+                      onDaySelected: (selectedDay, focusedDay) {
+                        _selectedDate.value = selectedDay;
+                        context.read<DateFilterBloc>().add(
+                            SelectDate(_selectedFilterType.value, selectedDay));
+                        context
+                            .read<ExpenseBloc>()
+                            .add(LoadExpenseCategories());
+                      },
+                      startingDayOfWeek: StartingDayOfWeek.monday,
+                      calendarBuilders: CalendarBuilders(
+                        dowBuilder: (context, day) {
+                          if (day.weekday == DateTime.sunday) {
+                            final text = DateFormat.E().format(day);
+
+                            return Center(
+                              child: Text(
+                                text,
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+            ],
+          );
+        },
       ),
     );
-  }
-
-  getStartDate(DateTime date) {
-    // Get the first day of the week (Sunday)
-    final startOfWeek = date.subtract(Duration(days: date.weekday - 1));
-
-    return startOfWeek;
-  }
-
-  getEndDate(DateTime date) {
-    // Get the first day of the week (Sunday)
-    final startOfWeek = date.subtract(Duration(days: date.weekday - 1));
-
-    // Get the last day of the week (Saturday)
-    final endOfWeek = startOfWeek.add(Duration(days: 6));
-
-    return endOfWeek;
   }
 
   Widget _tab(
