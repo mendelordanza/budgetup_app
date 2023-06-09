@@ -1,4 +1,5 @@
 import 'package:budgetup_app/helper/shared_prefs.dart';
+import 'package:budgetup_app/presentation/dashboard/bloc/dashboard_cubit.dart';
 import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
@@ -44,6 +45,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => getIt<RecurringDateFilterBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<DashboardCubit>(),
         ),
       ],
       child: MaterialApp(

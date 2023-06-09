@@ -9,7 +9,10 @@ class ExpenseCategoryInitial extends ExpenseState {}
 
 class ExpenseCategoryLoaded extends ExpenseState {
   final List<ExpenseCategory> expenseCategories;
-  final double? total;
+  final double total;
 
-  ExpenseCategoryLoaded({required this.expenseCategories, this.total});
+  ExpenseCategoryLoaded({
+    required this.expenseCategories,
+    this.total = 0.0,
+  });
 }

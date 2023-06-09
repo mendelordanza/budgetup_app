@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
+import '../dashboard/bloc/dashboard_cubit.dart';
+
 class ExpenseTxnArgs {
   final ExpenseCategory expenseCategory;
   final ExpenseTxn? expenseTxn;
@@ -40,6 +42,8 @@ class AddExpenseTxnPage extends HookWidget {
             .read<ExpenseTxnBloc>()
             .add(LoadExpenseTxns(categoryId: args.expenseCategory.id!));
         context.read<ExpenseBloc>().add(LoadExpenseCategories());
+        context.read<DashboardCubit>().getSummary();
+        Navigator.pop(context);
       }
     }, [added.value]);
 

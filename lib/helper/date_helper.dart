@@ -35,6 +35,14 @@ getEndDate(DateTime date) {
   return endOfWeek;
 }
 
+getFirstDayOfMonth(DateTime date) {
+  return DateTime(date.year, date.month, 0);
+}
+
+getLastDayOfMonth(DateTime date) {
+  return DateTime(date.year, date.month + 1, 1);
+}
+
 String getMonthText(DateFilterType dateFilterType, DateTime date) {
   switch (dateFilterType) {
     case DateFilterType.daily:

@@ -51,7 +51,7 @@ class ExpenseTxnPage extends HookWidget {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Text("${item.createdAt}"),
+                                Text("${item.updatedAt}"),
                                 Text("${item.amount}"),
                               ],
                             ),

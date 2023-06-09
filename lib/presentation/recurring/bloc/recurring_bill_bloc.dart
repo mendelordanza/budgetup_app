@@ -17,13 +17,10 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
   }) : super(RecurringBillInitial()) {
     on<LoadRecurringBills>((event, emit) async {
       final recurringBills = await recurringBillsRepo.getRecurringBills();
-      final paidRecurringBills =
-          await recurringBillsRepo.getPaidRecurringBills(DateTime.now());
 
       emit(RecurringBillsLoaded(
-        total: getPaidRecurringBillTotal(paidRecurringBills),
+        total: getPaidRecurringBillTotal(recurringBills),
         recurringBills: recurringBills,
-        paidRecurringBills: paidRecurringBills,
       ));
     });
     on<AddRecurringBill>((event, emit) async {
@@ -31,13 +28,10 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
         recurringBillsRepo.saveRecurringBill(event.recurringBill);
 
         final recurringBills = await recurringBillsRepo.getRecurringBills();
-        final paidRecurringBills =
-            await recurringBillsRepo.getPaidRecurringBills(DateTime.now());
 
         emit(RecurringBillsLoaded(
-          total: getPaidRecurringBillTotal(paidRecurringBills),
+          total: getPaidRecurringBillTotal(recurringBills),
           recurringBills: recurringBills,
-          paidRecurringBills: paidRecurringBills,
         ));
       }
     });
@@ -46,13 +40,10 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
         recurringBillsRepo.saveRecurringBill(event.recurringBill);
 
         final recurringBills = await recurringBillsRepo.getRecurringBills();
-        final paidRecurringBills =
-            await recurringBillsRepo.getPaidRecurringBills(DateTime.now());
 
         emit(RecurringBillsLoaded(
-          total: getPaidRecurringBillTotal(paidRecurringBills),
+          total: getPaidRecurringBillTotal(recurringBills),
           recurringBills: recurringBills,
-          paidRecurringBills: paidRecurringBills,
         ));
       }
     });
@@ -62,15 +53,12 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
 
         if (event.recurringBill.id != null) {
           recurringBillsRepo.deleteRecurringBill(event.recurringBill.id!);
-          final paidRecurringBills =
-              await recurringBillsRepo.getPaidRecurringBills(DateTime.now());
 
           emit(
             RecurringBillsLoaded(
-              total: getPaidRecurringBillTotal(paidRecurringBills),
+              total: getPaidRecurringBillTotal(state.recurringBills),
               recurringBills: List.from(state.recurringBills)
                 ..remove(event.recurringBill),
-              paidRecurringBills: paidRecurringBills,
             ),
           );
         }
@@ -91,7 +79,6 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
         emit(RecurringBillsLoaded(
           total: getPaidRecurringBillTotal(paidRecurringBills),
           recurringBills: recurringBills,
-          paidRecurringBills: paidRecurringBills,
         ));
       }
     });
@@ -106,19 +93,15 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
 
         final newRecurringBill = event.recurringBill.copy(
             recurringBillTxns: event.recurringBill.recurringBillTxns
-              ?..removeWhere((element) => element.id == event.recurringBillTxn.id));
+              ?..removeWhere(
+                  (element) => element.id == event.recurringBillTxn.id));
         //Update the list
         currentState.recurringBills[index] = newRecurringBill;
 
-        //Update dashboard summary
-        final updatePaidRecurringBills = currentState.paidRecurringBills
-          ..removeWhere((element) => element.id == event.recurringBill.id);
-
         emit(
           RecurringBillsLoaded(
-            total: getPaidRecurringBillTotal(updatePaidRecurringBills),
+            total: getPaidRecurringBillTotal(currentState.recurringBills),
             recurringBills: List.from(currentState.recurringBills),
-            paidRecurringBills: updatePaidRecurringBills,
           ),
         );
       }

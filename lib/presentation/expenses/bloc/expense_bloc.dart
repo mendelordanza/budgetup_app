@@ -19,12 +19,13 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
       var total = 0.0;
       categories.forEach((element) {
-        total += element.getTotal(DateFilterType.monthly, DateTime.now());
+        total += element.getTotal(
+            DateFilterType.monthly, event.selectedDate ?? DateTime.now());
       });
 
       emit(ExpenseCategoryLoaded(
-        total: total,
         expenseCategories: categories,
+        total: total,
       ));
     });
     on<AddExpenseCategory>((event, emit) async {

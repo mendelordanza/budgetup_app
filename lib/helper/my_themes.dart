@@ -16,8 +16,11 @@ class MyThemes {
     appBarTheme: AppBarTheme(
       titleTextStyle: TextStyle(
         color: Colors.white,
+        fontFamily: 'Quicksand',
+        fontWeight: FontWeight.w600,
       ),
     ),
+    fontFamily: 'Quicksand',
   );
 
   static final lightTheme = ThemeData(
@@ -33,7 +36,10 @@ class MyThemes {
     appBarTheme: AppBarTheme(
       titleTextStyle: TextStyle(
         color: dark,
+        fontFamily: 'Quicksand',
+        fontWeight: FontWeight.w600,
       ),
     ),
+    fontFamily: 'Quicksand',
   );
 }

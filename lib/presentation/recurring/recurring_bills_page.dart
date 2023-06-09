@@ -1,4 +1,5 @@
 import 'package:budgetup_app/helper/route_strings.dart';
+import 'package:budgetup_app/presentation/custom/balance.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_date_filter/recurring_date_bottom_sheet.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:collection/collection.dart';
 
 import '../../domain/recurring_bill_txn.dart';
-import '../../helper/colors.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
@@ -33,55 +33,46 @@ class RecurringBillsPage extends HookWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextButton(
-              onPressed: () {
-                showModalBottomSheet(
-                  backgroundColor: Colors.transparent,
-                  context: context,
-                  builder: (context) {
-                    return RecurringDateBottomSheet();
-                  },
-                );
-              },
-              child: BlocBuilder<RecurringDateFilterBloc,
-                  RecurringDateFilterState>(
-                builder: (context, state) {
-                  if (state is RecurringDateFilterSelected) {
-                    return Text(
-                        getMonthText(state.dateFilterType, state.selectedDate));
-                  }
-                  return Text(getMonthText(
-                      enumFromString(currentDateFilterType),
-                      currentSelectedDate));
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    backgroundColor: Colors.transparent,
+                    context: context,
+                    builder: (context) {
+                      return RecurringDateBottomSheet();
+                    },
+                  );
                 },
-              ),
-            ),
-            Material(
-              shape: ContinuousRectangleBorder(
-                borderRadius: BorderRadius.circular(40.0),
-              ),
-              color: Theme.of(context).cardColor,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    Text("Total Recurring Bills"),
-                    Text("PHP 1,000.00"),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                        vertical: 4.0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: red.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(4.0),
-                      ),
-                      child: Text("PHP 30.00 higher than last month"),
-                    )
+                    BlocBuilder<RecurringDateFilterBloc,
+                        RecurringDateFilterState>(
+                      builder: (context, state) {
+                        if (state is RecurringDateFilterSelected) {
+                          return Text(getMonthText(
+                              state.dateFilterType, state.selectedDate));
+                        }
+                        return Text(getMonthText(
+                            enumFromString(currentDateFilterType),
+                            currentSelectedDate));
+                      },
+                    ),
+                    Icon(Icons.keyboard_arrow_down),
                   ],
                 ),
               ),
+            ),
+            BlocBuilder<RecurringBillBloc, RecurringBillState>(
+              builder: (context, state) {
+                if (state is RecurringBillsLoaded && state.total != null) {
+                  return Balance(
+                      headerLabel: Text("Total Recurring Bills"),
+                      total: "${state.total}");
+                }
+                return Text("Empty categories");
+              },
             ),
             Row(
               children: [
@@ -222,11 +213,11 @@ class RecurringBillsPage extends HookWidget {
                       );
                     } else {
                       return Center(
-                        child: Text("Empty Categories"),
+                        child: Text("Empty Recurring Bills"),
                       );
                     }
                   }
-                  return Text("Empty categories");
+                  return Text("Empty Recurring Bills");
                 },
               ),
             ),

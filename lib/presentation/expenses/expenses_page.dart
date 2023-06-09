@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-import '../../helper/colors.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
+import '../custom/balance.dart';
 import '../expense_date_filter/date_bottom_sheet.dart';
 import 'bloc/expense_bloc.dart';
 
@@ -23,7 +23,9 @@ class ExpensesPage extends HookWidget {
     final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
 
     useEffect(() {
-      context.read<ExpenseBloc>().add(LoadExpenseCategories());
+      context
+          .read<ExpenseBloc>()
+          .add(LoadExpenseCategories(selectedDate: currentSelectedDate));
     }, []);
 
     return Scaffold(
@@ -31,54 +33,45 @@ class ExpensesPage extends HookWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextButton(
-              onPressed: () {
-                showModalBottomSheet(
-                  backgroundColor: Colors.transparent,
-                  context: context,
-                  builder: (context) {
-                    return ExpenseDateBottomSheet();
-                  },
-                );
-              },
-              child: BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
-                builder: (context, state) {
-                  if (state is ExpenseDateFilterSelected) {
-                    return Text(
-                        getMonthText(state.dateFilterType, state.selectedDate));
-                  }
-                  return Text(getMonthText(
-                      enumFromString(currentDateFilterType),
-                      currentSelectedDate));
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                    backgroundColor: Colors.transparent,
+                    context: context,
+                    builder: (context) {
+                      return ExpenseDateBottomSheet();
+                    },
+                  );
                 },
-              ),
-            ),
-            Material(
-              shape: ContinuousRectangleBorder(
-                borderRadius: BorderRadius.circular(40.0),
-              ),
-              color: Theme.of(context).cardColor,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    Text("Total Expenses"),
-                    Text("PHP 1,000.00"),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                        vertical: 4.0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: red.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(4.0),
-                      ),
-                      child: Text("PHP 30.00 higher than last month"),
-                    )
+                    BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
+                      builder: (context, state) {
+                        if (state is ExpenseDateFilterSelected) {
+                          return Text(getMonthText(
+                              state.dateFilterType, state.selectedDate));
+                        }
+                        return Text(getMonthText(
+                            enumFromString(currentDateFilterType),
+                            currentSelectedDate));
+                      },
+                    ),
+                    Icon(Icons.keyboard_arrow_down),
                   ],
                 ),
               ),
+            ),
+            BlocBuilder<ExpenseBloc, ExpenseState>(
+              builder: (context, state) {
+                if (state is ExpenseCategoryLoaded && state.total != null) {
+                  return Balance(
+                      headerLabel: Text("Total Expenses"),
+                      total: "${state.total}");
+                }
+                return Text("Empty categories");
+              },
             ),
             Row(
               children: [
@@ -94,25 +87,20 @@ class ExpensesPage extends HookWidget {
             Expanded(
               child: BlocBuilder<ExpenseBloc, ExpenseState>(
                 builder: (context, state) {
-                  if (state is ExpenseCategoryLoaded) {
-                    if (state.expenseCategories.isNotEmpty) {
-                      return GridView.builder(
-                        shrinkWrap: true,
-                        itemCount: state.expenseCategories.length,
-                        itemBuilder: (context, index) {
-                          final item = state.expenseCategories[index];
-                          return _categoryItem(context, item);
-                        },
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2),
-                      );
-                    } else {
-                      return Center(
-                        child: Text("Empty Categories"),
-                      );
-                    }
+                  if (state is ExpenseCategoryLoaded &&
+                      state.expenseCategories.isNotEmpty) {
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      itemCount: state.expenseCategories.length,
+                      itemBuilder: (context, index) {
+                        final item = state.expenseCategories[index];
+                        return _categoryItem(context, item);
+                      },
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2),
+                    );
                   }
-                  return Text("Empty categories");
+                  return Center(child: Text("Empty categories"));
                 },
               ),
             ),

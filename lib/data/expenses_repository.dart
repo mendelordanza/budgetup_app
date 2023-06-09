@@ -12,13 +12,20 @@ class ExpensesRepository {
     required IsarService isarService,
   }) : _isarService = isarService;
 
-  Future<double> getTotal(int categoryId) async {
-    final total = await _isarService.getTotal(categoryId);
+  Future<double> getTotalExpenseByDate(DateTime date) async {
+    final total = await _isarService.getTotalExpenseByDate(date);
     return total;
   }
 
   Future<List<ExpenseCategory>> getExpenseCategories() async {
     final objects = await _isarService.getAllExpenseCategories();
+    return objects.map((category) {
+      return ExpenseCategory.fromJson(category.toJson());
+    }).toList();
+  }
+
+  Future<List<ExpenseCategory>> getExpenseCategoriesByDate(DateTime date) async {
+    final objects = await _isarService.getAllExpenseCategoriesByDate(date);
     return objects.map((category) {
       return ExpenseCategory.fromJson(category.toJson());
     }).toList();

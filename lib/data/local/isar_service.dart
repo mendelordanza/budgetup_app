@@ -2,6 +2,7 @@ import 'package:budgetup_app/data/local/entities/expense_category_entity.dart';
 import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
 import 'package:budgetup_app/data/local/entities/recurring_bill_entity.dart';
 import 'package:budgetup_app/data/local/entities/recurring_bill_txn_entity.dart';
+import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -12,9 +13,38 @@ class IsarService {
     db = openDB();
   }
 
+  Future<double> getTotalExpenseByDate(DateTime date) async {
+    final isar = await db;
+    var total = 0.0;
+    final amountList = await isar.expenseTxnEntitys
+        .where()
+        .filter()
+        .updatedAtLessThan(date)
+        .amountProperty()
+        .findAll();
+    amountList.forEach((element) {
+      total += element ?? 0.0;
+    });
+    return total;
+  }
+
   Future<List<ExpenseCategoryEntity>> getAllExpenseCategories() async {
     final isar = await db;
     final list = await isar.expenseCategoryEntitys.where().findAll();
+    return list;
+  }
+
+  Future<List<ExpenseCategoryEntity>> getAllExpenseCategoriesByDate(
+      DateTime date) async {
+    final isar = await db;
+    final list = await isar.expenseCategoryEntitys
+        .where()
+        .filter()
+        .expenseTransactions(
+            (q) => q.updatedAtGreaterThan(getFirstDayOfMonth(date)))
+        .expenseTransactions(
+            (q) => q.updatedAtLessThan(getLastDayOfMonth(date)))
+        .findAll();
     return list;
   }
 
@@ -70,16 +100,6 @@ class IsarService {
         .filter()
         .category((q) => q.idEqualTo(categoryId))
         .findAll();
-  }
-
-  Future<double> getTotal(int categoryId) async {
-    final isar = await db;
-    return await isar.expenseTxnEntitys
-        .where()
-        .filter()
-        .category((q) => q.idEqualTo(categoryId))
-        .amountProperty()
-        .sum();
   }
 
   Future<List<RecurringBillEntity>> getAllRecurringBills() async {
