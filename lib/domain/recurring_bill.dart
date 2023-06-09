@@ -22,11 +22,8 @@ class RecurringBill extends Equatable {
 
   isPaid(DateTime selectedDate) {
     final paid = recurringBillTxns?.where((element) {
-      print("DATE PAID: ${element.datePaid!.month}");
-      print("SELECTED: ${selectedDate.month}");
       return element.datePaid!.month == selectedDate.month;
     }).toList();
-    print("PAID: $paid");
     return paid?.isNotEmpty;
   }
 

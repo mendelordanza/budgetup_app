@@ -1,6 +1,6 @@
 import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
-import 'package:budgetup_app/presentation/date_filter/bloc/date_filter_bloc.dart';
+import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -9,7 +9,7 @@ import '../../helper/colors.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
-import '../date_filter/date_bottom_sheet.dart';
+import '../expense_date_filter/date_bottom_sheet.dart';
 import 'bloc/expense_bloc.dart';
 
 class ExpensesPage extends HookWidget {
@@ -37,13 +37,13 @@ class ExpensesPage extends HookWidget {
                   backgroundColor: Colors.transparent,
                   context: context,
                   builder: (context) {
-                    return DateBottomSheet();
+                    return ExpenseDateBottomSheet();
                   },
                 );
               },
-              child: BlocBuilder<DateFilterBloc, DateFilterState>(
+              child: BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
                 builder: (context, state) {
-                  if (state is DateFilterSelected) {
+                  if (state is ExpenseDateFilterSelected) {
                     return Text(
                         getMonthText(state.dateFilterType, state.selectedDate));
                   }
@@ -148,9 +148,9 @@ class ExpensesPage extends HookWidget {
                   children: [
                     Text(item.title ?? "hello"),
                     Text("${item.budget}"),
-                    BlocBuilder<DateFilterBloc, DateFilterState>(
+                    BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
                       builder: (context, state) {
-                        if (state is DateFilterSelected) {
+                        if (state is ExpenseDateFilterSelected) {
                           return Text(
                               "${item.getTotal(state.dateFilterType, state.selectedDate)}");
                         }
@@ -181,9 +181,9 @@ class ExpensesPage extends HookWidget {
               ),
             ],
           ),
-          BlocBuilder<DateFilterBloc, DateFilterState>(
+          BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
             builder: (context, state) {
-              if (state is DateFilterSelected) {
+              if (state is ExpenseDateFilterSelected) {
                 return LinearProgressIndicator(
                   value: item.getTotalPercentage(
                       state.dateFilterType, state.selectedDate),

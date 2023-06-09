@@ -7,6 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:collection/collection.dart';
 
 import '../../domain/recurring_bill_txn.dart';
+import '../../helper/colors.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
@@ -30,6 +31,7 @@ class RecurringBillsPage extends HookWidget {
     return Scaffold(
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextButton(
               onPressed: () {
@@ -52,6 +54,33 @@ class RecurringBillsPage extends HookWidget {
                       enumFromString(currentDateFilterType),
                       currentSelectedDate));
                 },
+              ),
+            ),
+            Material(
+              shape: ContinuousRectangleBorder(
+                borderRadius: BorderRadius.circular(40.0),
+              ),
+              color: Theme.of(context).cardColor,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Total Recurring Bills"),
+                    Text("PHP 1,000.00"),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 4.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: red.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: Text("PHP 30.00 higher than last month"),
+                    )
+                  ],
+                ),
               ),
             ),
             Row(
@@ -165,7 +194,18 @@ class RecurringBillsPage extends HookWidget {
                                     );
                                   },
                                 ),
-                                Expanded(child: Text(item.title ?? "hello")),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      Text(item.title ?? "hello"),
+                                      if (txn != null && txn.datePaid != null)
+                                        Text(
+                                            "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}")
+                                    ],
+                                  ),
+                                ),
                                 Text("${item.amount}"),
                                 IconButton(
                                   onPressed: () {

@@ -52,7 +52,7 @@ String getMonthText(DateFilterType dateFilterType, DateTime date) {
       }
     case DateFilterType.monthly:
       if (date.month == DateTime.now().month) {
-        return "This month";
+        return "This month - ${formatDate(date, 'MMMM yyyy')}";
       } else {
         return "${formatDate(date, 'MMMM yyyy')}";
       }

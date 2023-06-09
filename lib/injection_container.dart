@@ -2,7 +2,7 @@ import 'package:budgetup_app/data/expenses_repository.dart';
 import 'package:budgetup_app/data/local/isar_service.dart';
 import 'package:budgetup_app/data/recurring_bills_repository.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
-import 'package:budgetup_app/presentation/date_filter/bloc/date_filter_bloc.dart';
+import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
@@ -23,7 +23,7 @@ Future<void> setup() async {
     () => RecurringBillBloc(recurringBillsRepo: getIt()),
   );
   getIt.registerFactory(
-    () => DateFilterBloc(sharedPrefs: getIt()),
+    () => ExpenseDateFilterBloc(sharedPrefs: getIt()),
   );
   getIt.registerFactory(
     () => RecurringDateFilterBloc(sharedPrefs: getIt()),

@@ -28,7 +28,10 @@ class AddExpenseTxnPage extends HookWidget {
         text: args.expenseTxn != null ? "${args.expenseTxn!.amount}" : "");
 
     final dateTextController = useTextEditingController();
-    final currentSelectedDate = useState<DateTime>(DateTime.now());
+    final currentSelectedDate = useState<DateTime>(
+        args.expenseTxn != null && args.expenseTxn!.updatedAt != null
+            ? args.expenseTxn!.updatedAt!
+            : DateTime.now());
     final added = useState<bool>(false);
 
     useEffect(() {

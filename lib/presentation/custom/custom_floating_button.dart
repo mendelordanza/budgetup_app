@@ -10,7 +10,7 @@ class CustomFloatingButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
-      elevation: 0,
+      elevation: 2,
       onPressed: onPressed,
       shape: ContinuousRectangleBorder(
         borderRadius: BorderRadius.circular(40.0),

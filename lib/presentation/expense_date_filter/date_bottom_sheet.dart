@@ -1,7 +1,7 @@
 import 'package:budgetup_app/helper/colors.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/injection_container.dart';
-import 'package:budgetup_app/presentation/date_filter/bloc/date_filter_bloc.dart';
+import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,8 +11,8 @@ import 'package:table_calendar/table_calendar.dart';
 
 import '../../helper/date_helper.dart';
 
-class DateBottomSheet extends HookWidget {
-  DateBottomSheet({Key? key}) : super(key: key);
+class ExpenseDateBottomSheet extends HookWidget {
+  ExpenseDateBottomSheet({Key? key}) : super(key: key);
 
   final types = [
     DateSelection(
@@ -26,10 +26,6 @@ class DateBottomSheet extends HookWidget {
     DateSelection(
       "Monthly",
       DateFilterType.monthly,
-    ),
-    DateSelection(
-      "Yearly",
-      DateFilterType.yearly,
     ),
   ];
 
@@ -52,7 +48,7 @@ class DateBottomSheet extends HookWidget {
         color: Theme.of(context).cardColor,
         borderRadius: const BorderRadius.all(Radius.circular(16.0)),
       ),
-      child: BlocBuilder<DateFilterBloc, DateFilterState>(
+      child: BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
         builder: (context, state) {
           return Column(
             children: [
@@ -69,8 +65,8 @@ class DateBottomSheet extends HookWidget {
                           isSelected: _selectedFilterType.value == element.type,
                           onSelect: () {
                             _selectedFilterType.value = element.type;
-                            context.read<DateFilterBloc>().add(
-                                SelectDate(element.type, _selectedDate.value));
+                            context.read<ExpenseDateFilterBloc>().add(
+                                ExpenseSelectDate(element.type, _selectedDate.value));
                             context
                                 .read<ExpenseBloc>()
                                 .add(LoadExpenseCategories());
@@ -102,8 +98,8 @@ class DateBottomSheet extends HookWidget {
                       },
                       onDaySelected: (selectedDay, focusedDay) {
                         _selectedDate.value = selectedDay;
-                        context.read<DateFilterBloc>().add(
-                            SelectDate(_selectedFilterType.value, selectedDay));
+                        context.read<ExpenseDateFilterBloc>().add(
+                            ExpenseSelectDate(_selectedFilterType.value, selectedDay));
                         context
                             .read<ExpenseBloc>()
                             .add(LoadExpenseCategories());

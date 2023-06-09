@@ -1,7 +1,6 @@
 import 'package:budgetup_app/helper/colors.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/injection_container.dart';
-import 'package:budgetup_app/presentation/date_filter/bloc/date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,85 +40,80 @@ class RecurringDateBottomSheet extends HookWidget {
         color: Theme.of(context).cardColor,
         borderRadius: const BorderRadius.all(Radius.circular(16.0)),
       ),
-      child: BlocBuilder<DateFilterBloc, DateFilterState>(
-        builder: (context, state) {
-          return Column(
-            children: [
-              _buildHandle(context),
-              Expanded(
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: types.map((element) {
-                        return _tab(
-                          context,
-                          label: element.label,
-                          isSelected: _selectedFilterType.value == element.type,
-                          onSelect: () {
-                            _selectedFilterType.value = element.type;
-                            context.read<RecurringDateFilterBloc>().add(
-                                RecurringSelectDate(
-                                    element.type, _selectedDate.value));
-                            context
-                                .read<RecurringBillBloc>()
-                                .add(LoadRecurringBills());
-                          },
-                        );
-                      }).toList(),
-                    ),
-                    // ElevatedButton(
-                    //   onPressed: () {
-                    //     _selectedDate.value = DateTime.now();
-                    //     context
-                    //         .read<DateFilterBloc>()
-                    //         .add(SelectDate(DateTime.now()));
-                    //   },
-                    //   child: Text("Today"),
-                    // ),
-                    TableCalendar(
-                      firstDay: DateTime.utc(2010, 10, 16),
-                      lastDay: DateTime.utc(2030, 3, 14),
-                      focusedDay: _selectedDate.value,
-                      headerStyle: HeaderStyle(
-                        titleCentered: true,
-                        formatButtonVisible: false,
-                      ),
-                      availableGestures: AvailableGestures.all,
-                      locale: "en_US",
-                      selectedDayPredicate: (day) {
-                        return isSameDay(day, _selectedDate.value);
-                      },
-                      onDaySelected: (selectedDay, focusedDay) {
-                        _selectedDate.value = selectedDay;
+      child: Column(
+        children: [
+          _buildHandle(context),
+          Expanded(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: types.map((element) {
+                    return _tab(
+                      context,
+                      label: element.label,
+                      isSelected: _selectedFilterType.value == element.type,
+                      onSelect: () {
+                        _selectedFilterType.value = element.type;
                         context.read<RecurringDateFilterBloc>().add(
-                            RecurringSelectDate(_selectedFilterType.value, selectedDay));
+                            RecurringSelectDate(
+                                element.type, _selectedDate.value));
                         context
                             .read<RecurringBillBloc>()
                             .add(LoadRecurringBills());
                       },
-                      startingDayOfWeek: StartingDayOfWeek.monday,
-                      calendarBuilders: CalendarBuilders(
-                        dowBuilder: (context, day) {
-                          if (day.weekday == DateTime.sunday) {
-                            final text = DateFormat.E().format(day);
-
-                            return Center(
-                              child: Text(
-                                text,
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  ],
+                    );
+                  }).toList(),
                 ),
-              ),
-            ],
-          );
-        },
+                // ElevatedButton(
+                //   onPressed: () {
+                //     _selectedDate.value = DateTime.now();
+                //     context
+                //         .read<DateFilterBloc>()
+                //         .add(SelectDate(DateTime.now()));
+                //   },
+                //   child: Text("Today"),
+                // ),
+                TableCalendar(
+                  firstDay: DateTime.utc(2010, 10, 16),
+                  lastDay: DateTime.utc(2030, 3, 14),
+                  focusedDay: _selectedDate.value,
+                  headerStyle: HeaderStyle(
+                    titleCentered: true,
+                    formatButtonVisible: false,
+                  ),
+                  availableGestures: AvailableGestures.all,
+                  locale: "en_US",
+                  selectedDayPredicate: (day) {
+                    return isSameDay(day, _selectedDate.value);
+                  },
+                  onDaySelected: (selectedDay, focusedDay) {
+                    _selectedDate.value = selectedDay;
+                    context.read<RecurringDateFilterBloc>().add(
+                        RecurringSelectDate(
+                            _selectedFilterType.value, selectedDay));
+                    context.read<RecurringBillBloc>().add(LoadRecurringBills());
+                  },
+                  startingDayOfWeek: StartingDayOfWeek.monday,
+                  calendarBuilders: CalendarBuilders(
+                    dowBuilder: (context, day) {
+                      if (day.weekday == DateTime.sunday) {
+                        final text = DateFormat.E().format(day);
+
+                        return Center(
+                          child: Text(
+                            text,
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'package:budgetup_app/helper/colors.dart';
+import 'package:budgetup_app/presentation/custom/custom_floating_button.dart';
 import 'package:budgetup_app/presentation/dashboard_page.dart';
 import 'package:budgetup_app/presentation/transactions_page.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +36,12 @@ class HomePage extends HookWidget {
         index: _selectedIndex.value,
         children: _pages,
       ),
+      floatingActionButton: CustomFloatingButton(
+        onPressed: () {},
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: secondaryColor,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Iconsax.home),

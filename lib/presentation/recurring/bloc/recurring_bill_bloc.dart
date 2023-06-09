@@ -19,7 +19,9 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
       final recurringBills = await recurringBillsRepo.getRecurringBills();
       final paidRecurringBills =
           await recurringBillsRepo.getPaidRecurringBills(DateTime.now());
+
       emit(RecurringBillsLoaded(
+        total: getPaidRecurringBillTotal(paidRecurringBills),
         recurringBills: recurringBills,
         paidRecurringBills: paidRecurringBills,
       ));
@@ -33,6 +35,7 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
             await recurringBillsRepo.getPaidRecurringBills(DateTime.now());
 
         emit(RecurringBillsLoaded(
+          total: getPaidRecurringBillTotal(paidRecurringBills),
           recurringBills: recurringBills,
           paidRecurringBills: paidRecurringBills,
         ));
@@ -47,6 +50,7 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
             await recurringBillsRepo.getPaidRecurringBills(DateTime.now());
 
         emit(RecurringBillsLoaded(
+          total: getPaidRecurringBillTotal(paidRecurringBills),
           recurringBills: recurringBills,
           paidRecurringBills: paidRecurringBills,
         ));
@@ -60,8 +64,10 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
           recurringBillsRepo.deleteRecurringBill(event.recurringBill.id!);
           final paidRecurringBills =
               await recurringBillsRepo.getPaidRecurringBills(DateTime.now());
+
           emit(
             RecurringBillsLoaded(
+              total: getPaidRecurringBillTotal(paidRecurringBills),
               recurringBills: List.from(state.recurringBills)
                 ..remove(event.recurringBill),
               paidRecurringBills: paidRecurringBills,
@@ -75,10 +81,15 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
         recurringBillsRepo.addRecurringBillTxn(
             event.recurringBill, event.recurringBillTxn);
 
+        //Transactions
         final recurringBills = await recurringBillsRepo.getRecurringBills();
+
+        //Dashboard Summary
         final paidRecurringBills =
             await recurringBillsRepo.getPaidRecurringBills(DateTime.now());
+
         emit(RecurringBillsLoaded(
+          total: getPaidRecurringBillTotal(paidRecurringBills),
           recurringBills: recurringBills,
           paidRecurringBills: paidRecurringBills,
         ));
@@ -95,17 +106,30 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
 
         final newRecurringBill = event.recurringBill.copy(
             recurringBillTxns: event.recurringBill.recurringBillTxns
-              ?..removeWhere(
-                  (element) => element.id == event.recurringBillTxn.id));
+              ?..removeWhere((element) => element.id == event.recurringBillTxn.id));
+        //Update the list
         currentState.recurringBills[index] = newRecurringBill;
+
+        //Update dashboard summary
+        final updatePaidRecurringBills = currentState.paidRecurringBills
+          ..removeWhere((element) => element.id == event.recurringBill.id);
 
         emit(
           RecurringBillsLoaded(
+            total: getPaidRecurringBillTotal(updatePaidRecurringBills),
             recurringBills: List.from(currentState.recurringBills),
-            paidRecurringBills: [],
+            paidRecurringBills: updatePaidRecurringBills,
           ),
         );
       }
     });
+  }
+
+  getPaidRecurringBillTotal(List<RecurringBill> paidRecurringBills) {
+    var total = 0.0;
+    paidRecurringBills.forEach((element) {
+      total += element.amount ?? 0.0;
+    });
+    return total;
   }
 }

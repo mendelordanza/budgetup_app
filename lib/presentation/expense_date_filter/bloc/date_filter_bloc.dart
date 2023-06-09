@@ -8,14 +8,14 @@ part 'date_filter_event.dart';
 
 part 'date_filter_state.dart';
 
-class DateFilterBloc extends Bloc<DateFilterEvent, DateFilterState> {
+class ExpenseDateFilterBloc extends Bloc<ExpenseDateFilterEvent, ExpenseDateFilterState> {
   final SharedPrefs sharedPrefs;
 
-  DateFilterBloc({required this.sharedPrefs}) : super(DateFilterInitial()) {
-    on<SelectDate>((event, emit) {
+  ExpenseDateFilterBloc({required this.sharedPrefs}) : super(ExpenseDateFilterInitial()) {
+    on<ExpenseSelectDate>((event, emit) {
       sharedPrefs.setSelectedDateFilterType(event.dateFilterType);
       sharedPrefs.setExpenseSelectedDate(event.selectedDate.toIso8601String());
-      emit(DateFilterSelected(event.dateFilterType, event.selectedDate));
+      emit(ExpenseDateFilterSelected(event.dateFilterType, event.selectedDate));
     });
   }
 }

@@ -3,6 +3,8 @@ import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:collection/collection.dart';
 
 import '../helper/colors.dart';
 import 'expenses/bloc/expense_bloc.dart';
@@ -12,6 +14,8 @@ class DashboardPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentMonth = formatDate(DateTime.now(), "MMMM yyyy");
+
     useEffect(() {
       context.read<RecurringBillBloc>().add(LoadRecurringBills());
     }, []);
@@ -33,7 +37,22 @@ class DashboardPage extends HookWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Total"),
+                      Tooltip(
+                        message:
+                            'Total Expenses + Total Recurring Bills for the month of $currentMonth',
+                        textAlign: TextAlign.center,
+                        triggerMode: TooltipTriggerMode.tap,
+                        child: Row(
+                          children: [
+                            Text("Total"),
+                            Icon(
+                              Iconsax.info_circle,
+                              size: 18,
+                            ),
+                          ],
+                        ),
+                        showDuration: Duration(seconds: 3),
+                      ),
                       Text("PHP 1,000.00"),
                       Container(
                         padding: EdgeInsets.symmetric(
@@ -50,8 +69,12 @@ class DashboardPage extends HookWidget {
                   ),
                 ),
               ),
-              _yourExpenses(),
-              _billsPaid(),
+              Text(
+                "This month - $currentMonth",
+                textAlign: TextAlign.center,
+              ),
+              _yourExpenses(currentMonth),
+              _billsPaid(currentMonth),
             ],
           ),
         ),
@@ -59,103 +82,119 @@ class DashboardPage extends HookWidget {
     );
   }
 
-  Widget _yourExpenses() {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: Column(
+  Widget _yourExpenses(String currentMonth) {
+    return BlocBuilder<ExpenseBloc, ExpenseState>(
+      builder: (context, state) {
+        return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text("Your Expenses"),
-            BlocBuilder<ExpenseBloc, ExpenseState>(
-              builder: (context, state) {
-                if (state is ExpenseCategoryLoaded) {
-                  if (state.expenseCategories.isNotEmpty) {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: state.expenseCategories.length,
-                      itemBuilder: (context, index) {
-                        final item = state.expenseCategories[index];
-                        return Row(
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: (state is ExpenseCategoryLoaded &&
+                      state.expenseCategories.isNotEmpty)
+                  ? Column(
+                      children: [
+                        ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: state.expenseCategories.length,
+                          itemBuilder: (context, index) {
+                            final item = state.expenseCategories[index];
+                            if (item.expenseTransactions != null &&
+                                item.expenseTransactions!.isNotEmpty) {
+                              return Row(
+                                children: [
+                                  Expanded(child: Text("${item.title}")),
+                                  Text(
+                                      "${item.getTotal(DateFilterType.monthly, DateTime.now())}")
+                                ],
+                              );
+                            }
+                          },
+                        ),
+                        Divider(),
+                        Row(
                           children: [
-                            Expanded(child: Text("${item.title}")),
-                            Text(
-                                "${item.getTotal(DateFilterType.monthly, DateTime.now())}")
+                            Expanded(
+                              child: Text("TOTAL"),
+                            ),
+                            Text("PHP ${state.total}"),
                           ],
-                        );
-                      },
-                    );
-                  } else {
-                    return Center(
-                      child: Text("Empty Categories"),
-                    );
-                  }
-                }
-                return Text("Empty categories");
-              },
-            ),
-            Divider(),
-            Row(
-              children: [
-                Expanded(
-                  child: Text("TOTAL"),
-                ),
-                Text("PHP 7,200.00"),
-              ],
+                        ),
+                      ],
+                    )
+                  : Center(
+                      child: Text(
+                          "Your expenses for $currentMonth will show here"),
+                    ),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _billsPaid() {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text("Bills you've paid"),
-            BlocBuilder<RecurringBillBloc, RecurringBillState>(
-              builder: (context, state) {
-                print("CURR STATE: ${state}");
-                if (state is RecurringBillsLoaded) {
-                  if (state.paidRecurringBills.isNotEmpty) {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: state.paidRecurringBills.length,
-                      itemBuilder: (context, index) {
-                        final item = state.paidRecurringBills[index];
-                        return Row(
+  Widget _billsPaid(String currentMonth) {
+    return BlocBuilder<RecurringBillBloc, RecurringBillState>(
+        builder: (context, state) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text("Bills you've paid"),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: (state is RecurringBillsLoaded &&
+                    state.paidRecurringBills.isNotEmpty)
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: state.paidRecurringBills.length,
+                        itemBuilder: (context, index) {
+                          final item = state.paidRecurringBills[index];
+                          final txn = item.recurringBillTxns?.firstWhereOrNull(
+                            (element) =>
+                                element.datePaid?.month == DateTime.now().month,
+                          );
+                          return Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text(item.title ?? "hello"),
+                                    if (txn != null && txn.datePaid != null)
+                                      Text(
+                                          "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}")
+                                  ],
+                                ),
+                              ),
+                              Text("${item.amount}"),
+                            ],
+                          );
+                        },
+                      ),
+                      Divider(),
+                      if (state.paidRecurringBills.isNotEmpty)
+                        Row(
                           children: [
-                            Expanded(child: Text(item.title ?? "hello")),
-                            Text("${item.amount}"),
+                            Expanded(
+                              child: Text("TOTAL"),
+                            ),
+                            Text("PHP ${state.total}"),
                           ],
-                        );
-                      },
-                    );
-                  } else {
-                    return Center(
-                      child: Text("Empty Categories"),
-                    );
-                  }
-                }
-                return Text("Empty categories");
-              },
-            ),
-            Divider(),
-            Row(
-              children: [
-                Expanded(
-                  child: Text("TOTAL"),
-                ),
-                Text("PHP 7,200.00"),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+                        ),
+                    ],
+                  )
+                : Center(
+                    child: Text(
+                        "Your bills paid for $currentMonth will show here"),
+                  ),
+          ),
+        ],
+      );
+    });
   }
 }

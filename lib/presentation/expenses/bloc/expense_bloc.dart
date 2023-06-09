@@ -1,3 +1,4 @@
+import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../data/expenses_repository.dart';
@@ -16,7 +17,13 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     on<LoadExpenseCategories>((event, emit) async {
       final categories = await expensesRepository.getExpenseCategories();
 
+      var total = 0.0;
+      categories.forEach((element) {
+        total += element.getTotal(DateFilterType.monthly, DateTime.now());
+      });
+
       emit(ExpenseCategoryLoaded(
+        total: total,
         expenseCategories: categories,
       ));
     });
@@ -27,11 +34,19 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
         //Save to DB
         expensesRepository.saveCategory(event.expenseCategory);
 
+        List<ExpenseCategory> newList = List.from(state.expenseCategories)
+          ..add(event.expenseCategory);
+
+        var total = 0.0;
+        newList.forEach((element) {
+          total += element.getTotal(DateFilterType.monthly, DateTime.now());
+        });
+
         //Emit state
         emit(
           ExpenseCategoryLoaded(
-            expenseCategories: List.from(state.expenseCategories)
-              ..add(event.expenseCategory),
+            total: total,
+            expenseCategories: newList,
           ),
         );
       }
@@ -43,10 +58,18 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
         //Save to DB
         expensesRepository.saveCategory(event.expenseCategory);
 
+        List<ExpenseCategory> newList = List.from(state.expenseCategories);
+
+        var total = 0.0;
+        newList.forEach((element) {
+          total += element.getTotal(DateFilterType.monthly, DateTime.now());
+        });
+
         //Emit state
         emit(
           ExpenseCategoryLoaded(
-            expenseCategories: List.from(state.expenseCategories),
+            total: total,
+            expenseCategories: newList,
           ),
         );
       }
@@ -59,11 +82,19 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
         if (event.expenseCategory.id != null) {
           expensesRepository.deleteCategory(event.expenseCategory.id!);
 
+          List<ExpenseCategory> newList = List.from(state.expenseCategories)
+            ..remove(event.expenseCategory);
+
+          var total = 0.0;
+          newList.forEach((element) {
+            total += element.getTotal(DateFilterType.monthly, DateTime.now());
+          });
+
           //Emit state
           emit(
             ExpenseCategoryLoaded(
-              expenseCategories: List.from(state.expenseCategories)
-                ..remove(event.expenseCategory),
+              total: total,
+              expenseCategories: newList,
             ),
           );
         }

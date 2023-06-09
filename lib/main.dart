@@ -1,5 +1,5 @@
 import 'package:budgetup_app/helper/shared_prefs.dart';
-import 'package:budgetup_app/presentation/date_filter/bloc/date_filter_bloc.dart';
+import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
           create: (context) => getIt<RecurringBillBloc>(),
         ),
         BlocProvider(
-          create: (context) => getIt<DateFilterBloc>(),
+          create: (context) => getIt<ExpenseDateFilterBloc>(),
         ),
         BlocProvider(
           create: (context) => getIt<RecurringDateFilterBloc>(),
