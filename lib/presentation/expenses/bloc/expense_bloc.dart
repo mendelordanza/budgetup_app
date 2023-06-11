@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:budgetup_app/helper/date_helper.dart';
+import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
+import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../data/expenses_repository.dart';
@@ -10,17 +14,40 @@ part 'expense_state.dart';
 
 class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
   final ExpensesRepository expensesRepository;
+  final ModifyExpensesBloc modifyExpensesBloc;
+  StreamSubscription? _expenseSubscription;
+  final TransactionsModifyBloc transactionsModifyBloc;
+  StreamSubscription? _expenseTxnSubscription;
 
   ExpenseBloc({
     required this.expensesRepository,
+    required this.modifyExpensesBloc,
+    required this.transactionsModifyBloc,
   }) : super(ExpenseCategoryInitial()) {
+    _expenseSubscription = modifyExpensesBloc.stream.listen((state) {
+      if (state is ExpenseAdded ||
+          state is ExpenseEdited ||
+          state is ExpenseRemoved) {
+        add(LoadExpenseCategories());
+      }
+    });
+
+    _expenseTxnSubscription = transactionsModifyBloc.stream.listen((state) {
+      if (state is ExpenseTxnAdded ||
+          state is ExpenseTxnEdited ||
+          state is ExpenseTxnRemoved) {
+        add(LoadExpenseCategories());
+      }
+    });
+
     on<LoadExpenseCategories>((event, emit) async {
       final categories = await expensesRepository.getExpenseCategories();
 
       var total = 0.0;
       categories.forEach((element) {
-        total += element.getTotal(
-            DateFilterType.monthly, event.selectedDate ?? DateTime.now());
+        total += element.getTotalByDate(
+            event.dateFilterType ?? DateFilterType.monthly,
+            event.selectedDate ?? DateTime.now());
       });
 
       emit(ExpenseCategoryLoaded(
@@ -28,78 +55,12 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
         total: total,
       ));
     });
-    on<AddExpenseCategory>((event, emit) async {
-      if (state is ExpenseCategoryLoaded) {
-        final state = this.state as ExpenseCategoryLoaded;
+  }
 
-        //Save to DB
-        expensesRepository.saveCategory(event.expenseCategory);
-
-        List<ExpenseCategory> newList = List.from(state.expenseCategories)
-          ..add(event.expenseCategory);
-
-        var total = 0.0;
-        newList.forEach((element) {
-          total += element.getTotal(DateFilterType.monthly, DateTime.now());
-        });
-
-        //Emit state
-        emit(
-          ExpenseCategoryLoaded(
-            total: total,
-            expenseCategories: newList,
-          ),
-        );
-      }
-    });
-    on<EditExpenseCategory>((event, emit) async {
-      if (state is ExpenseCategoryLoaded) {
-        final state = this.state as ExpenseCategoryLoaded;
-
-        //Save to DB
-        expensesRepository.saveCategory(event.expenseCategory);
-
-        List<ExpenseCategory> newList = List.from(state.expenseCategories);
-
-        var total = 0.0;
-        newList.forEach((element) {
-          total += element.getTotal(DateFilterType.monthly, DateTime.now());
-        });
-
-        //Emit state
-        emit(
-          ExpenseCategoryLoaded(
-            total: total,
-            expenseCategories: newList,
-          ),
-        );
-      }
-    });
-    on<RemoveExpenseCategory>((event, emit) async {
-      if (state is ExpenseCategoryLoaded) {
-        final state = this.state as ExpenseCategoryLoaded;
-
-        //Remove from DB
-        if (event.expenseCategory.id != null) {
-          expensesRepository.deleteCategory(event.expenseCategory.id!);
-
-          List<ExpenseCategory> newList = List.from(state.expenseCategories)
-            ..remove(event.expenseCategory);
-
-          var total = 0.0;
-          newList.forEach((element) {
-            total += element.getTotal(DateFilterType.monthly, DateTime.now());
-          });
-
-          //Emit state
-          emit(
-            ExpenseCategoryLoaded(
-              total: total,
-              expenseCategories: newList,
-            ),
-          );
-        }
-      }
-    });
+  @override
+  Future<void> close() {
+    _expenseSubscription?.cancel();
+    _expenseTxnSubscription?.cancel();
+    return super.close();
   }
 }

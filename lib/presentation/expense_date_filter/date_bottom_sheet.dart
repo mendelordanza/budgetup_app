@@ -69,8 +69,11 @@ class ExpenseDateBottomSheet extends HookWidget {
                                 ExpenseSelectDate(
                                     element.type, _selectedDate.value));
                             context.read<ExpenseBloc>().add(
-                                LoadExpenseCategories(
-                                    selectedDate: _selectedDate.value));
+                                  LoadExpenseCategories(
+                                    dateFilterType: element.type,
+                                    selectedDate: _selectedDate.value,
+                                  ),
+                                );
                           },
                         );
                       }).toList(),
@@ -103,7 +106,11 @@ class ExpenseDateBottomSheet extends HookWidget {
                             ExpenseSelectDate(
                                 _selectedFilterType.value, selectedDay));
                         context.read<ExpenseBloc>().add(
-                            LoadExpenseCategories(selectedDate: selectedDay));
+                              LoadExpenseCategories(
+                                dateFilterType: _selectedFilterType.value,
+                                selectedDate: selectedDay,
+                              ),
+                            );
                       },
                       startingDayOfWeek: StartingDayOfWeek.monday,
                       calendarBuilders: CalendarBuilders(

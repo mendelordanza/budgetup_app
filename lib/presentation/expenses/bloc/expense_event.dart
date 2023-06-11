@@ -6,28 +6,8 @@ abstract class ExpenseEvent {
 
 //Load Categories
 class LoadExpenseCategories extends ExpenseEvent {
+  final DateFilterType? dateFilterType;
   final DateTime? selectedDate;
 
-  LoadExpenseCategories({this.selectedDate});
-}
-
-//Add Expense Category
-class AddExpenseCategory extends ExpenseEvent {
-  final ExpenseCategory expenseCategory;
-
-  AddExpenseCategory({required this.expenseCategory});
-}
-
-//Edit Expense Category
-class EditExpenseCategory extends ExpenseEvent {
-  final ExpenseCategory expenseCategory;
-
-  EditExpenseCategory({required this.expenseCategory});
-}
-
-//Remove Expense Category
-class RemoveExpenseCategory extends ExpenseEvent {
-  final ExpenseCategory expenseCategory;
-
-  RemoveExpenseCategory({required this.expenseCategory});
+  LoadExpenseCategories({this.dateFilterType, this.selectedDate});
 }

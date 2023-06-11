@@ -6,16 +6,19 @@ abstract class DashboardState {}
 class DashboardInitial extends DashboardState {}
 
 class DashboardLoaded extends DashboardState {
-  final List<ExpenseCategory> dashboardCategories;
-  final double dashboardTotal;
+  final double overallTotal;
+
+  final List<ExpenseCategory> expensesCategories;
+  final double expensesTotal;
 
   final List<RecurringBill> paidRecurringBills;
   final double recurringBillTotal;
 
   DashboardLoaded({
-    required this.dashboardCategories,
-    this.dashboardTotal = 0.0,
+    this.overallTotal = 0.00,
+    required this.expensesCategories,
+    this.expensesTotal = 0.00,
     required this.paidRecurringBills,
-    this.recurringBillTotal = 0.0,
+    this.recurringBillTotal = 0.00,
   });
 }

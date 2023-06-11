@@ -114,7 +114,9 @@ class AddRecurringBillPage extends HookWidget {
                         .read<RecurringBillBloc>()
                         .add(AddRecurringBill(recurringBill: newRecurringBill));
                   }
-                  context.read<RecurringBillBloc>().add(LoadRecurringBills());
+                  context
+                      .read<RecurringBillBloc>()
+                      .add(LoadRecurringBills(currentSelectedDate.value));
 
                   //Pop page
                   added.value = true;

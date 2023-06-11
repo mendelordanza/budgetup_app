@@ -1,10 +1,10 @@
 import 'package:budgetup_app/helper/date_helper.dart';
+import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../domain/expense_category.dart';
-import 'bloc/expense_bloc.dart';
 
 class AddExpenseCategoryPage extends HookWidget {
   final ExpenseCategory? expenseCategory;
@@ -68,7 +68,7 @@ class AddExpenseCategoryPage extends HookWidget {
                       budget: double.parse(budgetTextController.text),
                       updatedAt: removeTimeFromDate(DateTime.now()),
                     );
-                    context.read<ExpenseBloc>().add(
+                    context.read<ModifyExpensesBloc>().add(
                         EditExpenseCategory(expenseCategory: editedCategory));
                   } else {
                     //Add
@@ -79,10 +79,10 @@ class AddExpenseCategoryPage extends HookWidget {
                       updatedAt: removeTimeFromDate(DateTime.now()),
                     );
                     context
-                        .read<ExpenseBloc>()
+                        .read<ModifyExpensesBloc>()
                         .add(AddExpenseCategory(expenseCategory: newCategory));
                   }
-                  context.read<ExpenseBloc>().add(LoadExpenseCategories());
+                  //context.read<ExpenseBloc>().add(LoadExpenseCategories());
 
                   //Pop page
                   added.value = true;

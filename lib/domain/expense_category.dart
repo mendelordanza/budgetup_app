@@ -24,7 +24,7 @@ class ExpenseCategory extends Equatable {
     this.updatedAt,
   });
 
-  double getTotal(DateFilterType dateFilterType, DateTime selectedDate) {
+  double getTotalByDate(DateFilterType dateFilterType, DateTime selectedDate) {
     var total = 0.00;
     List<ExpenseTxn>? filteredList;
 
@@ -64,8 +64,13 @@ class ExpenseCategory extends Equatable {
   double getTotalPercentage(
       DateFilterType dateFilterType, DateTime selectedDate) {
     final currentBudget = budget ?? 0.0;
-    var percentage = (getTotal(dateFilterType, selectedDate) / currentBudget);
+    var percentage =
+        (getTotalByDate(dateFilterType, selectedDate) / currentBudget);
     return percentage;
+  }
+
+  bool isExceeded(DateFilterType dateFilterType, DateTime selectedDate) {
+    return getTotalByDate(dateFilterType, selectedDate) >= (budget ?? 0.0);
   }
 
   ExpenseCategoryEntity toIsar(ExpenseTxnEntity expenseTxnEntity) {

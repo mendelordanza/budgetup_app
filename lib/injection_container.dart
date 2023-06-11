@@ -5,20 +5,46 @@ import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/presentation/dashboard/bloc/dashboard_cubit.dart';
 import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
+import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
+import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> setup() async {
   //Bloc
-  getIt.registerFactory(
-    () => ExpenseBloc(expensesRepository: getIt()),
+  getIt.registerLazySingleton(
+    () => DashboardCubit(
+      expensesRepository: getIt(),
+      recurringBillsRepository: getIt(),
+      transactionsModifyBloc: getIt(),
+    ),
   );
-  getIt.registerFactory(
-    () => ExpenseTxnBloc(expensesRepository: getIt()),
+  getIt.registerLazySingleton(
+    () => TransactionsModifyBloc(
+      expensesRepository: getIt(),
+    ),
+  );
+  getIt.registerLazySingleton(
+    () => ExpenseTxnBloc(
+      expensesRepository: getIt(),
+      transactionsModifyBloc: getIt(),
+    ),
+  );
+  getIt.registerLazySingleton(
+    () => ModifyExpensesBloc(
+      expensesRepository: getIt(),
+    ),
+  );
+  getIt.registerLazySingleton(
+    () => ExpenseBloc(
+      expensesRepository: getIt(),
+      modifyExpensesBloc: getIt(),
+      transactionsModifyBloc: getIt(),
+    ),
   );
   getIt.registerFactory(
     () => RecurringBillBloc(recurringBillsRepo: getIt()),
@@ -28,10 +54,6 @@ Future<void> setup() async {
   );
   getIt.registerFactory(
     () => RecurringDateFilterBloc(sharedPrefs: getIt()),
-  );
-  getIt.registerFactory(
-    () => DashboardCubit(
-        expensesRepository: getIt(), recurringBillsRepository: getIt()),
   );
 
   //Repository

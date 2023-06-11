@@ -4,6 +4,8 @@ import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_b
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
@@ -46,19 +48,39 @@ class ExpensesPage extends HookWidget {
                   );
                 },
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
                       builder: (context, state) {
                         if (state is ExpenseDateFilterSelected) {
-                          return Text(getMonthText(
-                              state.dateFilterType, state.selectedDate));
+                          return Text(
+                            getMonthText(
+                                state.dateFilterType, state.selectedDate),
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w500,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          );
                         }
-                        return Text(getMonthText(
-                            enumFromString(currentDateFilterType),
-                            currentSelectedDate));
+                        return Text(
+                          getMonthText(enumFromString(currentDateFilterType),
+                              currentSelectedDate),
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        );
                       },
                     ),
-                    Icon(Icons.keyboard_arrow_down),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: SvgPicture.asset(
+                        "assets/icons/ic_arrow_down.svg",
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -73,16 +95,30 @@ class ExpensesPage extends HookWidget {
                 return Text("Empty categories");
               },
             ),
+            SizedBox(
+              height: 27.0,
+            ),
             Row(
               children: [
                 Spacer(),
-                TextButton(
-                  onPressed: () {
+                GestureDetector(
+                  onTap: () {
                     Navigator.pushNamed(context, RouteStrings.addCategory);
                   },
-                  child: Text("Add Category"),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Iconsax.add,
+                        size: 20.0,
+                      ),
+                      Text("Add Category"),
+                    ],
+                  ),
                 ),
               ],
+            ),
+            SizedBox(
+              height: 10.0,
             ),
             Expanded(
               child: BlocBuilder<ExpenseBloc, ExpenseState>(
@@ -96,8 +132,12 @@ class ExpensesPage extends HookWidget {
                         final item = state.expenseCategories[index];
                         return _categoryItem(context, item);
                       },
+                      padding: EdgeInsets.only(bottom: 16.0),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2),
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 15.0,
+                        crossAxisSpacing: 15.0,
+                      ),
                     );
                   }
                   return Center(child: Text("Empty categories"));
@@ -127,63 +167,119 @@ class ExpensesPage extends HookWidget {
           arguments: item,
         );
       },
-      child: Column(
-        children: [
-          Row(
+      child: Material(
+        shape: ContinuousRectangleBorder(
+          borderRadius: BorderRadius.circular(40.0),
+        ),
+        color: Theme.of(context).cardColor,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 8.0,
+            horizontal: 24.0,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Flexible(
-                child: Column(
-                  children: [
-                    Text(item.title ?? "hello"),
-                    Text("${item.budget}"),
-                    BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
-                      builder: (context, state) {
-                        if (state is ExpenseDateFilterSelected) {
-                          return Text(
-                              "${item.getTotal(state.dateFilterType, state.selectedDate)}");
-                        }
+              Column(
+                children: [
+                  Icon(
+                    Iconsax.car,
+                    size: 30.0,
+                  ),
+                  SizedBox(
+                    height: 3.0,
+                  ),
+                  Text(
+                    item.title ?? "hello",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
+                    builder: (context, state) {
+                      if (state is ExpenseDateFilterSelected) {
                         return Text(
-                            "${item.getTotal(enumFromString(currentDateFilterType), currentSelectedDate)}");
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                onPressed: () {
-                  context.read<ExpenseBloc>().add(
-                        RemoveExpenseCategory(expenseCategory: item),
+                          "${item.getTotalByDate(state.dateFilterType, state.selectedDate)}",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        );
+                      }
+                      return Text(
+                        "${item.getTotalByDate(enumFromString(currentDateFilterType), currentSelectedDate)}",
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).primaryColor,
+                        ),
                       );
-                },
-                icon: Icon(Icons.delete),
+                    },
+                  ),
+                  SizedBox(
+                    height: 5.0,
+                  ),
+                  BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
+                    builder: (context, state) {
+                      if (state is ExpenseDateFilterSelected) {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            height: 12,
+                            child: LinearProgressIndicator(
+                              value: item.getTotalPercentage(
+                                  state.dateFilterType, state.selectedDate),
+                              color: item.isExceeded(
+                                      state.dateFilterType, state.selectedDate)
+                                  ? Colors.red
+                                  : null,
+                            ),
+                          ),
+                        );
+                      }
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          height: 12,
+                          child: LinearProgressIndicator(
+                            value: item.getTotalPercentage(
+                                enumFromString(currentDateFilterType),
+                                currentSelectedDate),
+                            color: item.isExceeded(
+                                    enumFromString(currentDateFilterType),
+                                    currentSelectedDate)
+                                ? Colors.red
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
-              IconButton(
-                onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    RouteStrings.addCategory,
-                    arguments: item,
-                  );
-                },
-                icon: Icon(Icons.edit),
+              Column(
+                children: [
+                  Text(
+                    "Budget",
+                    style: TextStyle(
+                      fontSize: 12.0,
+                    ),
+                  ),
+                  Text(
+                    "${item.budget}",
+                    style: TextStyle(
+                      fontSize: 12.0,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
-            builder: (context, state) {
-              if (state is ExpenseDateFilterSelected) {
-                return LinearProgressIndicator(
-                  value: item.getTotalPercentage(
-                      state.dateFilterType, state.selectedDate),
-                );
-              }
-              return LinearProgressIndicator(
-                value: item.getTotalPercentage(
-                    enumFromString(currentDateFilterType), currentSelectedDate),
-              );
-            },
-          ),
-        ],
+        ),
       ),
     );
   }

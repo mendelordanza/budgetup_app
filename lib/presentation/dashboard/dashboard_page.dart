@@ -39,28 +39,56 @@ class DashboardPage extends HookWidget {
               SizedBox(
                 height: 20,
               ),
-              Balance(
-                  headerLabel: Tooltip(
-                    message:
-                        'Total Expenses + Total Recurring Bills for the month of $currentMonth',
-                    textAlign: TextAlign.center,
-                    triggerMode: TooltipTriggerMode.tap,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text("Total"),
-                        SizedBox(
-                          width: 5,
+              BlocBuilder<DashboardCubit, DashboardState>(
+                builder: (context, state) {
+                  if (state is DashboardLoaded) {
+                    return Balance(
+                        headerLabel: Tooltip(
+                          message:
+                              'Total Expenses + Total Paid Recurring Bills for the month of $currentMonth',
+                          textAlign: TextAlign.center,
+                          triggerMode: TooltipTriggerMode.tap,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text("Total"),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Icon(
+                                Iconsax.info_circle,
+                                size: 16,
+                              ),
+                            ],
+                          ),
+                          showDuration: Duration(seconds: 3),
                         ),
-                        Icon(
-                          Iconsax.info_circle,
-                          size: 16,
+                        total: "${state.overallTotal}");
+                  }
+                  return Balance(
+                      headerLabel: Tooltip(
+                        message:
+                            'Total Expenses + Total Paid Recurring Bills for the month of $currentMonth',
+                        textAlign: TextAlign.center,
+                        triggerMode: TooltipTriggerMode.tap,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text("Total"),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Icon(
+                              Iconsax.info_circle,
+                              size: 16,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    showDuration: Duration(seconds: 3),
-                  ),
-                  total: "1,000.00"),
+                        showDuration: Duration(seconds: 3),
+                      ),
+                      total: "0.00");
+                },
+              ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -96,36 +124,39 @@ class DashboardPage extends HookWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: (state is DashboardLoaded &&
-                      state.dashboardCategories.isNotEmpty)
+                      state.expensesCategories.isNotEmpty)
                   ? Column(
                       children: [
                         ListView.builder(
                           shrinkWrap: true,
-                          itemCount: state.dashboardCategories.length,
+                          itemCount: state.expensesCategories.length,
                           itemBuilder: (context, index) {
-                            final item = state.dashboardCategories[index];
+                            final item = state.expensesCategories[index];
                             if (item.expenseTransactions != null &&
                                 item.expenseTransactions!.isNotEmpty) {
-                              return Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      "${item.title}",
-                                      style: TextStyle(
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.w500,
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 10.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "${item.title}",
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Text(
-                                      "${item.getTotal(DateFilterType.monthly, DateTime.now())}")
-                                ],
+                                    Text(
+                                        "${item.getTotalByDate(DateFilterType.monthly, DateTime.now())}")
+                                  ],
+                                ),
                               );
                             }
                           },
                         ),
                         Divider(),
-                        if (state.dashboardCategories.isNotEmpty)
+                        if (state.expensesCategories.isNotEmpty)
                           Row(
                             children: [
                               Expanded(
@@ -138,7 +169,7 @@ class DashboardPage extends HookWidget {
                                 ),
                               ),
                               Text(
-                                "PHP ${state.dashboardTotal}",
+                                "PHP ${state.expensesTotal}",
                                 style: TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.w600,

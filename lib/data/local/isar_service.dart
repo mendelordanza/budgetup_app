@@ -15,7 +15,7 @@ class IsarService {
 
   Future<double> getTotalExpenseByDate(DateTime date) async {
     final isar = await db;
-    var total = 0.0;
+    var total = 0.00;
     final amountList = await isar.expenseTxnEntitys
         .where()
         .filter()
@@ -99,6 +99,7 @@ class IsarService {
     return await isar.expenseTxnEntitys
         .filter()
         .category((q) => q.idEqualTo(categoryId))
+        .sortByUpdatedAt()
         .findAll();
   }
 
@@ -113,7 +114,10 @@ class IsarService {
     return await isar.recurringBillEntitys
         .where()
         .filter()
-        .recurringBillTxns((q) => q.datePaidLessThan(datePaid))
+        .recurringBillTxns(
+            (q) => q.datePaidGreaterThan(getFirstDayOfMonth(datePaid)))
+        .recurringBillTxns(
+            (q) => q.datePaidLessThan(getLastDayOfMonth(datePaid)))
         .findAll();
   }
 

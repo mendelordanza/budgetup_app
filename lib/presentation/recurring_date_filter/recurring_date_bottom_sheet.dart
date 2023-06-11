@@ -60,7 +60,7 @@ class RecurringDateBottomSheet extends HookWidget {
                                 element.type, _selectedDate.value));
                         context
                             .read<RecurringBillBloc>()
-                            .add(LoadRecurringBills());
+                            .add(LoadRecurringBills(_selectedDate.value));
                       },
                     );
                   }).toList(),
@@ -92,7 +92,7 @@ class RecurringDateBottomSheet extends HookWidget {
                     context.read<RecurringDateFilterBloc>().add(
                         RecurringSelectDate(
                             _selectedFilterType.value, selectedDay));
-                    context.read<RecurringBillBloc>().add(LoadRecurringBills());
+                    context.read<RecurringBillBloc>().add(LoadRecurringBills(selectedDay));
                   },
                   startingDayOfWeek: StartingDayOfWeek.monday,
                   calendarBuilders: CalendarBuilders(

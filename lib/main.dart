@@ -2,9 +2,11 @@ import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/presentation/dashboard/bloc/dashboard_cubit.dart';
 import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
+import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
+import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -32,7 +34,16 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
+          create: (context) => getIt<DashboardCubit>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<ModifyExpensesBloc>(),
+        ),
+        BlocProvider(
           create: (context) => getIt<ExpenseBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => getIt<TransactionsModifyBloc>(),
         ),
         BlocProvider(
           create: (context) => getIt<ExpenseTxnBloc>(),
@@ -45,9 +56,6 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => getIt<RecurringDateFilterBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<DashboardCubit>(),
         ),
       ],
       child: MaterialApp(

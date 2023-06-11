@@ -21,6 +21,10 @@ class MyThemes {
       ),
     ),
     fontFamily: 'Quicksand',
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: secondaryColor,
+      linearTrackColor: Colors.grey,
+    ),
   );
 
   static final lightTheme = ThemeData(
@@ -41,5 +45,9 @@ class MyThemes {
       ),
     ),
     fontFamily: 'Quicksand',
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: secondaryColor,
+      linearTrackColor: Colors.grey,
+    ),
   );
 }

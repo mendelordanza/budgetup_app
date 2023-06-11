@@ -18,8 +18,11 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
     on<LoadRecurringBills>((event, emit) async {
       final recurringBills = await recurringBillsRepo.getRecurringBills();
 
+      final paidRecurringBills =
+          await recurringBillsRepo.getPaidRecurringBills(event.selectedDate);
+
       emit(RecurringBillsLoaded(
-        total: getPaidRecurringBillTotal(recurringBills),
+        total: getPaidRecurringBillTotal(paidRecurringBills),
         recurringBills: recurringBills,
       ));
     });
@@ -72,9 +75,8 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
         //Transactions
         final recurringBills = await recurringBillsRepo.getRecurringBills();
 
-        //Dashboard Summary
         final paidRecurringBills =
-            await recurringBillsRepo.getPaidRecurringBills(DateTime.now());
+            await recurringBillsRepo.getPaidRecurringBills(event.selectedDate);
 
         emit(RecurringBillsLoaded(
           total: getPaidRecurringBillTotal(paidRecurringBills),
@@ -98,9 +100,13 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
         //Update the list
         currentState.recurringBills[index] = newRecurringBill;
 
+        final paidRecurringBills = currentState.recurringBills.where((element) {
+          return element.isPaid(event.selectedDate);
+        }).toList();
+
         emit(
           RecurringBillsLoaded(
-            total: getPaidRecurringBillTotal(currentState.recurringBills),
+            total: getPaidRecurringBillTotal(paidRecurringBills),
             recurringBills: List.from(currentState.recurringBills),
           ),
         );

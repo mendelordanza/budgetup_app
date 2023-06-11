@@ -11,25 +11,3 @@ class LoadExpenseTxns extends ExpenseTxnEvent {
 
   LoadExpenseTxns({required this.categoryId});
 }
-
-//Add Transaction
-class AddExpenseTxn extends ExpenseTxnEvent {
-  final ExpenseCategory expenseCategory;
-  final ExpenseTxn expenseTxn;
-
-  AddExpenseTxn({required this.expenseCategory, required this.expenseTxn});
-}
-
-//Edit Transaction
-class EditExpenseTxn extends ExpenseTxnEvent {
-  final ExpenseTxn expenseTxn;
-
-  EditExpenseTxn({required this.expenseTxn});
-}
-
-//Remove Transaction
-class RemoveExpenseTxn extends ExpenseTxnEvent {
-  final ExpenseTxn expenseTxn;
-
-  RemoveExpenseTxn({required this.expenseTxn});
-}

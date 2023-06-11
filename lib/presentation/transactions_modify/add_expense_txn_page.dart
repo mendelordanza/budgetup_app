@@ -1,13 +1,10 @@
 import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/domain/expense_txn.dart';
 import 'package:budgetup_app/helper/date_helper.dart';
-import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
-import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
+import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-
-import '../dashboard/bloc/dashboard_cubit.dart';
 
 class ExpenseTxnArgs {
   final ExpenseCategory expenseCategory;
@@ -38,12 +35,11 @@ class AddExpenseTxnPage extends HookWidget {
 
     useEffect(() {
       if (added.value) {
-        context
-            .read<ExpenseTxnBloc>()
-            .add(LoadExpenseTxns(categoryId: args.expenseCategory.id!));
-        context.read<ExpenseBloc>().add(LoadExpenseCategories());
-        context.read<DashboardCubit>().getSummary();
-        Navigator.pop(context);
+        // context
+        //     .read<ExpenseTxnBloc>()
+        //     .add(LoadExpenseTxns(categoryId: args.expenseCategory.id!));
+        //context.read<ExpenseBloc>().add(LoadExpenseCategories());
+        //context.read<DashboardCubit>().getSummary();
       }
     }, [added.value]);
 
@@ -81,7 +77,9 @@ class AddExpenseTxnPage extends HookWidget {
                         firstDate: DateTime(2015, 8),
                         lastDate: DateTime(2101),
                       ).then((date) {
-                        currentSelectedDate.value = date!;
+                        if (date != null) {
+                          currentSelectedDate.value = date;
+                        }
                       });
                     },
                     validator: (value) {
@@ -104,9 +102,9 @@ class AddExpenseTxnPage extends HookWidget {
                       notes: notesTextController.text,
                       updatedAt: removeTimeFromDate(currentSelectedDate.value),
                     );
-                    context
-                        .read<ExpenseTxnBloc>()
-                        .add(EditExpenseTxn(expenseTxn: editedTxn));
+                    context.read<TransactionsModifyBloc>().add(EditExpenseTxn(
+                        expenseCategory: args.expenseCategory,
+                        expenseTxn: editedTxn));
                   } else {
                     //Add
                     final newTxn = ExpenseTxn(
@@ -115,7 +113,7 @@ class AddExpenseTxnPage extends HookWidget {
                       createdAt: removeTimeFromDate(currentSelectedDate.value),
                       updatedAt: removeTimeFromDate(currentSelectedDate.value),
                     );
-                    context.read<ExpenseTxnBloc>().add(
+                    context.read<TransactionsModifyBloc>().add(
                           AddExpenseTxn(
                             expenseTxn: newTxn,
                             expenseCategory: args.expenseCategory,
