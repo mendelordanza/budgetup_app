@@ -89,16 +89,20 @@ class DashboardPage extends HookWidget {
                       total: "0.00");
                 },
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    _yourExpenses(currentMonth),
-                    SizedBox(
-                      height: 20,
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        _yourExpenses(currentMonth),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        _billsPaid(currentMonth),
+                      ],
                     ),
-                    _billsPaid(currentMonth),
-                  ],
+                  ),
                 ),
               )
             ],
@@ -128,6 +132,7 @@ class DashboardPage extends HookWidget {
                   ? Column(
                       children: [
                         ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: state.expensesCategories.length,
                           itemBuilder: (context, index) {
@@ -215,6 +220,7 @@ class DashboardPage extends HookWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: state.paidRecurringBills.length,
                         itemBuilder: (context, index) {

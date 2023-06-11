@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../helper/date_helper.dart';
-import 'bloc/recurring_bill_bloc.dart';
+import 'bloc/recurring_modify_bloc.dart';
 
 class AddRecurringBillPage extends HookWidget {
   final RecurringBill? recurringBill;
@@ -99,8 +99,9 @@ class AddRecurringBillPage extends HookWidget {
                       amount: double.parse(amountTextController.text),
                       reminderDate: currentSelectedDate.value,
                     );
-                    context.read<RecurringBillBloc>().add(
-                        EditRecurringBill(recurringBill: editedRecurringBill));
+                    context.read<RecurringModifyBloc>().add(EditRecurringBill(
+                        selectedDate: currentSelectedDate.value,
+                        recurringBill: editedRecurringBill));
                   } else {
                     //Add
                     final newRecurringBill = RecurringBill(
@@ -110,13 +111,10 @@ class AddRecurringBillPage extends HookWidget {
                       createdAt: DateTime.now(),
                       updatedAt: DateTime.now(),
                     );
-                    context
-                        .read<RecurringBillBloc>()
-                        .add(AddRecurringBill(recurringBill: newRecurringBill));
+                    context.read<RecurringModifyBloc>().add(AddRecurringBill(
+                        selectedDate: currentSelectedDate.value,
+                        recurringBill: newRecurringBill));
                   }
-                  context
-                      .read<RecurringBillBloc>()
-                      .add(LoadRecurringBills(currentSelectedDate.value));
 
                   //Pop page
                   added.value = true;

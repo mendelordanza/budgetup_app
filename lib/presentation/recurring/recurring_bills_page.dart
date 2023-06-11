@@ -3,6 +3,7 @@ import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/presentation/custom/balance.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_date_filter/recurring_date_bottom_sheet.dart';
+import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -14,7 +15,6 @@ import '../../domain/recurring_bill_txn.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
-import '../dashboard/bloc/dashboard_cubit.dart';
 import '../recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
 
 class RecurringBillsPage extends HookWidget {
@@ -187,7 +187,7 @@ class RecurringBillsPage extends HookWidget {
                   value: item.isPaid(state.selectedDate) ? true : false,
                   onChanged: (checked) async {
                     if (item.isPaid(state.selectedDate)) {
-                      context.read<RecurringBillBloc>().add(
+                      context.read<RecurringModifyBloc>().add(
                             RemoveRecurringBillTxn(
                               selectedDate: state.selectedDate,
                               recurringBill: item,
@@ -199,7 +199,7 @@ class RecurringBillsPage extends HookWidget {
                         isPaid: checked ?? false,
                         datePaid: removeTimeFromDate(state.selectedDate),
                       );
-                      context.read<RecurringBillBloc>().add(
+                      context.read<RecurringModifyBloc>().add(
                             AddRecurringBillTxn(
                               selectedDate: state.selectedDate,
                               recurringBill: item,
@@ -207,9 +207,6 @@ class RecurringBillsPage extends HookWidget {
                             ),
                           );
                     }
-
-                    //Update Summary
-                    context.read<DashboardCubit>().getSummary();
                   },
                 ),
                 Expanded(
@@ -233,7 +230,7 @@ class RecurringBillsPage extends HookWidget {
                 value: item.isPaid(currentSelectedDate) ? true : false,
                 onChanged: (checked) async {
                   if (item.isPaid(currentSelectedDate) && txn != null) {
-                    context.read<RecurringBillBloc>().add(
+                    context.read<RecurringModifyBloc>().add(
                           RemoveRecurringBillTxn(
                             selectedDate: currentSelectedDate,
                             recurringBill: item,
@@ -245,7 +242,7 @@ class RecurringBillsPage extends HookWidget {
                       isPaid: checked ?? false,
                       datePaid: removeTimeFromDate(currentSelectedDate),
                     );
-                    context.read<RecurringBillBloc>().add(
+                    context.read<RecurringModifyBloc>().add(
                           AddRecurringBillTxn(
                             selectedDate: currentSelectedDate,
                             recurringBill: item,
@@ -253,9 +250,6 @@ class RecurringBillsPage extends HookWidget {
                           ),
                         );
                   }
-
-                  //Update Summary
-                  context.read<DashboardCubit>().getSummary();
                 },
               ),
               Expanded(

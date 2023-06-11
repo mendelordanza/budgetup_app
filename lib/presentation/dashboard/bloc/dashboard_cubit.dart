@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:budgetup_app/data/expenses_repository.dart';
+import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:meta/meta.dart';
 
@@ -16,17 +17,30 @@ class DashboardCubit extends Cubit<DashboardState> {
   final ExpensesRepository expensesRepository;
   final RecurringBillsRepository recurringBillsRepository;
   final TransactionsModifyBloc transactionsModifyBloc;
+  final RecurringModifyBloc recurringModifyBloc;
   StreamSubscription? _expenseTxnSubscription;
+  StreamSubscription? _recurringTxnSubscription;
 
   DashboardCubit({
     required this.expensesRepository,
     required this.recurringBillsRepository,
     required this.transactionsModifyBloc,
+    required this.recurringModifyBloc,
   }) : super(DashboardInitial()) {
     _expenseTxnSubscription = transactionsModifyBloc.stream.listen((state) {
       if (state is ExpenseTxnAdded ||
           state is ExpenseTxnEdited ||
           state is ExpenseTxnRemoved) {
+        getSummary();
+      }
+    });
+
+    _recurringTxnSubscription = recurringModifyBloc.stream.listen((state) {
+      if (state is RecurringBillAdded ||
+          state is RecurringBillEdited ||
+          state is RecurringBillRemoved ||
+          state is MarkAsPaid ||
+          state is UnmarkAsPaid) {
         getSummary();
       }
     });
