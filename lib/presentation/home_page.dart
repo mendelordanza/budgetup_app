@@ -10,7 +10,7 @@ class HomePage extends HookWidget {
   HomePage({super.key});
 
   final _pages = [
-    DashboardPage(),
+    //DashboardPage(),
     TransactionsPage(),
   ];
 
@@ -36,23 +36,23 @@ class HomePage extends HookWidget {
         index: _selectedIndex.value,
         children: _pages,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: secondaryColor,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Iconsax.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Iconsax.dollar_circle),
-            label: 'Transactions',
-          ),
-        ],
-        currentIndex: _selectedIndex.value,
-        onTap: (index) {
-          _selectedIndex.value = index;
-        },
-      ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   selectedItemColor: secondaryColor,
+      //   items: [
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Iconsax.home),
+      //       label: 'Home',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Iconsax.dollar_circle),
+      //       label: 'Transactions',
+      //     ),
+      //   ],
+      //   currentIndex: _selectedIndex.value,
+      //   onTap: (index) {
+      //     _selectedIndex.value = index;
+      //   },
+      // ),
     );
   }
 }

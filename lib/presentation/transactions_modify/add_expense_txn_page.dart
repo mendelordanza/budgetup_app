@@ -78,6 +78,11 @@ class AddExpenseTxnPage extends HookWidget {
                     children: [
                       CustomTextField(
                         controller: amountTextController,
+                        label: "Category",
+                        onTap: () {},
+                      ),
+                      CustomTextField(
+                        controller: amountTextController,
                         textInputType:
                             TextInputType.numberWithOptions(decimal: true),
                         label: "Amount",

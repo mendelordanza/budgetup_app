@@ -20,6 +20,9 @@ class MyThemes {
         fontFamily: 'Quicksand',
         fontWeight: FontWeight.w600,
       ),
+      actionsIconTheme: IconThemeData(
+        color: Colors.white,
+      ),
     ),
     fontFamily: 'Quicksand',
     progressIndicatorTheme: ProgressIndicatorThemeData(
@@ -44,6 +47,9 @@ class MyThemes {
         color: dark,
         fontFamily: 'Quicksand',
         fontWeight: FontWeight.w600,
+      ),
+      actionsIconTheme: IconThemeData(
+        color: dark,
       ),
     ),
     fontFamily: 'Quicksand',

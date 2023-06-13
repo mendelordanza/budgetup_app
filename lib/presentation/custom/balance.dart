@@ -29,17 +29,22 @@ class Balance extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            // Container(
-            //   padding: EdgeInsets.symmetric(
-            //     horizontal: 8.0,
-            //     vertical: 4.0,
-            //   ),
-            //   decoration: BoxDecoration(
-            //     color: red.withOpacity(0.5),
-            //     borderRadius: BorderRadius.circular(4.0),
-            //   ),
-            //   child: Text("PHP 30.00 higher than last month"),
-            // )
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 4.0,
+              ),
+              decoration: BoxDecoration(
+                color: red.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(4.0),
+              ),
+              child: Text(
+                "Total Monthly Budget: PHP 10,000.00",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                ),
+              ),
+            )
           ],
         ),
       ),

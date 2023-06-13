@@ -12,7 +12,9 @@ import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
 import '../custom/balance.dart';
+import '../custom/custom_floating_button.dart';
 import '../expense_date_filter/date_bottom_sheet.dart';
+import '../transactions_modify/add_expense_txn_page.dart';
 import 'bloc/expense_bloc.dart';
 
 class ExpensesPage extends HookWidget {
@@ -33,123 +35,137 @@ class ExpensesPage extends HookWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: GestureDetector(
-                onTap: () {
-                  showModalBottomSheet(
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    context: context,
-                    builder: (context) {
-                      return ExpenseDateBottomSheet();
-                    },
-                  );
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
-                      builder: (context, state) {
-                        if (state is ExpenseDateFilterSelected) {
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      context: context,
+                      builder: (context) {
+                        return ExpenseDateBottomSheet();
+                      },
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      BlocBuilder<ExpenseDateFilterBloc,
+                          ExpenseDateFilterState>(
+                        builder: (context, state) {
+                          if (state is ExpenseDateFilterSelected) {
+                            return Text(
+                              getMonthText(
+                                  state.dateFilterType, state.selectedDate),
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            );
+                          }
                           return Text(
-                            getMonthText(
-                                state.dateFilterType, state.selectedDate),
+                            getMonthText(enumFromString(currentDateFilterType),
+                                currentSelectedDate),
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.w500,
                               color: Theme.of(context).primaryColor,
                             ),
                           );
-                        }
-                        return Text(
-                          getMonthText(enumFromString(currentDateFilterType),
-                              currentSelectedDate),
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        );
-                      },
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: SvgPicture.asset(
-                        "assets/icons/ic_arrow_down.svg",
-                        color: Theme.of(context).primaryColor,
+                        },
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            BlocBuilder<ExpenseBloc, ExpenseState>(
-              builder: (context, state) {
-                if (state is ExpenseCategoryLoaded && state.total != null) {
-                  return Balance(
-                    headerLabel: Text("Total Expenses"),
-                    total: state.total,
-                  );
-                }
-                return Text("Empty categories");
-              },
-            ),
-            SizedBox(
-              height: 27.0,
-            ),
-            Row(
-              children: [
-                Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, RouteStrings.addCategory);
-                  },
-                  child: Row(
-                    children: [
-                      Icon(
-                        Iconsax.add,
-                        size: 20.0,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: SvgPicture.asset(
+                          "assets/icons/ic_arrow_down.svg",
+                          color: Theme.of(context).primaryColor,
+                        ),
                       ),
-                      Text("Add Category"),
                     ],
                   ),
                 ),
-              ],
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            Expanded(
-              child: BlocBuilder<ExpenseBloc, ExpenseState>(
+              ),
+              BlocBuilder<ExpenseBloc, ExpenseState>(
                 builder: (context, state) {
-                  if (state is ExpenseCategoryLoaded &&
-                      state.expenseCategories.isNotEmpty) {
-                    return GridView.builder(
-                      shrinkWrap: true,
-                      itemCount: state.expenseCategories.length,
-                      itemBuilder: (context, index) {
-                        final item = state.expenseCategories[index];
-                        return _categoryItem(context, item);
-                      },
-                      padding: EdgeInsets.only(bottom: 16.0),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 15.0,
-                        crossAxisSpacing: 15.0,
-                      ),
+                  if (state is ExpenseCategoryLoaded && state.total != null) {
+                    return Balance(
+                      headerLabel: Text("Total Expenses"),
+                      total: state.total,
                     );
                   }
-                  return Center(child: Text("Empty categories"));
+                  return Text("Empty categories");
                 },
               ),
-            ),
-          ],
+              SizedBox(
+                height: 27.0,
+              ),
+              Row(
+                children: [
+                  Spacer(),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, RouteStrings.addCategory);
+                    },
+                    child: Row(
+                      children: [
+                        Icon(
+                          Iconsax.add,
+                          size: 20.0,
+                        ),
+                        Text("Add Category"),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Expanded(
+                child: BlocBuilder<ExpenseBloc, ExpenseState>(
+                  builder: (context, state) {
+                    if (state is ExpenseCategoryLoaded &&
+                        state.expenseCategories.isNotEmpty) {
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        itemCount: state.expenseCategories.length,
+                        itemBuilder: (context, index) {
+                          final item = state.expenseCategories[index];
+                          return _categoryItem(context, item);
+                        },
+                        padding: EdgeInsets.only(bottom: 16.0),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 15.0,
+                          crossAxisSpacing: 15.0,
+                        ),
+                      );
+                    }
+                    return Center(child: Text("Empty categories"));
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
+      // floatingActionButton: CustomFloatingButton(
+      //   onPressed: () {
+      //     Navigator.pushNamed(
+      //       context,
+      //       RouteStrings.addTransaction,
+      //     );
+      //   },
+      // ),
     );
   }
 

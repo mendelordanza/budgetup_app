@@ -38,130 +38,137 @@ class RecurringBillsPage extends HookWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: GestureDetector(
-                onTap: () {
-                  showModalBottomSheet(
-                    backgroundColor: Colors.transparent,
-                    context: context,
-                    builder: (context) {
-                      return RecurringDateBottomSheet();
-                    },
-                  );
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    BlocBuilder<RecurringDateFilterBloc,
-                        RecurringDateFilterState>(
-                      builder: (context, state) {
-                        if (state is RecurringDateFilterSelected) {
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      backgroundColor: Colors.transparent,
+                      context: context,
+                      builder: (context) {
+                        return RecurringDateBottomSheet();
+                      },
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      BlocBuilder<RecurringDateFilterBloc,
+                          RecurringDateFilterState>(
+                        builder: (context, state) {
+                          if (state is RecurringDateFilterSelected) {
+                            return Text(
+                              getMonthText(
+                                  state.dateFilterType, state.selectedDate),
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            );
+                          }
                           return Text(
-                            getMonthText(
-                                state.dateFilterType, state.selectedDate),
+                            getMonthText(enumFromString(currentDateFilterType),
+                                currentSelectedDate),
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.w500,
                               color: Theme.of(context).primaryColor,
                             ),
                           );
-                        }
-                        return Text(
-                          getMonthText(enumFromString(currentDateFilterType),
-                              currentSelectedDate),
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        );
-                      },
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: SvgPicture.asset(
-                        "assets/icons/ic_arrow_down.svg",
-                        color: Theme.of(context).primaryColor,
+                        },
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            BlocBuilder<RecurringBillBloc, RecurringBillState>(
-              builder: (context, state) {
-                if (state is RecurringBillsLoaded && state.total != null) {
-                  return Balance(
-                    headerLabel: Text("Total Paid Recurring Bills"),
-                    total: state.total!,
-                  );
-                }
-                return Text("Empty categories");
-              },
-            ),
-            SizedBox(
-              height: 27.0,
-            ),
-            Row(
-              children: [
-                Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, RouteStrings.addRecurringBill);
-                  },
-                  child: Row(
-                    children: [
-                      Icon(
-                        Iconsax.add,
-                        size: 20.0,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: SvgPicture.asset(
+                          "assets/icons/ic_arrow_down.svg",
+                          color: Theme.of(context).primaryColor,
+                        ),
                       ),
-                      Text("Add Recurring Bill"),
                     ],
                   ),
                 ),
-              ],
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            Expanded(
-              child: BlocBuilder<RecurringBillBloc, RecurringBillState>(
+              ),
+              BlocBuilder<RecurringBillBloc, RecurringBillState>(
                 builder: (context, state) {
-                  if (state is RecurringBillsLoaded) {
-                    if (state.recurringBills.isNotEmpty) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: state.recurringBills.length,
-                        itemBuilder: (context, index) {
-                          final item = state.recurringBills[index];
-                          final txn = item.recurringBillTxns?.firstWhereOrNull(
-                            (element) =>
-                                element.datePaid?.month ==
-                                currentSelectedDate.month,
-                          );
-                          return _recurringBillItem(
-                            context,
-                            item: item,
-                            txn: txn,
-                            currentSelectedDate: currentSelectedDate,
-                          );
-                        },
-                      );
-                    } else {
-                      return Center(
-                        child: Text("Empty Recurring Bills"),
-                      );
-                    }
+                  if (state is RecurringBillsLoaded && state.total != null) {
+                    return Balance(
+                      headerLabel: Text("Total Paid Recurring Bills"),
+                      total: state.total!,
+                    );
                   }
-                  return Text("Empty Recurring Bills");
+                  return Text("Empty categories");
                 },
               ),
-            ),
-          ],
+              SizedBox(
+                height: 27.0,
+              ),
+              Row(
+                children: [
+                  Spacer(),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                          context, RouteStrings.addRecurringBill);
+                    },
+                    child: Row(
+                      children: [
+                        Icon(
+                          Iconsax.add,
+                          size: 20.0,
+                        ),
+                        Text("Add Recurring Bill"),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              Expanded(
+                child: BlocBuilder<RecurringBillBloc, RecurringBillState>(
+                  builder: (context, state) {
+                    if (state is RecurringBillsLoaded) {
+                      if (state.recurringBills.isNotEmpty) {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: state.recurringBills.length,
+                          itemBuilder: (context, index) {
+                            final item = state.recurringBills[index];
+                            final txn =
+                                item.recurringBillTxns?.firstWhereOrNull(
+                              (element) =>
+                                  element.datePaid?.month ==
+                                  currentSelectedDate.month,
+                            );
+                            return _recurringBillItem(
+                              context,
+                              item: item,
+                              txn: txn,
+                              currentSelectedDate: currentSelectedDate,
+                            );
+                          },
+                        );
+                      } else {
+                        return Center(
+                          child: Text("Empty Recurring Bills"),
+                        );
+                      }
+                    }
+                    return Text("Empty Recurring Bills");
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -295,7 +295,10 @@ class DashboardPage extends HookWidget {
                   )
                 : Center(
                     child: Text(
-                        "Your bills paid for $currentMonth will show here"),
+                      "Your bills paid for $currentMonth will show here.\nGo to "
+                      "transactions tab to start tracking",
+                      textAlign: TextAlign.center,
+                    ),
                   ),
           ),
         ],

@@ -20,17 +20,17 @@ class TransactionsPage extends HookWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            16.0,
-            16.0,
-            16.0,
-            0.0,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                16.0,
+                16.0,
+                16.0,
+                0.0,
+              ),
+              child: Container(
                 height: 45,
                 decoration: BoxDecoration(
                   color: Color(0xFFB7B7B7),
@@ -83,17 +83,17 @@ class TransactionsPage extends HookWidget {
                   ),
                 ),
               ),
-              Expanded(
-                child: TabBarView(
-                  controller: tabController,
-                  children: [
-                    ExpensesPage(),
-                    RecurringBillsPage(),
-                  ],
-                ),
+            ),
+            Expanded(
+              child: TabBarView(
+                controller: tabController,
+                children: [
+                  ExpensesPage(),
+                  RecurringBillsPage(),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -102,7 +102,8 @@ class AddExpenseCategoryPage extends HookWidget {
                       //Edit
                       final editedCategory = expenseCategory!.copy(
                         title: titleTextController.text,
-                        budget: double.parse(budgetTextController.text),
+                        budget: double.parse(
+                            removeFormatting(budgetTextController.text)),
                         updatedAt: removeTimeFromDate(DateTime.now()),
                       );
                       context.read<ModifyExpensesBloc>().add(
@@ -111,7 +112,8 @@ class AddExpenseCategoryPage extends HookWidget {
                       //Add
                       final newCategory = ExpenseCategory(
                         title: titleTextController.text,
-                        budget: double.parse(budgetTextController.text),
+                        budget: double.parse(
+                            removeFormatting(budgetTextController.text)),
                         createdAt: removeTimeFromDate(DateTime.now()),
                         updatedAt: removeTimeFromDate(DateTime.now()),
                       );
