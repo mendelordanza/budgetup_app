@@ -7,6 +7,7 @@ class MyThemes {
     scaffoldBackgroundColor: darkBackgroundColor,
     colorScheme: ColorScheme.dark(
       onSurface: Colors.white,
+      primary: primaryColor,
     ),
     primaryColor: primaryColor,
     cardColor: Color(0xFF454545),
@@ -31,6 +32,7 @@ class MyThemes {
     scaffoldBackgroundColor: lightBackgroundColor,
     colorScheme: ColorScheme.light(
       onSurface: dark,
+      primary: primaryColor,
     ),
     cardColor: Colors.white,
     primaryColor: primaryColor,

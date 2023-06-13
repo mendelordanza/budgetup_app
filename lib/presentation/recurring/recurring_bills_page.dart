@@ -1,5 +1,7 @@
 import 'package:budgetup_app/domain/recurring_bill.dart';
+import 'package:budgetup_app/helper/colors.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
+import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/custom/balance.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_date_filter/recurring_date_bottom_sheet.dart';
@@ -94,8 +96,9 @@ class RecurringBillsPage extends HookWidget {
               builder: (context, state) {
                 if (state is RecurringBillsLoaded && state.total != null) {
                   return Balance(
-                      headerLabel: Text("Total Paid Recurring Bills"),
-                      total: "${state.total}");
+                    headerLabel: Text("Total Paid Recurring Bills"),
+                    total: state.total!,
+                  );
                 }
                 return Text("Empty categories");
               },
@@ -121,6 +124,9 @@ class RecurringBillsPage extends HookWidget {
                   ),
                 ),
               ],
+            ),
+            SizedBox(
+              height: 10.0,
             ),
             Expanded(
               child: BlocBuilder<RecurringBillBloc, RecurringBillState>(
@@ -167,106 +173,118 @@ class RecurringBillsPage extends HookWidget {
     RecurringBillTxn? txn,
     required DateTime currentSelectedDate,
   }) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          RouteStrings.addRecurringBill,
-          arguments: item,
-        );
-      },
-      child: BlocBuilder<RecurringDateFilterBloc, RecurringDateFilterState>(
-        builder: (context, state) {
-          if (state is RecurringDateFilterSelected) {
-            final txn = item.recurringBillTxns?.firstWhereOrNull(
-              (element) => element.datePaid?.month == state.selectedDate.month,
-            );
-            return Row(
-              children: [
-                Checkbox(
-                  value: item.isPaid(state.selectedDate) ? true : false,
-                  onChanged: (checked) async {
-                    if (item.isPaid(state.selectedDate)) {
-                      context.read<RecurringModifyBloc>().add(
-                            RemoveRecurringBillTxn(
-                              selectedDate: state.selectedDate,
-                              recurringBill: item,
-                              recurringBillTxn: txn!,
-                            ),
-                          );
-                    } else {
-                      final newRecurringTxn = RecurringBillTxn(
-                        isPaid: checked ?? false,
-                        datePaid: removeTimeFromDate(state.selectedDate),
-                      );
-                      context.read<RecurringModifyBloc>().add(
-                            AddRecurringBillTxn(
-                              selectedDate: state.selectedDate,
-                              recurringBill: item,
-                              recurringBillTxn: newRecurringTxn,
-                            ),
-                          );
-                    }
-                  },
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(item.title ?? "hello"),
-                      if (item.isPaid(state.selectedDate))
-                        Text(
-                            "paid ${formatDate(txn!.datePaid!, "MMM dd, yyyy")}")
-                    ],
-                  ),
-                ),
-                Text("${item.amount}"),
-              ],
-            );
-          }
-          return Row(
-            children: [
-              Checkbox(
-                value: item.isPaid(currentSelectedDate) ? true : false,
-                onChanged: (checked) async {
-                  if (item.isPaid(currentSelectedDate) && txn != null) {
-                    context.read<RecurringModifyBloc>().add(
-                          RemoveRecurringBillTxn(
-                            selectedDate: currentSelectedDate,
-                            recurringBill: item,
-                            recurringBillTxn: txn,
-                          ),
-                        );
-                  } else {
-                    final newRecurringTxn = RecurringBillTxn(
-                      isPaid: checked ?? false,
-                      datePaid: removeTimeFromDate(currentSelectedDate),
-                    );
-                    context.read<RecurringModifyBloc>().add(
-                          AddRecurringBillTxn(
-                            selectedDate: currentSelectedDate,
-                            recurringBill: item,
-                            recurringBillTxn: newRecurringTxn,
-                          ),
-                        );
-                  }
-                },
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(item.title ?? "hello"),
-                    if (item.isPaid(currentSelectedDate))
-                      Text("paid ${formatDate(txn!.datePaid!, "MMM dd, yyyy")}")
-                  ],
-                ),
-              ),
-              Text("${item.amount}"),
-            ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 13.0),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            RouteStrings.addRecurringBill,
+            arguments: item,
           );
         },
+        child: Material(
+          shape: ContinuousRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          color: Theme.of(context).cardColor,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 16.0,
+              horizontal: 21.0,
+            ),
+            child:
+                BlocBuilder<RecurringDateFilterBloc, RecurringDateFilterState>(
+              builder: (context, state) {
+                if (state is RecurringDateFilterSelected) {
+                  final txn = item.recurringBillTxns?.firstWhereOrNull(
+                    (element) =>
+                        element.datePaid?.month == state.selectedDate.month,
+                  );
+
+                  return _checkboxItem(context,
+                      selectedDate: state.selectedDate, item: item, txn: txn);
+                }
+                return _checkboxItem(
+                  context,
+                  selectedDate: currentSelectedDate,
+                  item: item,
+                  txn: txn,
+                );
+              },
+            ),
+          ),
+        ),
       ),
+    );
+  }
+
+  Widget _checkboxItem(
+    BuildContext context, {
+    required DateTime selectedDate,
+    required RecurringBill item,
+    RecurringBillTxn? txn,
+  }) {
+    return Row(
+      children: [
+        SizedBox(
+          height: 20,
+          width: 20,
+          child: Checkbox(
+            activeColor: secondaryColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                3.0,
+              ),
+            ),
+            value: item.isPaid(selectedDate) ? true : false,
+            onChanged: (checked) async {
+              if (item.isPaid(selectedDate) && txn != null) {
+                context.read<RecurringModifyBloc>().add(
+                      RemoveRecurringBillTxn(
+                        selectedDate: selectedDate,
+                        recurringBill: item,
+                        recurringBillTxn: txn,
+                      ),
+                    );
+              } else {
+                final newRecurringTxn = RecurringBillTxn(
+                  isPaid: checked ?? false,
+                  datePaid: removeTimeFromDate(selectedDate),
+                );
+                context.read<RecurringModifyBloc>().add(
+                      AddRecurringBillTxn(
+                        selectedDate: selectedDate,
+                        recurringBill: item,
+                        recurringBillTxn: newRecurringTxn,
+                      ),
+                    );
+              }
+            },
+          ),
+        ),
+        SizedBox(
+          width: 10.0,
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(item.title ?? "hello"),
+              if (item.isPaid(selectedDate) && txn != null)
+                Text("paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}")
+              else if (item.reminderDate != null)
+                Text("due ${formatDate(item.reminderDate!, "MMM dd")}")
+            ],
+          ),
+        ),
+        Text(
+          "USD ${decimalFormatter(item.amount ?? 0.00)}",
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }

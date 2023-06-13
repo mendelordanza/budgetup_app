@@ -36,10 +36,6 @@ class HomePage extends HookWidget {
         index: _selectedIndex.value,
         children: _pages,
       ),
-      floatingActionButton: CustomFloatingButton(
-        onPressed: () {},
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: secondaryColor,
         items: [

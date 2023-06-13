@@ -24,6 +24,14 @@ class ExpenseCategory extends Equatable {
     this.updatedAt,
   });
 
+  double getOverallTotal() {
+    var total = 0.00;
+    expenseTransactions?.forEach((e) {
+      total += e.amount ?? 0.00;
+    });
+    return total;
+  }
+
   double getTotalByDate(DateFilterType dateFilterType, DateTime selectedDate) {
     var total = 0.00;
     List<ExpenseTxn>? filteredList;

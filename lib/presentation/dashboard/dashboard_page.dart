@@ -1,4 +1,5 @@
 import 'package:budgetup_app/helper/date_helper.dart';
+import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/custom/balance.dart';
 import 'package:budgetup_app/presentation/dashboard/bloc/dashboard_cubit.dart';
 import 'package:flutter/material.dart';
@@ -63,30 +64,31 @@ class DashboardPage extends HookWidget {
                           ),
                           showDuration: Duration(seconds: 3),
                         ),
-                        total: "${state.overallTotal}");
+                        total: state.overallTotal);
                   }
                   return Balance(
-                      headerLabel: Tooltip(
-                        message:
-                            'Total Expenses + Total Paid Recurring Bills for the month of $currentMonth',
-                        textAlign: TextAlign.center,
-                        triggerMode: TooltipTriggerMode.tap,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text("Total"),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Icon(
-                              Iconsax.info_circle,
-                              size: 16,
-                            ),
-                          ],
-                        ),
-                        showDuration: Duration(seconds: 3),
+                    headerLabel: Tooltip(
+                      message:
+                          'Total Expenses + Total Paid Recurring Bills for the month of $currentMonth',
+                      textAlign: TextAlign.center,
+                      triggerMode: TooltipTriggerMode.tap,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text("Total"),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Icon(
+                            Iconsax.info_circle,
+                            size: 16,
+                          ),
+                        ],
                       ),
-                      total: "0.00");
+                      showDuration: Duration(seconds: 3),
+                    ),
+                    total: 0.00,
+                  );
                 },
               ),
               Expanded(
@@ -152,8 +154,9 @@ class DashboardPage extends HookWidget {
                                         ),
                                       ),
                                     ),
-                                    Text(
-                                        "${item.getTotalByDate(DateFilterType.monthly, DateTime.now())}")
+                                    Text(decimalFormatter(item.getTotalByDate(
+                                        DateFilterType.monthly,
+                                        DateTime.now()))),
                                   ],
                                 ),
                               );
@@ -174,7 +177,7 @@ class DashboardPage extends HookWidget {
                                 ),
                               ),
                               Text(
-                                "PHP ${state.expensesTotal}",
+                                "PHP ${decimalFormatter(state.expensesTotal)}",
                                 style: TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.w600,
@@ -230,7 +233,7 @@ class DashboardPage extends HookWidget {
                                 element.datePaid?.month == DateTime.now().month,
                           );
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: 10.0),
+                            padding: const EdgeInsets.only(bottom: 16.0),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -248,7 +251,7 @@ class DashboardPage extends HookWidget {
                                       if (txn != null && txn.datePaid != null)
                                         Padding(
                                           padding:
-                                              const EdgeInsets.only(top: 5.0),
+                                              const EdgeInsets.only(top: 3.0),
                                           child: Text(
                                             "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",
                                             style: TextStyle(fontSize: 12.0),
@@ -257,7 +260,9 @@ class DashboardPage extends HookWidget {
                                     ],
                                   ),
                                 ),
-                                Text("${item.amount}"),
+                                Text(
+                                  decimalFormatter(item.amount ?? 0.00),
+                                ),
                               ],
                             ),
                           );
@@ -277,7 +282,7 @@ class DashboardPage extends HookWidget {
                               ),
                             ),
                             Text(
-                              "PHP ${state.recurringBillTotal}",
+                              "PHP ${decimalFormatter(state.recurringBillTotal)}",
                               style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.w600,

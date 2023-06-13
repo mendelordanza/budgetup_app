@@ -1,10 +1,15 @@
 import 'package:budgetup_app/helper/date_helper.dart';
+import 'package:budgetup_app/presentation/custom/custom_button.dart';
+import 'package:budgetup_app/presentation/custom/custom_text_field.dart';
 import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../domain/expense_category.dart';
+import '../../helper/string.dart';
 
 class AddExpenseCategoryPage extends HookWidget {
   final ExpenseCategory? expenseCategory;
@@ -30,69 +35,101 @@ class AddExpenseCategoryPage extends HookWidget {
     }, [added.value]);
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          expenseCategory != null ? "Edit Category" : "Add Category",
+        ),
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SvgPicture.asset(
+              "assets/icons/ic_arrow_left.svg",
+            ),
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+      ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: titleTextController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
-                      }
-                      return null;
-                    },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      CustomTextField(
+                        controller: titleTextController,
+                        label: "Title",
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter some text';
+                          }
+                          return null;
+                        },
+                      ),
+                      CustomTextField(
+                        controller: budgetTextController,
+                        label: "Monthly Budget",
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          NumberInputFormatter(),
+                        ],
+                        textInputType: TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter some text';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
                   ),
-                  TextFormField(
-                    controller: budgetTextController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
-                      }
-                      return null;
-                    },
-                  ),
-                ],
+                ),
               ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  if (expenseCategory != null) {
-                    //Edit
-                    final editedCategory = expenseCategory!.copy(
-                      title: titleTextController.text,
-                      budget: double.parse(budgetTextController.text),
-                      updatedAt: removeTimeFromDate(DateTime.now()),
-                    );
-                    context.read<ModifyExpensesBloc>().add(
-                        EditExpenseCategory(expenseCategory: editedCategory));
-                  } else {
-                    //Add
-                    final newCategory = ExpenseCategory(
-                      title: titleTextController.text,
-                      budget: double.parse(budgetTextController.text),
-                      createdAt: removeTimeFromDate(DateTime.now()),
-                      updatedAt: removeTimeFromDate(DateTime.now()),
-                    );
-                    context
-                        .read<ModifyExpensesBloc>()
-                        .add(AddExpenseCategory(expenseCategory: newCategory));
-                  }
-                  //context.read<ExpenseBloc>().add(LoadExpenseCategories());
+              CustomButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    if (expenseCategory != null) {
+                      //Edit
+                      final editedCategory = expenseCategory!.copy(
+                        title: titleTextController.text,
+                        budget: double.parse(budgetTextController.text),
+                        updatedAt: removeTimeFromDate(DateTime.now()),
+                      );
+                      context.read<ModifyExpensesBloc>().add(
+                          EditExpenseCategory(expenseCategory: editedCategory));
+                    } else {
+                      //Add
+                      final newCategory = ExpenseCategory(
+                        title: titleTextController.text,
+                        budget: double.parse(budgetTextController.text),
+                        createdAt: removeTimeFromDate(DateTime.now()),
+                        updatedAt: removeTimeFromDate(DateTime.now()),
+                      );
+                      context.read<ModifyExpensesBloc>().add(
+                          AddExpenseCategory(expenseCategory: newCategory));
+                    }
+                    //context.read<ExpenseBloc>().add(LoadExpenseCategories());
 
-                  //Pop page
-                  added.value = true;
-                }
-              },
-              child: Text(
-                expenseCategory != null ? "Edit" : "Add",
+                    //Pop page
+                    added.value = true;
+                  }
+                },
+                child: Text(
+                  expenseCategory != null ? "Edit" : "Add",
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

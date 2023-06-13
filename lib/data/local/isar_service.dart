@@ -99,7 +99,7 @@ class IsarService {
     return await isar.expenseTxnEntitys
         .filter()
         .category((q) => q.idEqualTo(categoryId))
-        .sortByUpdatedAt()
+        .sortByUpdatedAtDesc()
         .findAll();
   }
 

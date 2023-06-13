@@ -1,6 +1,7 @@
 import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/domain/expense_txn.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
+import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/transactions_modify/add_expense_txn_page.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:grouped_list/grouped_list.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../helper/date_helper.dart';
@@ -58,85 +60,127 @@ class ExpenseTxnPage extends HookWidget {
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(Iconsax.setting),
+            icon: Icon(Iconsax.more),
           ),
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            BlocBuilder<ExpenseTxnBloc, ExpenseTxnState>(
-              builder: (context, state) {
-                if (state is ExpenseTxnLoaded) {
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 12.0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              BlocBuilder<ExpenseTxnBloc, ExpenseTxnState>(
+                builder: (context, state) {
+                  if (state is ExpenseTxnLoaded) {
+                    return Text(
+                      "USD ${decimalFormatter(state.total)}",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    );
+                  }
                   return Text(
-                    "USD ${state.total}",
+                    "USD 0.00",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.w700,
                     ),
                   );
-                }
-                return Text(
-                  "USD 0.00",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.w700,
+                },
+              ),
+              SizedBox(
+                height: 24.0,
+              ),
+              Column(
+                children: [
+                  Text(
+                    "Monthly Budget",
                   ),
-                );
-              },
-            ),
-            SizedBox(
-              height: 24.0,
-            ),
-            Column(
-              children: [
-                Text(
-                  "Budget",
-                ),
-                Text(
-                  "${expenseCategory.budget}",
-                ),
-              ],
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
-                ),
+                  Text(
+                    "${expenseCategory.budget}",
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 24.0,
+              ),
+              Expanded(
                 child: BlocListener<TransactionsModifyBloc,
                     TransactionsModifyState>(
                   listener: (contex, state) {
                     if (state is ExpenseTxnAdded) {
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("Transaction added!")));
-                      Navigator.pop(context);
+                    } else if (state is ExpenseTxnEdited) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Transaction edited!")));
                     }
+                    Navigator.pop(context);
                   },
                   child: BlocBuilder<ExpenseTxnBloc, ExpenseTxnState>(
                     builder: (context, state) {
                       if (state is ExpenseTxnLoaded) {
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: state.expenseTxns.length,
-                          itemBuilder: (context, index) {
-                            final item = state.expenseTxns[index];
-                            return _txnItem(
-                              context,
-                              item: item,
-                            );
-                          },
-                        );
+                        if (state.expenseTxns.isNotEmpty) {
+                          return GroupedListView(
+                            elements: state.expenseTxns,
+                            groupBy: (element) =>
+                                "${getMonthFromDate(element.updatedAt!)} ${element.updatedAt?.year}",
+                            itemComparator: (item1, item2) {
+                              return item2.updatedAt!
+                                  .compareTo(item1.updatedAt!);
+                            },
+                            groupSeparatorBuilder: (value) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Text(
+                                  value,
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              );
+                            },
+                            itemBuilder: (context, item) {
+                              return _txnItem(
+                                context,
+                                item: item,
+                              );
+                            },
+                          );
+                          return ListView.builder(
+                            padding: EdgeInsets.only(
+                              bottom: 60.0,
+                            ),
+                            shrinkWrap: true,
+                            itemCount: state.expenseTxns.length,
+                            itemBuilder: (context, index) {
+                              final item = state.expenseTxns[index];
+                              return _txnItem(
+                                context,
+                                item: item,
+                              );
+                            },
+                          );
+                        } else {
+                          return Center(child: Text("No transactions"));
+                        }
                       }
-                      return Text("Empty transactions");
+                      return Center(child: Text("No transactions"));
                     },
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       floatingActionButton: CustomFloatingButton(
@@ -157,51 +201,69 @@ class ExpenseTxnPage extends HookWidget {
     BuildContext context, {
     required ExpenseTxn item,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Material(
-        shape: ContinuousRectangleBorder(
-          borderRadius: BorderRadius.circular(40.0),
-        ),
-        color: Theme.of(context).cardColor,
-        child: Padding(
-          padding: const EdgeInsets.all(18.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (item.updatedAt != null)
-                      Text(
-                        formatDate(item.updatedAt!, "MMMM dd, yyyy"),
-                      ),
-                    if (item.notes != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5.0),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Iconsax.receipt_edit,
-                              size: 18.0,
-                            ),
-                            SizedBox(
-                              width: 5.0,
-                            ),
-                            Text(
-                              item.notes!,
-                              style: TextStyle(
-                                fontSize: 12.0,
-                              ),
-                            ),
-                          ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          RouteStrings.addTransaction,
+          arguments: ExpenseTxnArgs(
+            expenseCategory: expenseCategory,
+            expenseTxn: item,
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 12.0),
+        child: Material(
+          shape: ContinuousRectangleBorder(
+            borderRadius: BorderRadius.circular(40.0),
+          ),
+          color: Theme.of(context).cardColor,
+          child: Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (item.updatedAt != null)
+                        Text(
+                          formatDate(item.updatedAt!, "MMMM dd, yyyy"),
                         ),
-                      )
-                  ],
+                      if (item.notes != null && item.notes!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Iconsax.receipt_edit,
+                                size: 18.0,
+                              ),
+                              SizedBox(
+                                width: 5.0,
+                              ),
+                              Text(
+                                item.notes!,
+                                style: TextStyle(
+                                  fontSize: 12.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                    ],
+                  ),
                 ),
-              ),
-              Text("USD ${item.amount}")
-            ],
+                Text(
+                  "USD ${decimalFormatter(item.amount ?? 0.00)}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

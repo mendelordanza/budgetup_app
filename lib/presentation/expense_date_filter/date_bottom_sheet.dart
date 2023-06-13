@@ -41,99 +41,114 @@ class ExpenseDateBottomSheet extends HookWidget {
           : DateTime.now(),
     );
 
-    return Container(
-      padding: EdgeInsets.all(16.0),
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: const BorderRadius.all(Radius.circular(16.0)),
-      ),
-      child: BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
-        builder: (context, state) {
-          return Column(
-            children: [
-              _buildHandle(context),
-              Expanded(
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: types.map((element) {
-                        return _tab(
-                          context,
-                          label: element.label,
-                          isSelected: _selectedFilterType.value == element.type,
-                          onSelect: () {
-                            _selectedFilterType.value = element.type;
-                            context.read<ExpenseDateFilterBloc>().add(
-                                ExpenseSelectDate(
-                                    element.type, _selectedDate.value));
-                            context.read<ExpenseBloc>().add(
-                                  LoadExpenseCategories(
-                                    dateFilterType: element.type,
-                                    selectedDate: _selectedDate.value,
-                                  ),
-                                );
-                          },
-                        );
-                      }).toList(),
-                    ),
-                    // ElevatedButton(
-                    //   onPressed: () {
-                    //     _selectedDate.value = DateTime.now();
-                    //     context
-                    //         .read<DateFilterBloc>()
-                    //         .add(SelectDate(DateTime.now()));
-                    //   },
-                    //   child: Text("Today"),
-                    // ),
-                    TableCalendar(
-                      firstDay: DateTime.utc(2010, 10, 16),
-                      lastDay: DateTime.utc(2030, 3, 14),
-                      focusedDay: _selectedDate.value,
-                      headerStyle: HeaderStyle(
-                        titleCentered: true,
-                        formatButtonVisible: false,
-                      ),
-                      availableGestures: AvailableGestures.all,
-                      locale: "en_US",
-                      selectedDayPredicate: (day) {
-                        return isSameDay(day, _selectedDate.value);
-                      },
-                      onDaySelected: (selectedDay, focusedDay) {
-                        _selectedDate.value = selectedDay;
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.all(
+          16.0,
+        ),
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: const BorderRadius.all(Radius.circular(16.0)),
+        ),
+        child: BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
+          builder: (context, state) {
+            return Column(
+              children: [
+                _buildHandle(context),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: types.map((element) {
+                    return _tab(
+                      context,
+                      label: element.label,
+                      isSelected: _selectedFilterType.value == element.type,
+                      onSelect: () {
+                        _selectedFilterType.value = element.type;
                         context.read<ExpenseDateFilterBloc>().add(
                             ExpenseSelectDate(
-                                _selectedFilterType.value, selectedDay));
+                                element.type, _selectedDate.value));
                         context.read<ExpenseBloc>().add(
                               LoadExpenseCategories(
-                                dateFilterType: _selectedFilterType.value,
-                                selectedDate: selectedDay,
+                                dateFilterType: element.type,
+                                selectedDate: _selectedDate.value,
                               ),
                             );
                       },
-                      startingDayOfWeek: StartingDayOfWeek.monday,
-                      calendarBuilders: CalendarBuilders(
-                        dowBuilder: (context, day) {
-                          if (day.weekday == DateTime.sunday) {
-                            final text = DateFormat.E().format(day);
-
-                            return Center(
-                              child: Text(
-                                text,
-                                style: TextStyle(color: Colors.red),
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  ],
+                    );
+                  }).toList(),
                 ),
-              ),
-            ],
-          );
-        },
+                TableCalendar(
+                  firstDay: DateTime.utc(2010, 10, 16),
+                  lastDay: DateTime.utc(2030, 3, 14),
+                  focusedDay: _selectedDate.value,
+                  headerStyle: HeaderStyle(
+                    titleCentered: true,
+                    formatButtonVisible: false,
+                  ),
+                  availableGestures: AvailableGestures.all,
+                  locale: "en_US",
+                  selectedDayPredicate: (day) {
+                    return isSameDay(day, _selectedDate.value);
+                  },
+                  onDaySelected: (selectedDay, focusedDay) {
+                    _selectedDate.value = selectedDay;
+                    context.read<ExpenseDateFilterBloc>().add(ExpenseSelectDate(
+                        _selectedFilterType.value, selectedDay));
+                    context.read<ExpenseBloc>().add(
+                          LoadExpenseCategories(
+                            dateFilterType: _selectedFilterType.value,
+                            selectedDate: selectedDay,
+                          ),
+                        );
+                  },
+                  startingDayOfWeek: StartingDayOfWeek.monday,
+                  calendarBuilders: CalendarBuilders(
+                    defaultBuilder: (context, day, date) {
+                      final text = DateFormat.d().format(day);
+
+                      return Center(
+                        child: Text(
+                          text,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      );
+                    },
+                    dowBuilder: (context, day) {
+                      if (day.weekday == DateTime.sunday) {
+                        final text = DateFormat.E().format(day);
+
+                        return Center(
+                          child: Text(
+                            text,
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        );
+                      } else {
+                        return Center(
+                          child: Text(
+                            DateFormat.E().format(day),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Done"),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

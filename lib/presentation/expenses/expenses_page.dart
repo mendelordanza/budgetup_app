@@ -1,5 +1,6 @@
 import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
+import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,6 +41,7 @@ class ExpensesPage extends HookWidget {
               child: GestureDetector(
                 onTap: () {
                   showModalBottomSheet(
+                    isScrollControlled: true,
                     backgroundColor: Colors.transparent,
                     context: context,
                     builder: (context) {
@@ -89,8 +91,9 @@ class ExpensesPage extends HookWidget {
               builder: (context, state) {
                 if (state is ExpenseCategoryLoaded && state.total != null) {
                   return Balance(
-                      headerLabel: Text("Total Expenses"),
-                      total: "${state.total}");
+                    headerLabel: Text("Total Expenses"),
+                    total: state.total,
+                  );
                 }
                 return Text("Empty categories");
               },
@@ -180,48 +183,61 @@ class ExpensesPage extends HookWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              Icon(
+                Iconsax.car,
+                size: 30.0,
+              ),
               Column(
                 children: [
-                  Icon(
-                    Iconsax.car,
-                    size: 30.0,
-                  ),
-                  SizedBox(
-                    height: 3.0,
-                  ),
                   Text(
                     item.title ?? "hello",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ],
-              ),
-              Column(
-                children: [
                   BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
                     builder: (context, state) {
                       if (state is ExpenseDateFilterSelected) {
                         return Text(
-                          "${item.getTotalByDate(state.dateFilterType, state.selectedDate)}",
+                          "USD ${decimalFormatter(item.getTotalByDate(state.dateFilterType, state.selectedDate))}",
                           style: TextStyle(
                             fontSize: 16.0,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.w700,
                           ),
                         );
                       }
                       return Text(
-                        "${item.getTotalByDate(enumFromString(currentDateFilterType), currentSelectedDate)}",
+                        "USD ${decimalFormatter(item.getTotalByDate(enumFromString(currentDateFilterType), currentSelectedDate))}",
                         style: TextStyle(
                           fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.w700,
                         ),
                       );
                     },
                   ),
                   SizedBox(
-                    height: 5.0,
+                    height: 10.0,
+                  ),
+                  Column(
+                    children: [
+                      Text(
+                        "Monthly Budget",
+                        style: TextStyle(
+                          fontSize: 12.0,
+                        ),
+                      ),
+                      Text(
+                        "${item.budget}",
+                        style: TextStyle(
+                          fontSize: 12.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10.0,
                   ),
                   BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
                     builder: (context, state) {
@@ -258,22 +274,6 @@ class ExpensesPage extends HookWidget {
                         ),
                       );
                     },
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    "Budget",
-                    style: TextStyle(
-                      fontSize: 12.0,
-                    ),
-                  ),
-                  Text(
-                    "${item.budget}",
-                    style: TextStyle(
-                      fontSize: 12.0,
-                    ),
                   ),
                 ],
               ),
