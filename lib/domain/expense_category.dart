@@ -78,7 +78,7 @@ class ExpenseCategory extends Equatable {
   }
 
   bool isExceeded(DateFilterType dateFilterType, DateTime selectedDate) {
-    return getTotalByDate(dateFilterType, selectedDate) >= (budget ?? 0.0);
+    return getTotalByDate(dateFilterType, selectedDate) > (budget ?? 0.0);
   }
 
   ExpenseCategoryEntity toIsar(ExpenseTxnEntity expenseTxnEntity) {

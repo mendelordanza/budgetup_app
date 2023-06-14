@@ -15,14 +15,14 @@ class ExpenseDateBottomSheet extends HookWidget {
   ExpenseDateBottomSheet({Key? key}) : super(key: key);
 
   final types = [
-    DateSelection(
-      "Daily",
-      DateFilterType.daily,
-    ),
-    DateSelection(
-      "Weekly",
-      DateFilterType.weekly,
-    ),
+    // DateSelection(
+    //   "Daily",
+    //   DateFilterType.daily,
+    // ),
+    // DateSelection(
+    //   "Weekly",
+    //   DateFilterType.weekly,
+    // ),
     DateSelection(
       "Monthly",
       DateFilterType.monthly,

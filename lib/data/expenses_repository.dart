@@ -24,7 +24,8 @@ class ExpensesRepository {
     }).toList();
   }
 
-  Future<List<ExpenseCategory>> getExpenseCategoriesByDate(DateTime date) async {
+  Future<List<ExpenseCategory>> getExpenseCategoriesByDate(
+      DateTime date) async {
     final objects = await _isarService.getAllExpenseCategoriesByDate(date);
     return objects.map((category) {
       return ExpenseCategory.fromJson(category.toJson());
@@ -47,6 +48,7 @@ class ExpensesRepository {
   Future<void> saveCategory(ExpenseCategory category) async {
     final isarObject = ExpenseCategoryEntity()
       ..id = category.id != null ? category.id! : Isar.autoIncrement
+      ..icon = category.icon
       ..title = category.title
       ..budget = category.budget
       ..createdAt = category.createdAt

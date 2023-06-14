@@ -7,3 +7,4 @@ const primaryColor = Color(0xFFDE5400);
 const secondaryColor = Color(0xFFFFA559);
 const dark = Color(0xFF333333);
 const red = Color(0xFFDD432E);
+const green = Color(0xFF1A6300);

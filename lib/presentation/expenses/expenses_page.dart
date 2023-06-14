@@ -2,6 +2,7 @@ import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
+import 'package:emoji_data/emoji_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -12,9 +13,7 @@ import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
 import '../custom/balance.dart';
-import '../custom/custom_floating_button.dart';
 import '../expense_date_filter/date_bottom_sheet.dart';
-import '../transactions_modify/add_expense_txn_page.dart';
 import 'bloc/expense_bloc.dart';
 
 class ExpensesPage extends HookWidget {
@@ -100,6 +99,7 @@ class ExpensesPage extends HookWidget {
                     return Balance(
                       headerLabel: Text("Total Expenses"),
                       total: state.total,
+                      budget: state.totalBudget,
                     );
                   }
                   return Text("Empty categories");
@@ -199,9 +199,11 @@ class ExpensesPage extends HookWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Icon(
-                Iconsax.car,
-                size: 30.0,
+              Text(
+                item.icon ?? Emoji.objects[49],
+                style: TextStyle(
+                  fontSize: 30.0,
+                ),
               ),
               Column(
                 children: [
@@ -242,12 +244,22 @@ class ExpensesPage extends HookWidget {
                         "Monthly Budget",
                         style: TextStyle(
                           fontSize: 12.0,
+                          color: item.isExceeded(
+                                  enumFromString(currentDateFilterType),
+                                  currentSelectedDate)
+                              ? Colors.red
+                              : null,
                         ),
                       ),
                       Text(
                         "${item.budget}",
                         style: TextStyle(
                           fontSize: 12.0,
+                          color: item.isExceeded(
+                                  enumFromString(currentDateFilterType),
+                                  currentSelectedDate)
+                              ? Colors.red
+                              : null,
                         ),
                       ),
                     ],

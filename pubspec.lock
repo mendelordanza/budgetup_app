@@ -193,6 +193,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  emoji_data:
+    dependency: "direct main"
+    description:
+      name: emoji_data
+      sha256: "0704928b83cbee6612a6cb4f342b25f3e40502c98908c5ab029451de65b73c58"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   equatable:
     dependency: "direct main"
     description:

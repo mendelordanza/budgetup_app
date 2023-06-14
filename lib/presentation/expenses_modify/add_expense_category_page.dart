@@ -1,7 +1,9 @@
 import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:budgetup_app/presentation/custom/custom_button.dart';
+import 'package:budgetup_app/presentation/custom/custom_emoji_picker.dart';
 import 'package:budgetup_app/presentation/custom/custom_text_field.dart';
 import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
+import 'package:emoji_data/emoji_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,6 +25,7 @@ class AddExpenseCategoryPage extends HookWidget {
         text: expenseCategory != null ? expenseCategory!.title : "");
     final budgetTextController = useTextEditingController(
         text: expenseCategory != null ? "${expenseCategory!.budget}" : "");
+    final selectedEmoji = useState(Emoji.objects[49]);
 
     final added = useState<bool>(false);
 
@@ -64,6 +67,43 @@ class AddExpenseCategoryPage extends HookWidget {
                   key: _formKey,
                   child: Column(
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Text("Select Emoji Icon"),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) {
+                              return CustomEmojiPicker();
+                            },
+                            isScrollControlled: true,
+                          ).then((value) {
+                            if (value != null) {
+                              selectedEmoji.value = value;
+                            }
+                          });
+                        },
+                        child: Material(
+                          child: Padding(
+                            child: Text(
+                              selectedEmoji.value,
+                              style: TextStyle(
+                                fontSize: 30.0,
+                              ),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10.0,
+                              horizontal: 16.0,
+                            ),
+                          ),
+                          shape: ContinuousRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                          ),
+                        ),
+                      ),
                       CustomTextField(
                         controller: titleTextController,
                         label: "Title",
@@ -102,6 +142,7 @@ class AddExpenseCategoryPage extends HookWidget {
                       //Edit
                       final editedCategory = expenseCategory!.copy(
                         title: titleTextController.text,
+                        icon: selectedEmoji.value,
                         budget: double.parse(
                             removeFormatting(budgetTextController.text)),
                         updatedAt: removeTimeFromDate(DateTime.now()),
@@ -112,6 +153,7 @@ class AddExpenseCategoryPage extends HookWidget {
                       //Add
                       final newCategory = ExpenseCategory(
                         title: titleTextController.text,
+                        icon: selectedEmoji.value,
                         budget: double.parse(
                             removeFormatting(budgetTextController.text)),
                         createdAt: removeTimeFromDate(DateTime.now()),
@@ -120,7 +162,6 @@ class AddExpenseCategoryPage extends HookWidget {
                       context.read<ModifyExpensesBloc>().add(
                           AddExpenseCategory(expenseCategory: newCategory));
                     }
-                    //context.read<ExpenseBloc>().add(LoadExpenseCategories());
 
                     //Pop page
                     added.value = true;

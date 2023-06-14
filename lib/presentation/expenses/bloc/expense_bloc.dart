@@ -43,16 +43,22 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     on<LoadExpenseCategories>((event, emit) async {
       final categories = await expensesRepository.getExpenseCategories();
 
-      var total = 0.0;
+      var total = 0.00;
       categories.forEach((element) {
         total += element.getTotalByDate(
             event.dateFilterType ?? DateFilterType.monthly,
             event.selectedDate ?? DateTime.now());
       });
 
+      var budget = 0.00;
+      categories.forEach((element) {
+        budget += element.budget ?? 0.00;
+      });
+
       emit(ExpenseCategoryLoaded(
         expenseCategories: categories,
         total: total,
+        totalBudget: budget,
       ));
     });
   }

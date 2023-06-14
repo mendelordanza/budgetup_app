@@ -6,8 +6,10 @@ import '../../helper/colors.dart';
 class Balance extends StatelessWidget {
   final Widget headerLabel;
   final double total;
+  final double? budget;
 
-  Balance({required this.headerLabel, required this.total, super.key});
+  Balance(
+      {required this.headerLabel, required this.total, this.budget, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +24,9 @@ class Balance extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             headerLabel,
+            SizedBox(
+              height: 5.0,
+            ),
             Text(
               "PHP ${decimalFormatter(total)}",
               style: TextStyle(
@@ -29,22 +34,28 @@ class Balance extends StatelessWidget {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 8.0,
-                vertical: 4.0,
-              ),
-              decoration: BoxDecoration(
-                color: red.withOpacity(0.5),
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-              child: Text(
-                "Total Monthly Budget: PHP 10,000.00",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onInverseSurface,
+            if (budget != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 5.0),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 4.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: total > budget!
+                        ? red.withOpacity(0.3)
+                        : green.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(4.0),
+                  ),
+                  child: Text(
+                    "Total Monthly Budget: PHP ${decimalFormatter(budget!)}",
+                    style: TextStyle(
+                      color: total > budget! ? red : green,
+                    ),
+                  ),
                 ),
-              ),
-            )
+              )
           ],
         ),
       ),

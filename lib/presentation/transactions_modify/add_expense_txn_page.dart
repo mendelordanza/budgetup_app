@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:iconsax/iconsax.dart';
 
 import '../../helper/string.dart';
 
@@ -76,11 +75,6 @@ class AddExpenseTxnPage extends HookWidget {
                   key: _formKey,
                   child: Column(
                     children: [
-                      CustomTextField(
-                        controller: amountTextController,
-                        label: "Category",
-                        onTap: () {},
-                      ),
                       CustomTextField(
                         controller: amountTextController,
                         textInputType:
