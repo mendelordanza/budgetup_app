@@ -5,6 +5,7 @@ import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/transactions_modify/add_expense_txn_page.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
+import 'package:emoji_data/emoji_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -42,7 +43,7 @@ class ExpenseTxnPage extends HookWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          expenseCategory.title ?? "",
+          "${expenseCategory.icon ?? Emoji.objects[49]} ${expenseCategory.title}",
         ),
         leading: InkWell(
           onTap: () {
@@ -58,10 +59,29 @@ class ExpenseTxnPage extends HookWidget {
         elevation: 0,
         backgroundColor: Colors.transparent,
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Iconsax.more),
-          ),
+          PopupMenuButton(
+              // add icon, by default "3 dot" icon
+              icon: Icon(Iconsax.more),
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem<int>(
+                    value: 0,
+                    child: Text("Edit"),
+                  ),
+                  PopupMenuItem<int>(
+                    value: 1,
+                    child: Text("Delete"),
+                  ),
+                ];
+              },
+              onSelected: (value) {
+                if (value == 0) {
+                  Navigator.pushNamed(context, RouteStrings.addCategory,
+                      arguments: expenseCategory);
+                } else if (value == 1) {
+                  //TODO show alert dialog
+                }
+              }),
         ],
       ),
       body: SafeArea(
@@ -73,6 +93,14 @@ class ExpenseTxnPage extends HookWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Text(
+                "Overall Total",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               BlocBuilder<ExpenseTxnBloc, ExpenseTxnState>(
                 builder: (context, state) {
                   if (state is ExpenseTxnLoaded) {
@@ -98,19 +126,6 @@ class ExpenseTxnPage extends HookWidget {
               SizedBox(
                 height: 24.0,
               ),
-              Column(
-                children: [
-                  Text(
-                    "Monthly Budget",
-                  ),
-                  Text(
-                    "${expenseCategory.budget}",
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 24.0,
-              ),
               Expanded(
                 child: BlocListener<TransactionsModifyBloc,
                     TransactionsModifyState>(
@@ -126,53 +141,35 @@ class ExpenseTxnPage extends HookWidget {
                   },
                   child: BlocBuilder<ExpenseTxnBloc, ExpenseTxnState>(
                     builder: (context, state) {
-                      if (state is ExpenseTxnLoaded) {
-                        if (state.expenseTxns.isNotEmpty) {
-                          return GroupedListView(
-                            elements: state.expenseTxns,
-                            groupBy: (element) =>
-                                "${getMonthFromDate(element.updatedAt!)} ${element.updatedAt?.year}",
-                            itemComparator: (item1, item2) {
-                              return item2.updatedAt!
-                                  .compareTo(item1.updatedAt!);
-                            },
-                            groupSeparatorBuilder: (value) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                      if (state is ExpenseTxnLoaded &&
+                          state.expenseTxns.isNotEmpty) {
+                        return GroupedListView(
+                          elements: state.expenseTxns,
+                          groupBy: (element) =>
+                              "${getMonthFromDate(element.updatedAt!)} ${element.updatedAt?.year}",
+                          itemComparator: (item1, item2) {
+                            return item2.updatedAt!.compareTo(item1.updatedAt!);
+                          },
+                          groupSeparatorBuilder: (value) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text(
+                                value,
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                              );
-                            },
-                            itemBuilder: (context, item) {
-                              return _txnItem(
-                                context,
-                                item: item,
-                              );
-                            },
-                          );
-                          return ListView.builder(
-                            padding: EdgeInsets.only(
-                              bottom: 60.0,
-                            ),
-                            shrinkWrap: true,
-                            itemCount: state.expenseTxns.length,
-                            itemBuilder: (context, index) {
-                              final item = state.expenseTxns[index];
-                              return _txnItem(
-                                context,
-                                item: item,
-                              );
-                            },
-                          );
-                        } else {
-                          return Center(child: Text("No transactions"));
-                        }
+                              ),
+                            );
+                          },
+                          itemBuilder: (context, item) {
+                            return _txnItem(
+                              context,
+                              item: item,
+                            );
+                          },
+                        );
                       }
                       return Center(child: Text("No transactions"));
                     },

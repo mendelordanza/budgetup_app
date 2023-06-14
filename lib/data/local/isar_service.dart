@@ -150,8 +150,8 @@ class IsarService {
 
   Future<void> deleteRecurringBillTxn(int txnId) async {
     final isar = await db;
-    await isar.writeTxn(() async {
-      final success = await isar.recurringBillTxnEntitys.delete(txnId);
+    isar.writeTxnSync(() {
+      final success = isar.recurringBillTxnEntitys.deleteSync(txnId);
       print('deleted: $success');
     });
   }

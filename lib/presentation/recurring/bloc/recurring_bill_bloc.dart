@@ -36,7 +36,6 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
 
     on<LoadRecurringBills>((event, emit) async {
       final recurringBills = await recurringBillsRepo.getRecurringBills();
-
       final paidRecurringBills =
           await recurringBillsRepo.getPaidRecurringBills(event.selectedDate);
 
@@ -53,5 +52,11 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
       total += element.amount ?? 0.0;
     });
     return total;
+  }
+
+  @override
+  Future<void> close() {
+    _recurringSubscription?.cancel();
+    return super.close();
   }
 }

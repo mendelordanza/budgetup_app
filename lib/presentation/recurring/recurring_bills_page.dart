@@ -55,6 +55,7 @@ class RecurringBillsPage extends HookWidget {
                       builder: (context) {
                         return RecurringDateBottomSheet();
                       },
+                      isScrollControlled: true,
                     );
                   },
                   child: Row(
@@ -137,31 +138,24 @@ class RecurringBillsPage extends HookWidget {
                 child: BlocBuilder<RecurringBillBloc, RecurringBillState>(
                   builder: (context, state) {
                     if (state is RecurringBillsLoaded) {
-                      if (state.recurringBills.isNotEmpty) {
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: state.recurringBills.length,
-                          itemBuilder: (context, index) {
-                            final item = state.recurringBills[index];
-                            final txn =
-                                item.recurringBillTxns?.firstWhereOrNull(
-                              (element) =>
-                                  element.datePaid?.month ==
-                                  currentSelectedDate.month,
-                            );
-                            return _recurringBillItem(
-                              context,
-                              item: item,
-                              txn: txn,
-                              currentSelectedDate: currentSelectedDate,
-                            );
-                          },
-                        );
-                      } else {
-                        return Center(
-                          child: Text("Empty Recurring Bills"),
-                        );
-                      }
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: state.recurringBills.length,
+                        itemBuilder: (context, index) {
+                          final item = state.recurringBills[index];
+                          final txn = item.recurringBillTxns?.firstWhereOrNull(
+                            (element) =>
+                                element.datePaid?.month ==
+                                currentSelectedDate.month,
+                          );
+                          return _recurringBillItem(
+                            context,
+                            item: item,
+                            txn: txn,
+                            currentSelectedDate: currentSelectedDate,
+                          );
+                        },
+                      );
                     }
                     return Text("Empty Recurring Bills");
                   },
@@ -208,7 +202,6 @@ class RecurringBillsPage extends HookWidget {
                     (element) =>
                         element.datePaid?.month == state.selectedDate.month,
                   );
-
                   return _checkboxItem(context,
                       selectedDate: state.selectedDate, item: item, txn: txn);
                 }
@@ -256,7 +249,7 @@ class RecurringBillsPage extends HookWidget {
                     );
               } else {
                 final newRecurringTxn = RecurringBillTxn(
-                  isPaid: checked ?? false,
+                  isPaid: true,
                   datePaid: removeTimeFromDate(selectedDate),
                 );
                 context.read<RecurringModifyBloc>().add(
@@ -279,15 +272,26 @@ class RecurringBillsPage extends HookWidget {
             children: [
               Text(item.title ?? "hello"),
               if (item.isPaid(selectedDate) && txn != null)
-                Text("paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}")
+                Text(
+                  "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                  ),
+                )
               else if (item.reminderDate != null)
-                Text("due ${formatDate(item.reminderDate!, "MMM dd")}")
+                Text(
+                  "due ${formatDate(item.reminderDate!, "MMM dd")}",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                  ),
+                )
             ],
           ),
         ),
         Text(
           "USD ${decimalFormatter(item.amount ?? 0.00)}",
           style: TextStyle(
+            fontSize: 16.0,
             fontWeight: FontWeight.w600,
           ),
         ),

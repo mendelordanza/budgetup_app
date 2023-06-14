@@ -208,11 +208,11 @@ class ExpensesPage extends HookWidget {
               Column(
                 children: [
                   Text(
-                    item.title ?? "hello",
+                    item.title ?? "Category",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
@@ -222,7 +222,7 @@ class ExpensesPage extends HookWidget {
                           "USD ${decimalFormatter(item.getTotalByDate(state.dateFilterType, state.selectedDate))}",
                           style: TextStyle(
                             fontSize: 16.0,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                           ),
                         );
                       }
@@ -230,7 +230,7 @@ class ExpensesPage extends HookWidget {
                         "USD ${decimalFormatter(item.getTotalByDate(enumFromString(currentDateFilterType), currentSelectedDate))}",
                         style: TextStyle(
                           fontSize: 16.0,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                         ),
                       );
                     },
@@ -244,22 +244,12 @@ class ExpensesPage extends HookWidget {
                         "Monthly Budget",
                         style: TextStyle(
                           fontSize: 12.0,
-                          color: item.isExceeded(
-                                  enumFromString(currentDateFilterType),
-                                  currentSelectedDate)
-                              ? Colors.red
-                              : null,
                         ),
                       ),
                       Text(
-                        "${item.budget}",
+                        "${decimalFormatter(item.budget ?? 0.00)}",
                         style: TextStyle(
                           fontSize: 12.0,
-                          color: item.isExceeded(
-                                  enumFromString(currentDateFilterType),
-                                  currentSelectedDate)
-                              ? Colors.red
-                              : null,
                         ),
                       ),
                     ],

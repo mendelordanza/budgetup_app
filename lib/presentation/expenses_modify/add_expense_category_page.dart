@@ -25,7 +25,10 @@ class AddExpenseCategoryPage extends HookWidget {
         text: expenseCategory != null ? expenseCategory!.title : "");
     final budgetTextController = useTextEditingController(
         text: expenseCategory != null ? "${expenseCategory!.budget}" : "");
-    final selectedEmoji = useState(Emoji.objects[49]);
+    final selectedEmoji = useState(
+        expenseCategory != null && expenseCategory!.icon != null
+            ? expenseCategory!.icon!
+            : Emoji.objects[49]);
 
     final added = useState<bool>(false);
 

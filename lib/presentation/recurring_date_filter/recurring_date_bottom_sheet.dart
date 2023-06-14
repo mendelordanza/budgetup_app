@@ -15,6 +15,14 @@ class RecurringDateBottomSheet extends HookWidget {
   RecurringDateBottomSheet({Key? key}) : super(key: key);
 
   final types = [
+    // DateSelection(
+    //   "Daily",
+    //   DateFilterType.daily,
+    // ),
+    // DateSelection(
+    //   "Weekly",
+    //   DateFilterType.weekly,
+    // ),
     DateSelection(
       "Monthly",
       DateFilterType.monthly,
@@ -33,19 +41,21 @@ class RecurringDateBottomSheet extends HookWidget {
           : DateTime.now(),
     );
 
-    return Container(
-      padding: EdgeInsets.all(16.0),
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: const BorderRadius.all(Radius.circular(16.0)),
-      ),
-      child: Column(
-        children: [
-          _buildHandle(context),
-          Expanded(
-            child: Column(
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.all(
+          16.0,
+        ),
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: const BorderRadius.all(Radius.circular(16.0)),
+        ),
+        child: BlocBuilder<RecurringDateFilterBloc, RecurringDateFilterState>(
+          builder: (context, state) {
+            return Column(
               children: [
+                _buildHandle(context),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: types.map((element) {
@@ -58,22 +68,13 @@ class RecurringDateBottomSheet extends HookWidget {
                         context.read<RecurringDateFilterBloc>().add(
                             RecurringSelectDate(
                                 element.type, _selectedDate.value));
-                        context
-                            .read<RecurringBillBloc>()
-                            .add(LoadRecurringBills(_selectedDate.value));
+                        context.read<RecurringBillBloc>().add(
+                              LoadRecurringBills(_selectedDate.value),
+                            );
                       },
                     );
                   }).toList(),
                 ),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     _selectedDate.value = DateTime.now();
-                //     context
-                //         .read<DateFilterBloc>()
-                //         .add(SelectDate(DateTime.now()));
-                //   },
-                //   child: Text("Today"),
-                // ),
                 TableCalendar(
                   firstDay: DateTime.utc(2010, 10, 16),
                   lastDay: DateTime.utc(2030, 3, 14),
@@ -92,10 +93,24 @@ class RecurringDateBottomSheet extends HookWidget {
                     context.read<RecurringDateFilterBloc>().add(
                         RecurringSelectDate(
                             _selectedFilterType.value, selectedDay));
-                    context.read<RecurringBillBloc>().add(LoadRecurringBills(selectedDay));
+                    context.read<RecurringBillBloc>().add(
+                          LoadRecurringBills(selectedDay),
+                        );
                   },
                   startingDayOfWeek: StartingDayOfWeek.monday,
                   calendarBuilders: CalendarBuilders(
+                    defaultBuilder: (context, day, date) {
+                      final text = DateFormat.d().format(day);
+
+                      return Center(
+                        child: Text(
+                          text,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                        ),
+                      );
+                    },
                     dowBuilder: (context, day) {
                       if (day.weekday == DateTime.sunday) {
                         final text = DateFormat.E().format(day);
@@ -106,14 +121,29 @@ class RecurringDateBottomSheet extends HookWidget {
                             style: TextStyle(color: Colors.red),
                           ),
                         );
+                      } else {
+                        return Center(
+                          child: Text(
+                            DateFormat.E().format(day),
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                        );
                       }
                     },
                   ),
                 ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Done"),
+                ),
               ],
-            ),
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
   }

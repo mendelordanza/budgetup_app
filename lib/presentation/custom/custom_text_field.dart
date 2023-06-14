@@ -49,6 +49,7 @@ class CustomTextField extends StatelessWidget {
             validator: validator,
             keyboardType: textInputType,
             textInputAction: textInputAction,
+            textCapitalization: TextCapitalization.sentences,
             autofocus: true,
             maxLines: maxLines,
             decoration: InputDecoration(

@@ -5,6 +5,7 @@ import 'package:budgetup_app/domain/recurring_bill.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/presentation/home_page.dart';
 import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
+import 'package:budgetup_app/presentation/settings/settings_page.dart';
 import 'package:budgetup_app/presentation/transactions_modify/add_expense_txn_page.dart';
 import 'package:budgetup_app/presentation/transactions/expense_txn_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,6 +21,10 @@ class RouteGenerator {
       case RouteStrings.landing:
         return _navigate(
           builder: (_) => HomePage(),
+        );
+      case RouteStrings.settings:
+        return _navigate(
+          builder: (_) => SettingsPage(),
         );
       case RouteStrings.addCategory:
         if (args is ExpenseCategory?) {

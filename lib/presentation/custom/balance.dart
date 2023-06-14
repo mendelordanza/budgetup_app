@@ -44,14 +44,14 @@ class Balance extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: total > budget!
-                        ? red.withOpacity(0.3)
-                        : green.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(4.0),
+                        ? red.withOpacity(0.7)
+                        : green.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(8.0),
                   ),
                   child: Text(
                     "Total Monthly Budget: PHP ${decimalFormatter(budget!)}",
                     style: TextStyle(
-                      color: total > budget! ? red : green,
+                      color: Colors.white,
                     ),
                   ),
                 ),
