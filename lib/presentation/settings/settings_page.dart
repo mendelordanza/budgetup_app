@@ -79,9 +79,6 @@ class SettingsPage extends StatelessWidget {
                                   onSelect: (Currency currency) {
                                     context
                                         .read<ConvertCurrencyCubit>()
-                                        .loadCurrencies();
-                                    context
-                                        .read<ConvertCurrencyCubit>()
                                         .changeCurrency(
                                             currency.symbol, currency.code);
                                   },

@@ -40,9 +40,8 @@ class ExpensesRepository {
   }
 
   Future<void> deleteCategory(int categoryId) async {
-    _isarService.deleteAllTxns(categoryId).then((value) {
-      _isarService.deleteExpenseCategory(categoryId);
-    });
+    await _isarService.deleteAllTxns(categoryId);
+    await _isarService.deleteExpenseCategory(categoryId);
   }
 
   Future<void> bulkEditCategory(
@@ -59,7 +58,7 @@ class ExpensesRepository {
       return isarObject;
     }).toList();
 
-    _isarService.bulkEditCategory(updatedCategories);
+    await _isarService.bulkEditCategory(updatedCategories);
   }
 
   Future<void> saveCategory(ExpenseCategory category) async {
@@ -70,7 +69,7 @@ class ExpensesRepository {
       ..budget = category.budget
       ..createdAt = category.createdAt
       ..updatedAt = category.updatedAt;
-    _isarService.saveExpenseCategory(isarObject);
+    await _isarService.saveExpenseCategory(isarObject);
   }
 
   Future<void> addTransaction(
@@ -83,7 +82,7 @@ class ExpensesRepository {
       ..updatedAt = expenseTxn.updatedAt;
 
     if (category.id != null) {
-      _isarService.addTransaction(txnObject);
+      await _isarService.addTransaction(txnObject);
     }
   }
 
@@ -96,7 +95,7 @@ class ExpensesRepository {
       ..updatedAt = expenseTxn.updatedAt;
 
     if (expenseTxn.id != null) {
-      _isarService.editTransaction(txnObject);
+      await _isarService.editTransaction(txnObject);
     }
   }
 
@@ -110,10 +109,10 @@ class ExpensesRepository {
         ..updatedAt = expenseTxn.updatedAt;
       return txnObject;
     }).toList();
-    _isarService.bulkEditTxns(updatedTxns);
+    await _isarService.bulkEditTxns(updatedTxns);
   }
 
   Future<void> deleteTransaction(int txnId) async {
-    _isarService.deleteTransaction(txnId);
+    await _isarService.deleteTransaction(txnId);
   }
 }

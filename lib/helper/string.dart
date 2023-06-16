@@ -1,4 +1,3 @@
-
 import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/injection_container.dart';
 import 'package:flutter/material.dart';
@@ -15,13 +14,10 @@ String decimalFormatter(double number) {
 removeFormatting(String formattedValue) {
   final sharedPrefs = getIt<SharedPrefs>();
   final numberFormat = NumberFormat('#,##0.###');
-  final parsedAmount = double.tryParse(
-      formattedValue.replaceAll('${sharedPrefs.getCurrencySymbol()}', ''));
-  if (parsedAmount != null) {
-    return numberFormat.format(parsedAmount);
-  } else {
-    return numberFormat.parse(formattedValue).toString();
-  }
+  return numberFormat
+      .parse(
+          formattedValue.replaceAll('${sharedPrefs.getCurrencySymbol()}', ''))
+      .toString();
 }
 
 class NumberInputFormatter extends TextInputFormatter {

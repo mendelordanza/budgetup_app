@@ -56,11 +56,11 @@ class IsarService {
         () => isar.expenseCategoryEntitys.putSync(expenseCategory));
   }
 
-  Future<void> deleteExpenseCategory(int categoryId) async {
+  Future<bool> deleteExpenseCategory(int categoryId) async {
     final isar = await db;
-    await isar.writeTxn(() async {
+    return await isar.writeTxn(() async {
       final success = await isar.expenseCategoryEntitys.delete(categoryId);
-      print('deleted: $success');
+      return success;
     });
   }
 

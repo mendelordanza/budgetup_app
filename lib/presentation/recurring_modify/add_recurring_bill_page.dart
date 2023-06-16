@@ -48,7 +48,7 @@ class AddRecurringBillPage extends HookWidget {
     }, [added.value]);
 
     useEffect(() {
-      dateTextController.text = formatDate(currentSelectedDate.value, "MMM dd");
+      dateTextController.text = formatDate(currentSelectedDate.value, "dd");
       return null;
     }, [currentSelectedDate.value]);
 

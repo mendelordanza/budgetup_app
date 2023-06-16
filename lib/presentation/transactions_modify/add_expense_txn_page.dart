@@ -80,30 +80,13 @@ class AddExpenseTxnPage extends HookWidget {
         ),
         actions: args.from == From.expensePage
             ? [
-                PopupMenuButton(
-                    // add icon, by default "3 dot" icon
-                    icon: Icon(Iconsax.more),
-                    itemBuilder: (context) {
-                      return [
-                        PopupMenuItem<int>(
-                          value: 0,
-                          child: Text("View Transactions"),
-                        ),
-                        // PopupMenuItem<int>(
-                        //   value: 1,
-                        //   child: Text("Delete"),
-                        // ),
-                      ];
-                    },
-                    onSelected: (value) {
-                      if (value == 0) {
-                        Navigator.popAndPushNamed(
-                            context, RouteStrings.transactions,
-                            arguments: args.expenseCategory);
-                      } else if (value == 1) {
-                        //TODO show alert dialog
-                      }
-                    }),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, RouteStrings.transactions,
+                        arguments: args.expenseCategory);
+                  },
+                  icon: Icon(Iconsax.layer),
+                )
               ]
             : null,
         elevation: 0,
@@ -125,6 +108,11 @@ class AddExpenseTxnPage extends HookWidget {
                           padding: const EdgeInsets.only(bottom: 16.0),
                           child: Column(
                             children: [
+                              Text(
+                                  "${args.expenseCategory.icon} ${args.expenseCategory.title}"),
+                              SizedBox(
+                                height: 20,
+                              ),
                               Text("${sharedPrefs.getCurrencyCode()}"),
                               TextFormField(
                                 controller: amountTextController,
@@ -157,27 +145,6 @@ class AddExpenseTxnPage extends HookWidget {
                             ],
                           ),
                         ),
-                        // CustomTextField(
-                        //   controller: amountTextController,
-                        //   textInputType:
-                        //       TextInputType.numberWithOptions(decimal: true),
-                        //   label: "Amount",
-                        //   inputFormatters: [
-                        //     FilteringTextInputFormatter.digitsOnly,
-                        //     NumberInputFormatter(),
-                        //   ],
-                        //   validator: (value) {
-                        //     if (value == null || value.isEmpty) {
-                        //       return 'Amount is required';
-                        //     }
-                        //     return null;
-                        //   },
-                        // ),
-                        CustomTextField(
-                          controller: notesTextController,
-                          label: "Notes (optional)",
-                          maxLines: 3,
-                        ),
                         CustomTextField(
                           controller: dateTextController,
                           textInputType: TextInputType.datetime,
@@ -194,6 +161,11 @@ class AddExpenseTxnPage extends HookWidget {
                               }
                             });
                           },
+                        ),
+                        CustomTextField(
+                          controller: notesTextController,
+                          label: "Notes (optional)",
+                          maxLines: 3,
                         ),
                       ],
                     ),
@@ -233,6 +205,9 @@ class AddExpenseTxnPage extends HookWidget {
                             ),
                           );
                     }
+
+                    Navigator.pushNamed(context, RouteStrings.transactions,
+                        arguments: args.expenseCategory);
                   }
                 },
                 child: Text(

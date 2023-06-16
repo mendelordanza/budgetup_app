@@ -5,6 +5,7 @@ import 'package:budgetup_app/presentation/custom/custom_emoji_picker.dart';
 import 'package:budgetup_app/presentation/custom/custom_text_field.dart';
 import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
 import 'package:emoji_data/emoji_data.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -97,6 +98,12 @@ class AddExpenseCategoryPage extends HookWidget {
                             });
                           },
                           child: Material(
+                            shape: SmoothRectangleBorder(
+                              borderRadius: SmoothBorderRadius(
+                                cornerRadius: 16,
+                                cornerSmoothing: 1.0,
+                              ),
+                            ),
                             child: Padding(
                               child: Text(
                                 selectedEmoji.value,
@@ -108,9 +115,6 @@ class AddExpenseCategoryPage extends HookWidget {
                                 vertical: 10.0,
                                 horizontal: 16.0,
                               ),
-                            ),
-                            shape: ContinuousRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
                             ),
                           ),
                         ),

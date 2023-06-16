@@ -29,7 +29,7 @@ class TransactionsModifyBloc
       emit(ExpenseTxnEdited(event.expenseCategory));
     });
     on<RemoveExpenseTxn>((event, emit) async {
-      expensesRepository.deleteTransaction(event.expenseTxn.id!);
+      await expensesRepository.deleteTransaction(event.expenseTxn.id!);
       emit(ExpenseTxnRemoved(event.expenseCategory));
     });
   }

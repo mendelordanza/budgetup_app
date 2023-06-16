@@ -2,6 +2,7 @@ import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
+import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/add_expense_txn_page.dart';
 import 'package:emoji_data/emoji_data.dart';
 import 'package:figma_squircle/figma_squircle.dart';
@@ -134,6 +135,12 @@ class ExpensesPage extends HookWidget {
                 height: 10.0,
               ),
               Expanded(
+                  child: BlocListener<ModifyExpensesBloc, ModifyExpensesState>(
+                listener: (context, state) {
+                  if (state is ExpenseRemoved) {
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                  }
+                },
                 child: BlocBuilder<ExpenseBloc, ExpenseState>(
                   builder: (context, state) {
                     if (state is ExpenseCategoryLoaded &&
@@ -156,7 +163,7 @@ class ExpensesPage extends HookWidget {
                     return Center(child: Text("Empty categories"));
                   },
                 ),
-              ),
+              )),
             ],
           ),
         ),
@@ -181,136 +188,152 @@ class ExpensesPage extends HookWidget {
         DateTime.parse(sharedPrefs.getExpenseSelectedDate());
     final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          RouteStrings.addTransaction,
-          arguments: ExpenseTxnArgs(
-            expenseCategory: item,
-            from: From.expensePage,
-          ),
-        );
-      },
-      child: Material(
-        shape: SmoothRectangleBorder(
-          borderRadius: SmoothBorderRadius(
-            cornerRadius: 24,
-            cornerSmoothing: 1.0,
-          ),
-        ),
-        color: Theme.of(context).cardColor,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Column(
-                  children: [
-                    Text(
-                      item.icon ?? Emoji.objects[49],
-                      style: TextStyle(
-                        fontSize: 20.0,
-                      ),
-                    ),
-                    Text(
-                      item.title ?? "Category",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
-                      builder: (context, state) {
-                        if (state is ExpenseDateFilterSelected) {
-                          return Text(
-                            decimalFormatter(item.getTotalByDate(
-                                state.dateFilterType, state.selectedDate)),
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          );
-                        }
-                        return Text(
-                          decimalFormatter(item.getTotalByDate(
-                              enumFromString(currentDateFilterType),
-                              currentSelectedDate)),
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+    return Stack(
+      children: [
+        GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              RouteStrings.addTransaction,
+              arguments: ExpenseTxnArgs(
+                expenseCategory: item,
+                from: From.expensePage,
               ),
-              Column(
+            );
+          },
+          child: Material(
+            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: 24,
+                cornerSmoothing: 1.0,
+              ),
+            ),
+            color: Theme.of(context).cardColor,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Text(
-                    "Monthly Budget",
-                    style: TextStyle(
-                      fontSize: 12.0,
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          item.icon ?? Emoji.objects[49],
+                          style: TextStyle(
+                            fontSize: 20.0,
+                          ),
+                        ),
+                        Text(
+                          item.title ?? "Category",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        BlocBuilder<ExpenseDateFilterBloc,
+                            ExpenseDateFilterState>(
+                          builder: (context, state) {
+                            if (state is ExpenseDateFilterSelected) {
+                              return Text(
+                                decimalFormatter(item.getTotalByDate(
+                                    state.dateFilterType, state.selectedDate)),
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              );
+                            }
+                            return Text(
+                              decimalFormatter(item.getTotalByDate(
+                                  enumFromString(currentDateFilterType),
+                                  currentSelectedDate)),
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                  Text(
-                    decimalFormatter(item.budget ?? 0.00),
-                    style: TextStyle(
-                      fontSize: 12.0,
-                    ),
+                  Column(
+                    children: [
+                      Text(
+                        "Monthly Budget",
+                        style: TextStyle(
+                          fontSize: 12.0,
+                        ),
+                      ),
+                      Text(
+                        decimalFormatter(item.budget ?? 0.00),
+                        style: TextStyle(
+                          fontSize: 12.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
+                    builder: (context, state) {
+                      if (state is ExpenseDateFilterSelected) {
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            height: 12,
+                            child: LinearProgressIndicator(
+                              value: item.getTotalPercentage(
+                                  state.dateFilterType, state.selectedDate),
+                              color: item.isExceeded(
+                                      state.dateFilterType, state.selectedDate)
+                                  ? Colors.red
+                                  : null,
+                            ),
+                          ),
+                        );
+                      }
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          height: 12,
+                          child: LinearProgressIndicator(
+                            value: item
+                                    .getTotalPercentage(
+                                        enumFromString(currentDateFilterType),
+                                        currentSelectedDate)
+                                    .isNaN
+                                ? 0.0
+                                : item.getTotalPercentage(
+                                    enumFromString(currentDateFilterType),
+                                    currentSelectedDate),
+                            color: item.isExceeded(
+                                    enumFromString(currentDateFilterType),
+                                    currentSelectedDate)
+                                ? Colors.red
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
-              SizedBox(
-                height: 10.0,
-              ),
-              BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
-                builder: (context, state) {
-                  if (state is ExpenseDateFilterSelected) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        height: 12,
-                        child: LinearProgressIndicator(
-                          value: item.getTotalPercentage(
-                              state.dateFilterType, state.selectedDate),
-                          color: item.isExceeded(
-                                  state.dateFilterType, state.selectedDate)
-                              ? Colors.red
-                              : null,
-                        ),
-                      ),
-                    );
-                  }
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      height: 12,
-                      child: LinearProgressIndicator(
-                        value: item
-                                .getTotalPercentage(
-                                    enumFromString(currentDateFilterType),
-                                    currentSelectedDate)
-                                .isNaN
-                            ? 0.0
-                            : item.getTotalPercentage(
-                                enumFromString(currentDateFilterType),
-                                currentSelectedDate),
-                        color: item.isExceeded(
-                                enumFromString(currentDateFilterType),
-                                currentSelectedDate)
-                            ? Colors.red
-                            : null,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
+            ),
           ),
         ),
-      ),
+        // Align(
+        //   alignment: Alignment.topRight,
+        //   child: IconButton(
+        //       onPressed: () {
+        //         //TODO show are you sure you want to delete
+        //         context
+        //             .read<ModifyExpensesBloc>()
+        //             .add(RemoveExpenseCategory(expenseCategory: item));
+        //       },
+        //       icon: Icon(Iconsax.close_circle)),
+        // ),
+      ],
     );
   }
 }

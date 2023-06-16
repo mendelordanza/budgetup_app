@@ -232,41 +232,39 @@ class RecurringBillsPage extends HookWidget {
   }) {
     return Row(
       children: [
-        SizedBox(
-          height: 20,
-          width: 20,
-          child: Checkbox(
-            activeColor: secondaryColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                3.0,
-              ),
+        Checkbox(
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
+          activeColor: secondaryColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+              3.0,
             ),
-            value: item.isPaid(selectedDate) ? true : false,
-            onChanged: (checked) async {
-              if (item.isPaid(selectedDate) && txn != null) {
-                context.read<RecurringModifyBloc>().add(
-                      RemoveRecurringBillTxn(
-                        selectedDate: selectedDate,
-                        recurringBill: item,
-                        recurringBillTxn: txn,
-                      ),
-                    );
-              } else {
-                final newRecurringTxn = RecurringBillTxn(
-                  isPaid: true,
-                  datePaid: removeTimeFromDate(selectedDate),
-                );
-                context.read<RecurringModifyBloc>().add(
-                      AddRecurringBillTxn(
-                        selectedDate: selectedDate,
-                        recurringBill: item,
-                        recurringBillTxn: newRecurringTxn,
-                      ),
-                    );
-              }
-            },
           ),
+          value: item.isPaid(selectedDate) ? true : false,
+          onChanged: (checked) async {
+            if (item.isPaid(selectedDate) && txn != null) {
+              context.read<RecurringModifyBloc>().add(
+                    RemoveRecurringBillTxn(
+                      selectedDate: selectedDate,
+                      recurringBill: item,
+                      recurringBillTxn: txn,
+                    ),
+                  );
+            } else {
+              final newRecurringTxn = RecurringBillTxn(
+                isPaid: true,
+                datePaid: removeTimeFromDate(selectedDate),
+              );
+              context.read<RecurringModifyBloc>().add(
+                    AddRecurringBillTxn(
+                      selectedDate: selectedDate,
+                      recurringBill: item,
+                      recurringBillTxn: newRecurringTxn,
+                    ),
+                  );
+            }
+          },
         ),
         SizedBox(
           width: 10.0,
