@@ -29,7 +29,9 @@ class AddExpenseCategoryPage extends HookWidget {
     final titleTextController = useTextEditingController(
         text: expenseCategory != null ? expenseCategory!.title : "");
     final budgetTextController = useTextEditingController(
-        text: expenseCategory != null ? "${expenseCategory!.budget}" : "0.00");
+        text: expenseCategory != null
+            ? decimalFormatter(expenseCategory!.budget ?? 0.00)
+            : "${sharedPrefs.getCurrencySymbol()} 0.00");
     final selectedEmoji = useState(
         expenseCategory != null && expenseCategory!.icon != null
             ? expenseCategory!.icon!
@@ -133,7 +135,6 @@ class AddExpenseCategoryPage extends HookWidget {
                       CustomTextField(
                         controller: budgetTextController,
                         label: "Monthly Budget",
-                        prefix: Text("${sharedPrefs.getCurrencySymbol()} "),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                           NumberInputFormatter(),

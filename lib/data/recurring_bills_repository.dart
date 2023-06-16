@@ -41,9 +41,8 @@ class RecurringBillsRepository {
   }
 
   Future<void> deleteRecurringBill(int recurringBillId) async {
-    _isarService.deleteAllRecurringBillTxns(recurringBillId).then((value) {
-      _isarService.deleteRecurringBill(recurringBillId);
-    });
+    await _isarService.deleteAllRecurringBillTxns(recurringBillId);
+    await _isarService.deleteRecurringBill(recurringBillId);
   }
 
   Future<void> addRecurringBillTxn(

@@ -21,6 +21,8 @@ removeFormatting(String formattedValue) {
 }
 
 class NumberInputFormatter extends TextInputFormatter {
+  final sharedPrefs = getIt<SharedPrefs>();
+
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
     if (newValue.selection.baseOffset == 0) {
@@ -34,7 +36,8 @@ class NumberInputFormatter extends TextInputFormatter {
     }
 
     final formatter = NumberFormat('#,##0.00');
-    final newText = formatter.format(number / 100);
+    final newText =
+        "${sharedPrefs.getCurrencySymbol()} ${formatter.format(number / 100)}";
 
     return newValue.copyWith(
       text: newText,

@@ -38,6 +38,7 @@ class HomePage extends HookWidget {
             icon: SvgPicture.asset(
               "assets/icons/ic_setting.svg",
               height: 24.0,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],

@@ -114,6 +114,7 @@ class AddRecurringBillPage extends HookWidget {
                         CustomTextField(
                           label: "Title",
                           controller: titleTextController,
+                          hintText: "eg. Internet",
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Title is required';
@@ -146,7 +147,7 @@ class AddRecurringBillPage extends HookWidget {
                         //   },
                         // ),
                         CustomTextField(
-                          label: "Remind me to pay every...",
+                          label: "Remind me to pay monthly every...",
                           controller: dateTextController,
                           onTap: () async {
                             await showDatePicker(

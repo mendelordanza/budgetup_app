@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -186,39 +187,23 @@ class RecurringBillsPage extends HookWidget {
             arguments: item,
           );
         },
-        child: Material(
-          shape: SmoothRectangleBorder(
-            borderRadius: SmoothBorderRadius(
-              cornerRadius: 16,
-              cornerSmoothing: 1.0,
-            ),
-          ),
-          color: Theme.of(context).cardColor,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 16.0,
-              horizontal: 21.0,
-            ),
-            child:
-                BlocBuilder<RecurringDateFilterBloc, RecurringDateFilterState>(
-              builder: (context, state) {
-                if (state is RecurringDateFilterSelected) {
-                  final txn = item.recurringBillTxns?.firstWhereOrNull(
-                    (element) =>
-                        element.datePaid?.month == state.selectedDate.month,
-                  );
-                  return _checkboxItem(context,
-                      selectedDate: state.selectedDate, item: item, txn: txn);
-                }
-                return _checkboxItem(
-                  context,
-                  selectedDate: currentSelectedDate,
-                  item: item,
-                  txn: txn,
-                );
-              },
-            ),
-          ),
+        child: BlocBuilder<RecurringDateFilterBloc, RecurringDateFilterState>(
+          builder: (context, state) {
+            if (state is RecurringDateFilterSelected) {
+              final txn = item.recurringBillTxns?.firstWhereOrNull(
+                (element) =>
+                    element.datePaid?.month == state.selectedDate.month,
+              );
+              return _checkboxItem(context,
+                  selectedDate: state.selectedDate, item: item, txn: txn);
+            }
+            return _checkboxItem(
+              context,
+              selectedDate: currentSelectedDate,
+              item: item,
+              txn: txn,
+            );
+          },
         ),
       ),
     );
@@ -230,75 +215,118 @@ class RecurringBillsPage extends HookWidget {
     required RecurringBill item,
     RecurringBillTxn? txn,
   }) {
-    return Row(
-      children: [
-        Checkbox(
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          visualDensity: VisualDensity.compact,
-          activeColor: secondaryColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              3.0,
+    return Slidable(
+      // Specify a key if the Slidable is dismissible.
+      key: ValueKey(item.id!),
+
+      // The end action pane is the one at the right or the bottom side.
+      endActionPane: ActionPane(
+        motion: ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (context) {
+              context.read<RecurringModifyBloc>().add(RemoveRecurringBill(
+                  selectedDate: selectedDate, recurringBill: item));
+            },
+            autoClose: true,
+            backgroundColor: red,
+            foregroundColor: Colors.white,
+            icon: Iconsax.trash,
+            label: 'Delete',
+            borderRadius: BorderRadius.all(
+              Radius.circular(16.0),
             ),
           ),
-          value: item.isPaid(selectedDate) ? true : false,
-          onChanged: (checked) async {
-            if (item.isPaid(selectedDate) && txn != null) {
-              context.read<RecurringModifyBloc>().add(
-                    RemoveRecurringBillTxn(
-                      selectedDate: selectedDate,
-                      recurringBill: item,
-                      recurringBillTxn: txn,
-                    ),
-                  );
-            } else {
-              final newRecurringTxn = RecurringBillTxn(
-                isPaid: true,
-                datePaid: removeTimeFromDate(selectedDate),
-              );
-              context.read<RecurringModifyBloc>().add(
-                    AddRecurringBillTxn(
-                      selectedDate: selectedDate,
-                      recurringBill: item,
-                      recurringBillTxn: newRecurringTxn,
-                    ),
-                  );
-            }
-          },
+        ],
+      ),
+
+      // The child of the Slidable is what the user sees when the
+      // component is not dragged.
+      child: Material(
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 16,
+            cornerSmoothing: 1.0,
+          ),
         ),
-        SizedBox(
-          width: 10.0,
-        ),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+        color: Theme.of(context).cardColor,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 16.0,
+            horizontal: 21.0,
+          ),
+          child: Row(
             children: [
-              Text(item.title ?? "hello"),
-              if (item.isPaid(selectedDate) && txn != null)
-                Text(
-                  "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",
-                  style: TextStyle(
-                    fontSize: 12.0,
+              Checkbox(
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+                activeColor: secondaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    3.0,
                   ),
-                )
-              else if (item.reminderDate != null)
-                Text(
-                  "due ${formatDate(item.reminderDate!, "MMM dd")}",
-                  style: TextStyle(
-                    fontSize: 12.0,
-                  ),
-                )
+                ),
+                value: item.isPaid(selectedDate) ? true : false,
+                onChanged: (checked) async {
+                  if (item.isPaid(selectedDate) && txn != null) {
+                    context.read<RecurringModifyBloc>().add(
+                          RemoveRecurringBillTxn(
+                            selectedDate: selectedDate,
+                            recurringBill: item,
+                            recurringBillTxn: txn,
+                          ),
+                        );
+                  } else {
+                    final newRecurringTxn = RecurringBillTxn(
+                      isPaid: true,
+                      datePaid: removeTimeFromDate(selectedDate),
+                    );
+                    context.read<RecurringModifyBloc>().add(
+                          AddRecurringBillTxn(
+                            selectedDate: selectedDate,
+                            recurringBill: item,
+                            recurringBillTxn: newRecurringTxn,
+                          ),
+                        );
+                  }
+                },
+              ),
+              SizedBox(
+                width: 10.0,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(item.title ?? "hello"),
+                    if (item.isPaid(selectedDate) && txn != null)
+                      Text(
+                        "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",
+                        style: TextStyle(
+                          fontSize: 12.0,
+                        ),
+                      )
+                    else if (item.reminderDate != null)
+                      Text(
+                        "every ${formatDate(item.reminderDate!, "dd")} of the month",
+                        style: TextStyle(
+                          fontSize: 12.0,
+                        ),
+                      )
+                  ],
+                ),
+              ),
+              Text(
+                decimalFormatter(item.amount ?? 0.00),
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
         ),
-        Text(
-          decimalFormatter(item.amount ?? 0.00),
-          style: TextStyle(
-            fontSize: 16.0,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

@@ -17,28 +17,25 @@ class RecurringModifyBloc
     required this.recurringBillsRepo,
   }) : super(RecurringModifyInitial()) {
     on<AddRecurringBill>((event, emit) async {
-      recurringBillsRepo.saveRecurringBill(event.recurringBill);
+      await recurringBillsRepo.saveRecurringBill(event.recurringBill);
 
       emit(RecurringBillAdded(event.selectedDate));
     });
     on<EditRecurringBill>((event, emit) async {
-      recurringBillsRepo.saveRecurringBill(event.recurringBill);
-
+      await recurringBillsRepo.saveRecurringBill(event.recurringBill);
       emit(RecurringBillEdited(event.selectedDate));
     });
     on<RemoveRecurringBill>((event, emit) async {
-      recurringBillsRepo.deleteRecurringBill(event.recurringBill.id!);
+      await recurringBillsRepo.deleteRecurringBill(event.recurringBill.id!);
       emit(RecurringBillRemoved(event.selectedDate));
     });
     on<AddRecurringBillTxn>((event, emit) async {
-      recurringBillsRepo.addRecurringBillTxn(
+      await recurringBillsRepo.addRecurringBillTxn(
           event.recurringBill, event.recurringBillTxn);
-
       emit(MarkAsPaid(event.selectedDate));
     });
     on<RemoveRecurringBillTxn>((event, emit) async {
-      recurringBillsRepo.deleteRecurringBillTxn(event.recurringBillTxn);
-
+      await recurringBillsRepo.deleteRecurringBillTxn(event.recurringBillTxn);
       emit(UnmarkAsPaid(event.selectedDate));
     });
   }

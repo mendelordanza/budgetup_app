@@ -48,7 +48,7 @@ class AddExpenseTxnPage extends HookWidget {
     final amountTextController = useTextEditingController(
         text: args.expenseTxn != null
             ? decimalFormatter(args.expenseTxn!.amount ?? 0.00)
-            : "0.00");
+            : "${sharedPrefs.getCurrencySymbol()} 0.00");
 
     final dateTextController = useTextEditingController();
     final currentSelectedDate = useState<DateTime>(
@@ -109,11 +109,15 @@ class AddExpenseTxnPage extends HookWidget {
                           child: Column(
                             children: [
                               Text(
-                                  "${args.expenseCategory.icon} ${args.expenseCategory.title}"),
+                                "${args.expenseCategory.icon} ${args.expenseCategory.title}",
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                               SizedBox(
                                 height: 20,
                               ),
-                              Text("${sharedPrefs.getCurrencyCode()}"),
                               TextFormField(
                                 controller: amountTextController,
                                 decoration: InputDecoration(
@@ -206,7 +210,8 @@ class AddExpenseTxnPage extends HookWidget {
                           );
                     }
 
-                    Navigator.pushNamed(context, RouteStrings.transactions,
+                    Navigator.pushReplacementNamed(
+                        context, RouteStrings.transactions,
                         arguments: args.expenseCategory);
                   }
                 },
