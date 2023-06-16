@@ -1,4 +1,5 @@
 import 'package:budgetup_app/helper/date_helper.dart';
+import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/presentation/custom/custom_button.dart';
 import 'package:budgetup_app/presentation/custom/custom_emoji_picker.dart';
 import 'package:budgetup_app/presentation/custom/custom_text_field.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../domain/expense_category.dart';
 import '../../helper/string.dart';
+import '../../injection_container.dart';
 
 class AddExpenseCategoryPage extends HookWidget {
   final ExpenseCategory? expenseCategory;
@@ -21,14 +23,16 @@ class AddExpenseCategoryPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sharedPrefs = getIt<SharedPrefs>();
+
     final titleTextController = useTextEditingController(
         text: expenseCategory != null ? expenseCategory!.title : "");
     final budgetTextController = useTextEditingController(
-        text: expenseCategory != null ? "${expenseCategory!.budget}" : "");
+        text: expenseCategory != null ? "${expenseCategory!.budget}" : "0.00");
     final selectedEmoji = useState(
         expenseCategory != null && expenseCategory!.icon != null
             ? expenseCategory!.icon!
-            : Emoji.objects[49]);
+            : Emoji.travelPlaces[0]);
 
     final added = useState<bool>(false);
 
@@ -38,6 +42,7 @@ class AddExpenseCategoryPage extends HookWidget {
           Navigator.pop(context);
         }
       });
+      return null;
     }, [added.value]);
 
     return Scaffold(
@@ -74,42 +79,46 @@ class AddExpenseCategoryPage extends HookWidget {
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: Text("Select Emoji Icon"),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) {
-                              return CustomEmojiPicker();
-                            },
-                            isScrollControlled: true,
-                          ).then((value) {
-                            if (value != null) {
-                              selectedEmoji.value = value;
-                            }
-                          });
-                        },
-                        child: Material(
-                          child: Padding(
-                            child: Text(
-                              selectedEmoji.value,
-                              style: TextStyle(
-                                fontSize: 30.0,
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) {
+                                return CustomEmojiPicker();
+                              },
+                              isScrollControlled: true,
+                            ).then((value) {
+                              if (value != null) {
+                                selectedEmoji.value = value;
+                              }
+                            });
+                          },
+                          child: Material(
+                            child: Padding(
+                              child: Text(
+                                selectedEmoji.value,
+                                style: TextStyle(
+                                  fontSize: 30.0,
+                                ),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                vertical: 10.0,
+                                horizontal: 16.0,
                               ),
                             ),
-                            padding: EdgeInsets.symmetric(
-                              vertical: 10.0,
-                              horizontal: 16.0,
+                            shape: ContinuousRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
                             ),
-                          ),
-                          shape: ContinuousRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0),
                           ),
                         ),
                       ),
                       CustomTextField(
                         controller: titleTextController,
                         label: "Title",
+                        hintText: "eg. Transporation",
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter some text';
@@ -120,6 +129,7 @@ class AddExpenseCategoryPage extends HookWidget {
                       CustomTextField(
                         controller: budgetTextController,
                         label: "Monthly Budget",
+                        prefix: Text("${sharedPrefs.getCurrencySymbol()} "),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                           NumberInputFormatter(),
@@ -130,6 +140,8 @@ class AddExpenseCategoryPage extends HookWidget {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter some text';
+                          } else if (value == "0.00") {
+                            return 'Please enter a valid number';
                           }
                           return null;
                         },
@@ -146,8 +158,8 @@ class AddExpenseCategoryPage extends HookWidget {
                       final editedCategory = expenseCategory!.copy(
                         title: titleTextController.text,
                         icon: selectedEmoji.value,
-                        budget: double.parse(
-                            removeFormatting(budgetTextController.text)),
+                        budget: convertBudget(sharedPrefs,
+                            budget: budgetTextController.text),
                         updatedAt: removeTimeFromDate(DateTime.now()),
                       );
                       context.read<ModifyExpensesBloc>().add(
@@ -157,8 +169,8 @@ class AddExpenseCategoryPage extends HookWidget {
                       final newCategory = ExpenseCategory(
                         title: titleTextController.text,
                         icon: selectedEmoji.value,
-                        budget: double.parse(
-                            removeFormatting(budgetTextController.text)),
+                        budget: convertBudget(sharedPrefs,
+                            budget: budgetTextController.text),
                         createdAt: removeTimeFromDate(DateTime.now()),
                         updatedAt: removeTimeFromDate(DateTime.now()),
                       );
@@ -179,5 +191,12 @@ class AddExpenseCategoryPage extends HookWidget {
         ),
       ),
     );
+  }
+
+  convertBudget(SharedPrefs sharedPrefs, {required String budget}) {
+    return sharedPrefs.getCurrencyCode() == "USD"
+        ? double.parse(removeFormatting(budget))
+        : double.parse(removeFormatting(budget)) /
+            sharedPrefs.getCurrencyRate();
   }
 }

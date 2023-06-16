@@ -6,6 +6,7 @@ import 'package:budgetup_app/presentation/transactions_modify/add_expense_txn_pa
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:emoji_data/emoji_data.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -30,6 +31,7 @@ class ExpenseTxnPage extends HookWidget {
       context
           .read<ExpenseTxnBloc>()
           .add(LoadExpenseTxns(categoryId: expenseCategory.id!));
+      return null;
     }, []);
 
     useEffect(() {
@@ -38,6 +40,7 @@ class ExpenseTxnPage extends HookWidget {
             .read<ExpenseTxnBloc>()
             .add(LoadExpenseTxns(categoryId: expenseCategory.id!));
       }
+      return null;
     }, [modifySuccess.value]);
 
     return Scaffold(
@@ -96,16 +99,12 @@ class ExpenseTxnPage extends HookWidget {
               Text(
                 "Overall Total",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w700,
-                ),
               ),
               BlocBuilder<ExpenseTxnBloc, ExpenseTxnState>(
                 builder: (context, state) {
                   if (state is ExpenseTxnLoaded) {
                     return Text(
-                      "USD ${decimalFormatter(state.total)}",
+                      decimalFormatter(state.total),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24.0,
@@ -187,6 +186,7 @@ class ExpenseTxnPage extends HookWidget {
             RouteStrings.addTransaction,
             arguments: ExpenseTxnArgs(
               expenseCategory: expenseCategory,
+              from: From.txnPage,
             ),
           );
         },
@@ -206,14 +206,18 @@ class ExpenseTxnPage extends HookWidget {
           arguments: ExpenseTxnArgs(
             expenseCategory: expenseCategory,
             expenseTxn: item,
+            from: From.txnPage,
           ),
         );
       },
       child: Padding(
         padding: const EdgeInsets.only(bottom: 12.0),
         child: Material(
-          shape: ContinuousRectangleBorder(
-            borderRadius: BorderRadius.circular(40.0),
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 16,
+              cornerSmoothing: 1.0,
+            ),
           ),
           color: Theme.of(context).cardColor,
           child: Padding(
@@ -253,7 +257,7 @@ class ExpenseTxnPage extends HookWidget {
                   ),
                 ),
                 Text(
-                  "USD ${decimalFormatter(item.amount ?? 0.00)}",
+                  decimalFormatter(item.amount ?? 0.00),
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     color: Colors.red,

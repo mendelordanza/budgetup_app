@@ -1,4 +1,3 @@
-import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
 import 'package:budgetup_app/domain/expense_txn.dart';
 import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:equatable/equatable.dart';
@@ -81,13 +80,12 @@ class ExpenseCategory extends Equatable {
     return getTotalByDate(dateFilterType, selectedDate) > (budget ?? 0.0);
   }
 
-  ExpenseCategoryEntity toIsar(ExpenseTxnEntity expenseTxnEntity) {
+  ExpenseCategoryEntity toIsar() {
     final isarObject = ExpenseCategoryEntity()
       ..id = id!
       ..title = title
       ..budget = budget
       ..icon = icon
-      ..expenseTransactions.add(expenseTxnEntity)
       ..createdAt = createdAt
       ..updatedAt = updatedAt;
     return isarObject;

@@ -1,4 +1,6 @@
+import 'package:budgetup_app/data/currency_repository.dart';
 import 'package:budgetup_app/data/expenses_repository.dart';
+import 'package:budgetup_app/data/http_service.dart';
 import 'package:budgetup_app/data/local/isar_service.dart';
 import 'package:budgetup_app/data/recurring_bills_repository.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
@@ -9,6 +11,7 @@ import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_b
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
+import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currency_cubit.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -28,12 +31,15 @@ Future<void> setup() async {
   getIt.registerLazySingleton(
     () => TransactionsModifyBloc(
       expensesRepository: getIt(),
+      sharedPrefs: getIt(),
     ),
   );
   getIt.registerLazySingleton(
     () => ExpenseTxnBloc(
       expensesRepository: getIt(),
       transactionsModifyBloc: getIt(),
+      convertCurrencyCubit: getIt(),
+      sharedPrefs: getIt(),
     ),
   );
   getIt.registerLazySingleton(
@@ -46,6 +52,8 @@ Future<void> setup() async {
       expensesRepository: getIt(),
       modifyExpensesBloc: getIt(),
       transactionsModifyBloc: getIt(),
+      convertCurrencyCubit: getIt(),
+      sharedPrefs: getIt(),
     ),
   );
   getIt.registerLazySingleton(
@@ -57,6 +65,14 @@ Future<void> setup() async {
     () => RecurringBillBloc(
       recurringBillsRepo: getIt(),
       recurringModifyBloc: getIt(),
+      convertCurrencyCubit: getIt(),
+      sharedPrefs: getIt(),
+    ),
+  );
+  getIt.registerLazySingleton(
+    () => ConvertCurrencyCubit(
+      currencyRepository: getIt(),
+      sharedPrefs: getIt(),
     ),
   );
   getIt.registerFactory(
@@ -70,8 +86,13 @@ Future<void> setup() async {
   getIt.registerLazySingleton(() => ExpensesRepository(isarService: getIt()));
   getIt.registerLazySingleton(
       () => RecurringBillsRepository(isarService: getIt()));
+  getIt.registerLazySingleton(() => CurrencyRepository(
+        httpService: getIt(),
+        isarService: getIt(),
+      ));
 
   //Data
   getIt.registerLazySingleton<SharedPrefs>(() => SharedPrefs());
   getIt.registerLazySingleton<IsarService>(() => IsarService());
+  getIt.registerLazySingleton<HttpService>(() => HttpService());
 }

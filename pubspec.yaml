@@ -67,6 +67,15 @@ dependencies:
   #Emojis
   emoji_data: ^1.0.0
 
+  #Squircle
+  figma_squircle: ^0.5.3
+
+  #CurrencyPicker
+  currency_picker: ^2.0.16
+
+  #HTTP
+  dio: ^5.2.1+1
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2

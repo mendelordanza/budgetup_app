@@ -1,8 +1,10 @@
 import 'package:budgetup_app/helper/route_strings.dart';
+import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currency_cubit.dart';
 import 'package:budgetup_app/presentation/transactions_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomePage extends HookWidget {
   HomePage({super.key});
@@ -16,6 +18,11 @@ class HomePage extends HookWidget {
   Widget build(BuildContext context) {
     final _selectedIndex = useState<int>(0);
 
+    useEffect(() {
+      context.read<ConvertCurrencyCubit>().loadCurrencies();
+      return null;
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -28,7 +35,10 @@ class HomePage extends HookWidget {
             onPressed: () {
               Navigator.pushNamed(context, RouteStrings.settings);
             },
-            icon: Icon(Iconsax.setting),
+            icon: SvgPicture.asset(
+              "assets/icons/ic_setting.svg",
+              height: 24.0,
+            ),
           ),
         ],
       ),

@@ -50,20 +50,20 @@ class RecurringBillsRepository {
     RecurringBill recurringBill,
     RecurringBillTxn recurringBillTxn,
   ) async {
-    final txnObject = RecurringBillTxnEntity()
-      ..isPaid = recurringBillTxn.isPaid
-      ..datePaid = recurringBillTxn.datePaid;
-
-    final newRecurringBill = RecurringBillEntity()
+    final newRecurringBillObject = RecurringBillEntity()
       ..id = recurringBill.id!
       ..title = recurringBill.title
       ..amount = recurringBill.amount
       ..reminderDate = recurringBill.reminderDate
-      ..recurringBillTxns.add(txnObject)
       ..createdAt = recurringBill.createdAt
       ..updatedAt = DateTime.now();
 
-    _isarService.saveRecurringBill(newRecurringBill);
+    final txnObject = RecurringBillTxnEntity()
+      ..isPaid = recurringBillTxn.isPaid
+      ..datePaid = recurringBillTxn.datePaid
+      ..recurringBill.value = newRecurringBillObject;
+
+    _isarService.addRecurringBillTxn(txnObject);
   }
 
   Future<void> deleteRecurringBillTxn(

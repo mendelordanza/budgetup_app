@@ -1,16 +1,27 @@
+
+import 'package:budgetup_app/helper/shared_prefs.dart';
+import 'package:budgetup_app/injection_container.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 String decimalFormatter(double number) {
+  final sharedPrefs = getIt<SharedPrefs>();
   double roundedNumber = double.parse(number.toStringAsFixed(2));
-  NumberFormat formatter = NumberFormat("#,##0.00");
-  return formatter.format(roundedNumber);
+  final formatter = NumberFormat("#,##0.00");
+  return "${sharedPrefs.getCurrencySymbol()} ${formatter.format(roundedNumber)}";
 }
 
 removeFormatting(String formattedValue) {
+  final sharedPrefs = getIt<SharedPrefs>();
   final numberFormat = NumberFormat('#,##0.###');
-  final parsedValue = numberFormat.parse(formattedValue);
-  return parsedValue.toString();
+  final parsedAmount = double.tryParse(
+      formattedValue.replaceAll('${sharedPrefs.getCurrencySymbol()}', ''));
+  if (parsedAmount != null) {
+    return numberFormat.format(parsedAmount);
+  } else {
+    return numberFormat.parse(formattedValue).toString();
+  }
 }
 
 class NumberInputFormatter extends TextInputFormatter {

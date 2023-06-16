@@ -15,6 +15,10 @@ class SharedPrefs {
   static const String KEY_RECURRING_SELECTED_DATE =
       "key_recurring_selected_date";
   static const String KEY_RECURRING_DATE_FILTER = "key_recurring_date_filter";
+  static const String KEY_CURRENCY_SYMBOL = "key_currency_symbol";
+  static const String KEY_CURRENCY_CODE = "key_currency_code";
+  static const String KEY_BASE_CURRENCY_RATE = "key_base_currency_rate";
+  static const String KEY_CURRENCY_RATE = "key_currency_rate";
 
   Future setFinishedOnboarding(bool isFinished) async {
     await _preferences?.setBool(KEY_IS_FINISHED, isFinished);
@@ -55,4 +59,32 @@ class SharedPrefs {
   String getRecurringSelectedDateFilterType() =>
       _preferences?.getString(KEY_RECURRING_DATE_FILTER) ??
       DateFilterType.monthly.name;
+
+  Future setCurrencySymbol(String symbol) async {
+    await _preferences?.setString(KEY_CURRENCY_SYMBOL, symbol);
+  }
+
+  String getCurrencySymbol() =>
+      _preferences?.getString(KEY_CURRENCY_SYMBOL) ?? "\$";
+
+  Future setCurrencyCode(String currencyCode) async {
+    await _preferences?.setString(KEY_CURRENCY_CODE, currencyCode);
+  }
+
+  String getCurrencyCode() =>
+      _preferences?.getString(KEY_CURRENCY_CODE) ?? "USD";
+
+  Future setBaseCurrencyRate(double baseCurrencyRate) async {
+    await _preferences?.setDouble(KEY_BASE_CURRENCY_RATE, baseCurrencyRate);
+  }
+
+  double getBaseCurrencyRate() =>
+      _preferences?.getDouble(KEY_BASE_CURRENCY_RATE) ?? 0.00;
+
+  Future setCurrencyRate(double currencyRate) async {
+    await _preferences?.setDouble(KEY_CURRENCY_RATE, currencyRate);
+  }
+
+  double getCurrencyRate() =>
+      _preferences?.getDouble(KEY_CURRENCY_RATE) ?? 0.00;
 }

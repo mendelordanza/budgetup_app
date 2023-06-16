@@ -10,3 +10,13 @@ class LoadRecurringBills extends RecurringBillEvent {
 }
 
 class LoadPaidRecurringBills extends RecurringBillEvent {}
+
+class ConvertRecurringBill extends RecurringBillEvent {
+  final String currencyCode;
+  final double currencyRate;
+
+  ConvertRecurringBill({
+    required this.currencyCode,
+    required this.currencyRate,
+  });
+}

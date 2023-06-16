@@ -11,3 +11,14 @@ class LoadExpenseCategories extends ExpenseEvent {
 
   LoadExpenseCategories({this.dateFilterType, this.selectedDate});
 }
+
+//Convert Expense Budget
+class ConvertExpenseBudget extends ExpenseEvent {
+  final String currencyCode;
+  final double currencyRate;
+
+  ConvertExpenseBudget({
+    required this.currencyCode,
+    required this.currencyRate,
+  });
+}

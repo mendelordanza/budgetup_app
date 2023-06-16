@@ -11,3 +11,14 @@ class LoadExpenseTxns extends ExpenseTxnEvent {
 
   LoadExpenseTxns({required this.categoryId});
 }
+
+//Convert
+class ConvertTxn extends ExpenseTxnEvent {
+  final String currencyCode;
+  final double currencyRate;
+
+  ConvertTxn({
+    required this.currencyCode,
+    required this.currencyRate,
+  });
+}

@@ -1,5 +1,9 @@
 import 'package:budgetup_app/presentation/paywall/paywall.dart';
+import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currency_cubit.dart';
+import 'package:currency_picker/currency_picker.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -38,18 +42,20 @@ class SettingsPage extends StatelessWidget {
                         settingItems: [
                           SettingItem(
                             onTap: () {
-                              showModalBottomSheet(context: context, builder: (context) {
-                                return Paywall();
-                              });
+                              showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return Paywall();
+                                  });
                             },
                             icon: "assets/icons/ic_app_icon.svg",
                             iconBackgroundColor: Color(0xFF666666),
                             label: "Subscribe to BudgetUp Pro",
+                            subtitle: "Unlock all features!",
                           ),
                         ],
                       ),
                       SettingsContainer(
-                        label: "App",
                         settingItems: [
                           SettingItem(
                               onTap: () {},
@@ -64,7 +70,23 @@ class SettingsPage extends StatelessWidget {
                               label: "Appearance"),
                           Divider(),
                           SettingItem(
-                              onTap: () {},
+                              onTap: () {
+                                showCurrencyPicker(
+                                  context: context,
+                                  showFlag: true,
+                                  showCurrencyName: true,
+                                  showCurrencyCode: true,
+                                  onSelect: (Currency currency) {
+                                    context
+                                        .read<ConvertCurrencyCubit>()
+                                        .loadCurrencies();
+                                    context
+                                        .read<ConvertCurrencyCubit>()
+                                        .changeCurrency(
+                                            currency.symbol, currency.code);
+                                  },
+                                );
+                              },
                               icon: "assets/icons/ic_currency.svg",
                               iconBackgroundColor: Color(0xFF00A61B),
                               label: "Currency"),
@@ -76,7 +98,6 @@ class SettingsPage extends StatelessWidget {
                         ],
                       ),
                       SettingsContainer(
-                        label: "General",
                         settingItems: [
                           SettingItem(
                               onTap: () {},
@@ -104,17 +125,10 @@ class SettingsPage extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
-              child: Column(
-                children: [
-                  Text(
-                    "BudgetUp v1.0",
-                    style: TextStyle(fontSize: 12.0),
-                  ),
-                  Text(
-                    "Made with ❤️ by Ralph Ordanza",
-                    style: TextStyle(fontSize: 12.0),
-                  ),
-                ],
+              child: Text(
+                "BudgetUp v1.0",
+                style: TextStyle(fontSize: 12.0),
+                textAlign: TextAlign.center,
               ),
             )
           ],
@@ -155,8 +169,11 @@ class SettingsContainer extends StatelessWidget {
           ),
           Material(
             color: Theme.of(context).cardColor,
-            shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.circular(40.0),
+            shape: SmoothRectangleBorder(
+              borderRadius: SmoothBorderRadius(
+                cornerRadius: 16,
+                cornerSmoothing: 1.0,
+              ),
             ),
             child: Padding(
               padding: const EdgeInsets.all(18.0),
@@ -178,6 +195,7 @@ class SettingItem extends StatelessWidget {
   final String? iconSize;
   final Color iconBackgroundColor;
   final String label;
+  final String? subtitle;
 
   SettingItem({
     required this.onTap,
@@ -185,6 +203,7 @@ class SettingItem extends StatelessWidget {
     this.iconSize,
     required this.iconBackgroundColor,
     required this.label,
+    this.subtitle,
   });
 
   @override
@@ -211,10 +230,21 @@ class SettingItem extends StatelessWidget {
               width: 10.0,
             ),
             Expanded(
-              child: Text(
-                label,
-              ),
-            ),
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  label,
+                ),
+                if (subtitle != null)
+                  Text(
+                    subtitle!,
+                    style: TextStyle(
+                      fontSize: 12.0,
+                    ),
+                  ),
+              ],
+            )),
             SvgPicture.asset(
               "assets/icons/ic_arrow_right.svg",
             ),

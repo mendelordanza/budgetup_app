@@ -19,7 +19,7 @@ class DashboardPage extends HookWidget {
 
     useEffect(() {
       context.read<DashboardCubit>().getSummary();
-      //context.read<RecurringBillBloc>().add(LoadRecurringBills());
+      return null;
     }, []);
 
     return Scaffold(
@@ -161,6 +161,7 @@ class DashboardPage extends HookWidget {
                                 ),
                               );
                             }
+                            return Container();
                           },
                         ),
                         Divider(),
@@ -177,7 +178,7 @@ class DashboardPage extends HookWidget {
                                 ),
                               ),
                               Text(
-                                "PHP ${decimalFormatter(state.expensesTotal)}",
+                                decimalFormatter(state.expensesTotal),
                                 style: TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.w600,
@@ -282,7 +283,7 @@ class DashboardPage extends HookWidget {
                               ),
                             ),
                             Text(
-                              "PHP ${decimalFormatter(state.recurringBillTotal)}",
+                              decimalFormatter(state.recurringBillTotal),
                               style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.w600,

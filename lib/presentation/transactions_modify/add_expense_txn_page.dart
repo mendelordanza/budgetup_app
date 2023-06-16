@@ -1,6 +1,8 @@
 import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/domain/expense_txn.dart';
 import 'package:budgetup_app/helper/date_helper.dart';
+import 'package:budgetup_app/helper/shared_prefs.dart';
+import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/custom/custom_button.dart';
 import 'package:budgetup_app/presentation/custom/custom_text_field.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
@@ -9,14 +11,26 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:iconsax/iconsax.dart';
 
+import '../../helper/route_strings.dart';
 import '../../helper/string.dart';
 
 class ExpenseTxnArgs {
   final ExpenseCategory expenseCategory;
   final ExpenseTxn? expenseTxn;
+  final From from;
 
-  ExpenseTxnArgs({required this.expenseCategory, this.expenseTxn});
+  ExpenseTxnArgs({
+    required this.expenseCategory,
+    this.expenseTxn,
+    required this.from,
+  });
+}
+
+enum From {
+  expensePage,
+  txnPage,
 }
 
 class AddExpenseTxnPage extends HookWidget {
@@ -27,12 +41,14 @@ class AddExpenseTxnPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sharedPrefs = getIt<SharedPrefs>();
+
     final notesTextController = useTextEditingController(
         text: args.expenseTxn != null ? args.expenseTxn!.notes : "");
     final amountTextController = useTextEditingController(
         text: args.expenseTxn != null
             ? decimalFormatter(args.expenseTxn!.amount ?? 0.00)
-            : "");
+            : "0.00");
 
     final dateTextController = useTextEditingController();
     final currentSelectedDate = useState<DateTime>(
@@ -43,6 +59,7 @@ class AddExpenseTxnPage extends HookWidget {
     useEffect(() {
       dateTextController.text =
           formatDate(currentSelectedDate.value, "MMM dd, yyyy");
+      return null;
     }, [currentSelectedDate.value]);
 
     return Scaffold(
@@ -61,6 +78,34 @@ class AddExpenseTxnPage extends HookWidget {
             ),
           ),
         ),
+        actions: args.from == From.expensePage
+            ? [
+                PopupMenuButton(
+                    // add icon, by default "3 dot" icon
+                    icon: Icon(Iconsax.more),
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem<int>(
+                          value: 0,
+                          child: Text("View Transactions"),
+                        ),
+                        // PopupMenuItem<int>(
+                        //   value: 1,
+                        //   child: Text("Delete"),
+                        // ),
+                      ];
+                    },
+                    onSelected: (value) {
+                      if (value == 0) {
+                        Navigator.popAndPushNamed(
+                            context, RouteStrings.transactions,
+                            arguments: args.expenseCategory);
+                      } else if (value == 1) {
+                        //TODO show alert dialog
+                      }
+                    }),
+              ]
+            : null,
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
@@ -71,49 +116,87 @@ class AddExpenseTxnPage extends HookWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      CustomTextField(
-                        controller: amountTextController,
-                        textInputType:
-                            TextInputType.numberWithOptions(decimal: true),
-                        label: "Amount",
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          NumberInputFormatter(),
-                        ],
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Amount is required';
-                          }
-                          return null;
-                        },
-                      ),
-                      CustomTextField(
-                        controller: notesTextController,
-                        label: "Notes (optional)",
-                        maxLines: 3,
-                      ),
-                      CustomTextField(
-                        controller: dateTextController,
-                        textInputType: TextInputType.datetime,
-                        label: "Date",
-                        onTap: () async {
-                          await showDatePicker(
-                            context: context,
-                            initialDate: currentSelectedDate.value,
-                            firstDate: DateTime(2015, 8),
-                            lastDate: DateTime(2101),
-                          ).then((date) {
-                            if (date != null) {
-                              currentSelectedDate.value = date;
-                            }
-                          });
-                        },
-                      ),
-                    ],
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: Column(
+                            children: [
+                              Text("${sharedPrefs.getCurrencyCode()}"),
+                              TextFormField(
+                                controller: amountTextController,
+                                decoration: InputDecoration(
+                                  fillColor: Colors.transparent,
+                                  filled: true,
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                                style: TextStyle(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                autofocus: true,
+                                textAlign: TextAlign.center,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  NumberInputFormatter(),
+                                ],
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Amount is required';
+                                  } else if (value == "0.00") {
+                                    return 'Please enter a valid number';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        // CustomTextField(
+                        //   controller: amountTextController,
+                        //   textInputType:
+                        //       TextInputType.numberWithOptions(decimal: true),
+                        //   label: "Amount",
+                        //   inputFormatters: [
+                        //     FilteringTextInputFormatter.digitsOnly,
+                        //     NumberInputFormatter(),
+                        //   ],
+                        //   validator: (value) {
+                        //     if (value == null || value.isEmpty) {
+                        //       return 'Amount is required';
+                        //     }
+                        //     return null;
+                        //   },
+                        // ),
+                        CustomTextField(
+                          controller: notesTextController,
+                          label: "Notes (optional)",
+                          maxLines: 3,
+                        ),
+                        CustomTextField(
+                          controller: dateTextController,
+                          textInputType: TextInputType.datetime,
+                          label: "Date",
+                          onTap: () async {
+                            await showDatePicker(
+                              context: context,
+                              initialDate: currentSelectedDate.value,
+                              firstDate: DateTime(2015, 8),
+                              lastDate: DateTime(2101),
+                            ).then((date) {
+                              if (date != null) {
+                                currentSelectedDate.value = date;
+                              }
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -123,8 +206,8 @@ class AddExpenseTxnPage extends HookWidget {
                     if (args.expenseTxn != null) {
                       //Edit
                       final editedTxn = args.expenseTxn!.copy(
-                        amount: double.parse(
-                            removeFormatting(amountTextController.text)),
+                        amount: convertAmount(sharedPrefs,
+                            amount: amountTextController.text),
                         notes: notesTextController.text,
                         updatedAt:
                             removeTimeFromDate(currentSelectedDate.value),
@@ -135,8 +218,8 @@ class AddExpenseTxnPage extends HookWidget {
                     } else {
                       //Add
                       final newTxn = ExpenseTxn(
-                        amount: double.parse(
-                            removeFormatting(amountTextController.text)),
+                        amount: convertAmount(sharedPrefs,
+                            amount: amountTextController.text),
                         notes: notesTextController.text,
                         createdAt:
                             removeTimeFromDate(currentSelectedDate.value),
@@ -161,5 +244,12 @@ class AddExpenseTxnPage extends HookWidget {
         ),
       ),
     );
+  }
+
+  convertAmount(SharedPrefs sharedPrefs, {required String amount}) {
+    return sharedPrefs.getCurrencyCode() == "USD"
+        ? double.parse(removeFormatting(amount))
+        : double.parse(removeFormatting(amount)) /
+            sharedPrefs.getCurrencyRate();
   }
 }

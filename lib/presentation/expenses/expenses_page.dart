@@ -2,7 +2,9 @@ import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
+import 'package:budgetup_app/presentation/transactions_modify/add_expense_txn_page.dart';
 import 'package:emoji_data/emoji_data.dart';
+import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -30,6 +32,7 @@ class ExpensesPage extends HookWidget {
       context
           .read<ExpenseBloc>()
           .add(LoadExpenseCategories(selectedDate: currentSelectedDate));
+      return null;
     }, []);
 
     return Scaffold(
@@ -95,7 +98,7 @@ class ExpensesPage extends HookWidget {
               ),
               BlocBuilder<ExpenseBloc, ExpenseState>(
                 builder: (context, state) {
-                  if (state is ExpenseCategoryLoaded && state.total != null) {
+                  if (state is ExpenseCategoryLoaded) {
                     return Balance(
                       headerLabel: Text("Total Expenses"),
                       total: state.total,
@@ -182,118 +185,127 @@ class ExpensesPage extends HookWidget {
       onTap: () {
         Navigator.pushNamed(
           context,
-          RouteStrings.transactions,
-          arguments: item,
+          RouteStrings.addTransaction,
+          arguments: ExpenseTxnArgs(
+            expenseCategory: item,
+            from: From.expensePage,
+          ),
         );
       },
       child: Material(
-        shape: ContinuousRectangleBorder(
-          borderRadius: BorderRadius.circular(40.0),
+        shape: SmoothRectangleBorder(
+          borderRadius: SmoothBorderRadius(
+            cornerRadius: 24,
+            cornerSmoothing: 1.0,
+          ),
         ),
         color: Theme.of(context).cardColor,
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 8.0,
-            horizontal: 24.0,
-          ),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Text(
-                item.icon ?? Emoji.objects[49],
-                style: TextStyle(
-                  fontSize: 30.0,
-                ),
-              ),
-              Column(
-                children: [
-                  Text(
-                    item.title ?? "Category",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Column(
+                  children: [
+                    Text(
+                      item.icon ?? Emoji.objects[49],
+                      style: TextStyle(
+                        fontSize: 20.0,
+                      ),
                     ),
-                  ),
-                  BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
-                    builder: (context, state) {
-                      if (state is ExpenseDateFilterSelected) {
+                    Text(
+                      item.title ?? "Category",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
+                      builder: (context, state) {
+                        if (state is ExpenseDateFilterSelected) {
+                          return Text(
+                            decimalFormatter(item.getTotalByDate(
+                                state.dateFilterType, state.selectedDate)),
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          );
+                        }
                         return Text(
-                          "USD ${decimalFormatter(item.getTotalByDate(state.dateFilterType, state.selectedDate))}",
+                          decimalFormatter(item.getTotalByDate(
+                              enumFromString(currentDateFilterType),
+                              currentSelectedDate)),
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w600,
                           ),
                         );
-                      }
-                      return Text(
-                        "USD ${decimalFormatter(item.getTotalByDate(enumFromString(currentDateFilterType), currentSelectedDate))}",
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      );
-                    },
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                children: [
+                  Text(
+                    "Monthly Budget",
+                    style: TextStyle(
+                      fontSize: 12.0,
+                    ),
                   ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        "Monthly Budget",
-                        style: TextStyle(
-                          fontSize: 12.0,
-                        ),
-                      ),
-                      Text(
-                        "${decimalFormatter(item.budget ?? 0.00)}",
-                        style: TextStyle(
-                          fontSize: 12.0,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
-                    builder: (context, state) {
-                      if (state is ExpenseDateFilterSelected) {
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Container(
-                            height: 12,
-                            child: LinearProgressIndicator(
-                              value: item.getTotalPercentage(
-                                  state.dateFilterType, state.selectedDate),
-                              color: item.isExceeded(
-                                      state.dateFilterType, state.selectedDate)
-                                  ? Colors.red
-                                  : null,
-                            ),
-                          ),
-                        );
-                      }
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Container(
-                          height: 12,
-                          child: LinearProgressIndicator(
-                            value: item.getTotalPercentage(
-                                enumFromString(currentDateFilterType),
-                                currentSelectedDate),
-                            color: item.isExceeded(
-                                    enumFromString(currentDateFilterType),
-                                    currentSelectedDate)
-                                ? Colors.red
-                                : null,
-                          ),
-                        ),
-                      );
-                    },
+                  Text(
+                    decimalFormatter(item.budget ?? 0.00),
+                    style: TextStyle(
+                      fontSize: 12.0,
+                    ),
                   ),
                 ],
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
+                builder: (context, state) {
+                  if (state is ExpenseDateFilterSelected) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        height: 12,
+                        child: LinearProgressIndicator(
+                          value: item.getTotalPercentage(
+                              state.dateFilterType, state.selectedDate),
+                          color: item.isExceeded(
+                                  state.dateFilterType, state.selectedDate)
+                              ? Colors.red
+                              : null,
+                        ),
+                      ),
+                    );
+                  }
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      height: 12,
+                      child: LinearProgressIndicator(
+                        value: item
+                                .getTotalPercentage(
+                                    enumFromString(currentDateFilterType),
+                                    currentSelectedDate)
+                                .isNaN
+                            ? 0.0
+                            : item.getTotalPercentage(
+                                enumFromString(currentDateFilterType),
+                                currentSelectedDate),
+                        color: item.isExceeded(
+                                enumFromString(currentDateFilterType),
+                                currentSelectedDate)
+                            ? Colors.red
+                            : null,
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

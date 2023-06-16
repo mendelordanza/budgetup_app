@@ -1,3 +1,4 @@
+import 'package:budgetup_app/data/local/entities/currency_rate_entity.dart';
 import 'package:budgetup_app/data/local/entities/expense_category_entity.dart';
 import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
 import 'package:budgetup_app/data/local/entities/recurring_bill_entity.dart';
@@ -63,6 +64,17 @@ class IsarService {
     });
   }
 
+  Future<void> bulkEditCategory(
+    List<ExpenseCategoryEntity> updatedCategories,
+  ) async {
+    final isar = await db;
+    await isar.writeTxn(() async {
+      final success =
+          await isar.expenseCategoryEntitys.putAll(updatedCategories);
+      print('deleted: $success');
+    });
+  }
+
   Future<void> deleteAllTxns(int categoryId) async {
     final isar = await db;
     await isar.writeTxn(() async {
@@ -75,15 +87,23 @@ class IsarService {
     });
   }
 
-  Future<void> addTransaction(ExpenseCategoryEntity expenseCategory) async {
+  Future<void> addTransaction(ExpenseTxnEntity expenseTxnEntity) async {
     final isar = await db;
     isar.writeTxnSync<int>(
-        () => isar.expenseCategoryEntitys.putSync(expenseCategory));
+        () => isar.expenseTxnEntitys.putSync(expenseTxnEntity));
   }
 
   Future<void> editTransaction(ExpenseTxnEntity expenseTxn) async {
     final isar = await db;
     isar.writeTxnSync<int>(() => isar.expenseTxnEntitys.putSync(expenseTxn));
+  }
+
+  Future<void> bulkEditTxns(List<ExpenseTxnEntity> updatedTxns) async {
+    final isar = await db;
+    await isar.writeTxn(() async {
+      final success = await isar.expenseTxnEntitys.putAll(updatedTxns);
+      print('deleted: $success');
+    });
   }
 
   Future<void> deleteTransaction(int txnId) async {
@@ -128,6 +148,13 @@ class IsarService {
         () => isar.recurringBillEntitys.putSync(recurringBillEntity));
   }
 
+  Future<void> addRecurringBillTxn(
+      RecurringBillTxnEntity recurringBillTxnEntity) async {
+    final isar = await db;
+    isar.writeTxnSync<int>(
+        () => isar.recurringBillTxnEntitys.putSync(recurringBillTxnEntity));
+  }
+
   Future<void> deleteRecurringBill(int recurringBillId) async {
     final isar = await db;
     await isar.writeTxn(() async {
@@ -156,6 +183,36 @@ class IsarService {
     });
   }
 
+  Future<void> addCurrency(CurrencyRateEntity currencyRateEntity) async {
+    final isar = await db;
+    await isar.writeTxn(() async {
+      await isar.currencyRateEntitys.put(currencyRateEntity);
+    });
+  }
+
+  Future<List<CurrencyRateEntity>> getAllCurrencies() async {
+    final isar = await db;
+    final list = await isar.currencyRateEntitys.where().findAll();
+    return list;
+  }
+
+  Future<void> deleteAllCurrencies() async {
+    final isar = await db;
+    await isar.writeTxn(() async {
+      await isar.currencyRateEntitys.clear();
+    });
+  }
+
+  Future<CurrencyRateEntity?> getCurrencyRate(String currencyCode) async {
+    final isar = await db;
+    final list = await isar.currencyRateEntitys
+        .where()
+        .filter()
+        .countryEqualTo(currencyCode)
+        .findFirst();
+    return list;
+  }
+
   Future<void> cleanDb() async {
     final isar = await db;
     await isar.writeTxn(() => isar.clear());
@@ -170,6 +227,7 @@ class IsarService {
           ExpenseTxnEntitySchema,
           RecurringBillEntitySchema,
           RecurringBillTxnEntitySchema,
+          CurrencyRateEntitySchema,
         ],
         inspector: true,
         directory: dir.path,

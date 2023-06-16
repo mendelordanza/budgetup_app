@@ -45,6 +45,23 @@ class ExpensesRepository {
     });
   }
 
+  Future<void> bulkEditCategory(
+    List<ExpenseCategory> categories,
+  ) async {
+    final updatedCategories = categories.map((category) {
+      final isarObject = ExpenseCategoryEntity()
+        ..id = category.id != null ? category.id! : Isar.autoIncrement
+        ..icon = category.icon
+        ..title = category.title
+        ..budget = category.budget
+        ..createdAt = category.createdAt
+        ..updatedAt = category.updatedAt;
+      return isarObject;
+    }).toList();
+
+    _isarService.bulkEditCategory(updatedCategories);
+  }
+
   Future<void> saveCategory(ExpenseCategory category) async {
     final isarObject = ExpenseCategoryEntity()
       ..id = category.id != null ? category.id! : Isar.autoIncrement
@@ -61,11 +78,12 @@ class ExpensesRepository {
     final txnObject = ExpenseTxnEntity()
       ..notes = expenseTxn.notes
       ..amount = expenseTxn.amount
+      ..category.value = category.toIsar()
       ..createdAt = expenseTxn.createdAt
       ..updatedAt = expenseTxn.updatedAt;
 
     if (category.id != null) {
-      _isarService.addTransaction(category.toIsar(txnObject));
+      _isarService.addTransaction(txnObject);
     }
   }
 
@@ -80,6 +98,19 @@ class ExpensesRepository {
     if (expenseTxn.id != null) {
       _isarService.editTransaction(txnObject);
     }
+  }
+
+  Future<void> bulkEditTxns(List<ExpenseTxn> txns) async {
+    final updatedTxns = txns.map((expenseTxn) {
+      final txnObject = ExpenseTxnEntity()
+        ..id = expenseTxn.id != null ? expenseTxn.id! : Isar.autoIncrement
+        ..notes = expenseTxn.notes
+        ..amount = expenseTxn.amount
+        ..createdAt = expenseTxn.createdAt
+        ..updatedAt = expenseTxn.updatedAt;
+      return txnObject;
+    }).toList();
+    _isarService.bulkEditTxns(updatedTxns);
   }
 
   Future<void> deleteTransaction(int txnId) async {
