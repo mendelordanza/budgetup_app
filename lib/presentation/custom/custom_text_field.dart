@@ -4,24 +4,26 @@ import 'package:flutter/services.dart';
 import '../../helper/colors.dart';
 
 class CustomTextField extends StatelessWidget {
-  TextEditingController controller;
-  String? label;
-  TextInputAction? textInputAction;
-  String? hintText;
-  String? Function(String?)? validator;
-  Widget? prefix;
-  TextInputType? textInputType;
-  Function()? onTap;
-  int? maxLines;
-  List<TextInputFormatter>? inputFormatters;
+  final FocusNode? focusNode;
+  final TextEditingController controller;
+  final String? label;
+  final TextInputAction? textInputAction;
+  final String? hintText;
+  final String? Function(String?)? validator;
+  final Widget? prefixIcon;
+  final TextInputType? textInputType;
+  final Function()? onTap;
+  final int? maxLines;
+  final List<TextInputFormatter>? inputFormatters;
 
   CustomTextField({
+    this.focusNode,
     required this.controller,
     this.label,
     this.textInputAction,
     this.hintText,
     this.validator,
-    this.prefix,
+    this.prefixIcon,
     this.textInputType,
     this.onTap,
     this.maxLines,
@@ -43,6 +45,8 @@ class CustomTextField extends StatelessWidget {
               ),
             ),
           TextFormField(
+            focusNode: focusNode,
+            textAlignVertical: TextAlignVertical.center,
             inputFormatters: inputFormatters,
             onTap: onTap,
             controller: controller,
@@ -73,7 +77,7 @@ class CustomTextField extends StatelessWidget {
               filled: true,
               fillColor: Theme.of(context).cardColor,
               contentPadding: EdgeInsets.all(16.0),
-              prefix: prefix,
+              prefixIcon: prefixIcon,
             ),
           ),
         ],

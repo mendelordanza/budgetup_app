@@ -3,6 +3,7 @@ import 'package:budgetup_app/domain/expense_txn.dart';
 import 'package:budgetup_app/helper/colors.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/helper/string.dart';
+import 'package:budgetup_app/presentation/expenses/bloc/single_category_cubit.dart';
 import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/add_expense_txn_page.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
@@ -33,19 +34,17 @@ class ExpenseTxnPage extends HookWidget {
       return null;
     }, []);
 
-    // useEffect(() {
-    //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //     if (modifySuccess.value) {
-    //       Navigator.pop(context);
-    //     }
-    //   });
-    //   return null;
-    // }, [modifySuccess.value]);
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "${expenseCategory.icon ?? Emoji.objects[49]} ${expenseCategory.title}",
+        title: BlocBuilder<SingleCategoryCubit, SingleCategoryState>(
+          builder: (context, state) {
+            if (state is SingleCategoryLoaded) {
+              return Text(
+                "${state.expenseCategory.icon ?? Emoji.objects[49]} ${state.expenseCategory.title}",
+              );
+            }
+            return Text("Title");
+          },
         ),
         leading: InkWell(
           onTap: () {
@@ -61,31 +60,53 @@ class ExpenseTxnPage extends HookWidget {
         elevation: 0,
         backgroundColor: Colors.transparent,
         actions: [
-          PopupMenuButton(
-              // add icon, by default "3 dot" icon
-              icon: Icon(Iconsax.more),
-              itemBuilder: (context) {
-                return [
-                  PopupMenuItem<int>(
-                    value: 0,
-                    child: Text("Edit Category"),
-                  ),
-                  PopupMenuItem<int>(
-                    value: 1,
-                    child: Text("Delete Category"),
-                  ),
-                ];
-              },
-              onSelected: (value) {
-                if (value == 0) {
-                  Navigator.pushNamed(context, RouteStrings.addCategory,
-                      arguments: expenseCategory);
-                } else if (value == 1) {
-                  //TODO show alert dialog
-                  context.read<ModifyExpensesBloc>().add(
-                      RemoveExpenseCategory(expenseCategory: expenseCategory));
-                }
-              }),
+          BlocBuilder<SingleCategoryCubit, SingleCategoryState>(
+            builder: (context, state) {
+              if (state is SingleCategoryLoaded) {
+                return PopupMenuButton(
+                    // add icon, by default "3 dot" icon
+                    icon: Icon(Iconsax.more),
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem<int>(
+                          value: 0,
+                          child: Text("Edit"),
+                        ),
+                        PopupMenuItem<int>(
+                          value: 1,
+                          child: Text("Delete"),
+                        ),
+                      ];
+                    },
+                    onSelected: (value) {
+                      if (value == 0) {
+                        Navigator.pushNamed(context, RouteStrings.addCategory,
+                            arguments: state.expenseCategory);
+                      } else if (value == 1) {
+                        //TODO show alert dialog
+                        context.read<ModifyExpensesBloc>().add(
+                            RemoveExpenseCategory(
+                                expenseCategory: state.expenseCategory));
+                      }
+                    });
+              }
+              return PopupMenuButton(
+                  icon: Icon(Iconsax.more),
+                  itemBuilder: (context) {
+                    return [
+                      PopupMenuItem<int>(
+                        value: 0,
+                        child: Text("Edit"),
+                      ),
+                      PopupMenuItem<int>(
+                        value: 1,
+                        child: Text("Delete"),
+                      ),
+                    ];
+                  },
+                  onSelected: (value) {});
+            },
+          ),
         ],
       ),
       body: SafeArea(
@@ -131,8 +152,18 @@ class ExpenseTxnPage extends HookWidget {
                   Text(
                     "Monthly Budget",
                   ),
-                  Text(
-                    decimalFormatter(expenseCategory.budget ?? 0.00),
+                  BlocBuilder<SingleCategoryCubit, SingleCategoryState>(
+                    builder: (context, state) {
+                      if (state is SingleCategoryLoaded) {
+                        return Text(
+                          decimalFormatter(
+                              state.expenseCategory.budget ?? 0.00),
+                        );
+                      }
+                      return Text(
+                        decimalFormatter(0.00),
+                      );
+                    },
                   ),
                 ],
               ),

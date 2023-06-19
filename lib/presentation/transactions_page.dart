@@ -16,6 +16,7 @@ class TransactionsPage extends HookWidget {
       tabController.addListener(() {
         _currentIndex.value = tabController.index;
       });
+      return null;
     }, []);
 
     return Scaffold(

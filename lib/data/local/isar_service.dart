@@ -35,6 +35,12 @@ class IsarService {
     return list;
   }
 
+  Future<ExpenseCategoryEntity?> getCategoryById(int categoryId) async {
+    final isar = await db;
+    final category = await isar.expenseCategoryEntitys.get(categoryId);
+    return category;
+  }
+
   Future<List<ExpenseCategoryEntity>> getAllExpenseCategoriesByDate(
       DateTime date) async {
     final isar = await db;

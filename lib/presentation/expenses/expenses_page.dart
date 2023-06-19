@@ -137,7 +137,9 @@ class ExpensesPage extends HookWidget {
               Expanded(
                   child: BlocListener<ModifyExpensesBloc, ModifyExpensesState>(
                 listener: (context, state) {
-                  if (state is ExpenseRemoved) {
+                  if (state is ExpenseEdited) {
+                    Navigator.pop(context);
+                  } else if (state is ExpenseAdded || state is ExpenseRemoved) {
                     Navigator.popUntil(context, (route) => route.isFirst);
                   }
                 },

@@ -15,6 +15,7 @@ import 'package:iconsax/iconsax.dart';
 
 import '../../helper/route_strings.dart';
 import '../../helper/string.dart';
+import '../expenses/bloc/single_category_cubit.dart';
 
 class ExpenseTxnArgs {
   final ExpenseCategory expenseCategory;
@@ -49,12 +50,20 @@ class AddExpenseTxnPage extends HookWidget {
         text: args.expenseTxn != null
             ? decimalFormatter(args.expenseTxn!.amount ?? 0.00)
             : "${sharedPrefs.getCurrencySymbol()} 0.00");
+    final focusNode = useFocusNode();
 
     final dateTextController = useTextEditingController();
     final currentSelectedDate = useState<DateTime>(
         args.expenseTxn != null && args.expenseTxn!.updatedAt != null
             ? args.expenseTxn!.updatedAt!
             : DateTime.now());
+
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<SingleCategoryCubit>().getCategory(args.expenseCategory);
+      });
+      return null;
+    }, []);
 
     useEffect(() {
       dateTextController.text =
@@ -108,13 +117,44 @@ class AddExpenseTxnPage extends HookWidget {
                           padding: const EdgeInsets.only(bottom: 16.0),
                           child: Column(
                             children: [
-                              Text(
-                                "${args.expenseCategory.icon} ${args.expenseCategory.title}",
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                              BlocBuilder<SingleCategoryCubit,
+                                      SingleCategoryState>(
+                                  builder: (context, state) {
+                                if (state is SingleCategoryLoaded) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        RouteStrings.addCategory,
+                                        arguments: state.expenseCategory,
+                                      );
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          "${state.expenseCategory.icon} ${state.expenseCategory.title}",
+                                          style: TextStyle(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 5.0,
+                                        ),
+                                        Icon(
+                                          Iconsax.edit,
+                                          size: 14,
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                }
+                                return Text("No category");
+                              }),
                               SizedBox(
                                 height: 20,
                               ),
@@ -150,10 +190,16 @@ class AddExpenseTxnPage extends HookWidget {
                           ),
                         ),
                         CustomTextField(
+                          focusNode: focusNode,
                           controller: dateTextController,
                           textInputType: TextInputType.datetime,
-                          label: "Date",
+                          label: "Transaction Date",
+                          prefixIcon: Icon(
+                            Iconsax.calendar,
+                            size: 16,
+                          ),
                           onTap: () async {
+                            focusNode.unfocus();
                             await showDatePicker(
                               context: context,
                               initialDate: currentSelectedDate.value,
@@ -169,7 +215,11 @@ class AddExpenseTxnPage extends HookWidget {
                         CustomTextField(
                           controller: notesTextController,
                           label: "Notes (optional)",
-                          maxLines: 3,
+                          maxLines: null,
+                          prefixIcon: Icon(
+                            Iconsax.receipt_edit,
+                            size: 16,
+                          ),
                         ),
                       ],
                     ),
@@ -216,7 +266,7 @@ class AddExpenseTxnPage extends HookWidget {
                   }
                 },
                 child: Text(
-                  args.expenseTxn != null ? "Edit" : "Add",
+                  "Save",
                 ),
               ),
             ],

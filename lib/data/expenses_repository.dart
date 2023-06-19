@@ -24,6 +24,11 @@ class ExpensesRepository {
     }).toList();
   }
 
+  Future<ExpenseCategory> getExpenseCategoryById(int categoryId) async {
+    final category = await _isarService.getCategoryById(categoryId);
+    return ExpenseCategory.fromJson(category!.toJson());
+  }
+
   Future<List<ExpenseCategory>> getExpenseCategoriesByDate(
       DateTime date) async {
     final objects = await _isarService.getAllExpenseCategoriesByDate(date);

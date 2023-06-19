@@ -138,6 +138,15 @@ class RecurringBillsPage extends HookWidget {
                 height: 10.0,
               ),
               Expanded(
+                  child:
+                      BlocListener<RecurringModifyBloc, RecurringModifyState>(
+                listener: (context, state) {
+                  if (state is RecurringBillRemoved ||
+                      state is RecurringBillEdited ||
+                      state is RecurringBillAdded) {
+                    Navigator.pop(context);
+                  }
+                },
                 child: BlocBuilder<RecurringBillBloc, RecurringBillState>(
                   builder: (context, state) {
                     if (state is RecurringBillsLoaded) {
@@ -163,7 +172,7 @@ class RecurringBillsPage extends HookWidget {
                     return Text("Empty Recurring Bills");
                   },
                 ),
-              ),
+              )),
             ],
           ),
         ),

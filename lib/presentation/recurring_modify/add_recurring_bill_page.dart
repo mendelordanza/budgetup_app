@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../../helper/date_helper.dart';
 import 'bloc/recurring_modify_bloc.dart';
@@ -29,23 +30,13 @@ class AddRecurringBillPage extends HookWidget {
         text: recurringBill != null
             ? decimalFormatter(recurringBill!.amount ?? 0.00)
             : "0.00");
+    final focusNode = FocusNode();
 
     final dateTextController = useTextEditingController();
     final currentSelectedDate = useState<DateTime>(
         recurringBill != null && recurringBill!.reminderDate != null
             ? recurringBill!.reminderDate!
             : DateTime.now());
-
-    final added = useState<bool>(false);
-
-    useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (added.value) {
-          Navigator.pop(context);
-        }
-      });
-      return null;
-    }, [added.value]);
 
     useEffect(() {
       dateTextController.text = formatDate(currentSelectedDate.value, "dd");
@@ -68,6 +59,17 @@ class AddRecurringBillPage extends HookWidget {
             ),
           ),
         ),
+        actions: [
+          if (recurringBill != null)
+            IconButton(
+              icon: Icon(Iconsax.trash),
+              onPressed: () {
+                context.read<RecurringModifyBloc>().add(RemoveRecurringBill(
+                    selectedDate: currentSelectedDate.value,
+                    recurringBill: recurringBill!));
+              },
+            )
+        ],
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
@@ -147,9 +149,15 @@ class AddRecurringBillPage extends HookWidget {
                         //   },
                         // ),
                         CustomTextField(
+                          focusNode: focusNode,
                           label: "Remind me to pay monthly every...",
                           controller: dateTextController,
+                          prefixIcon: Icon(
+                            Iconsax.calendar,
+                            size: 18,
+                          ),
                           onTap: () async {
+                            focusNode.unfocus();
                             await showDatePicker(
                               context: context,
                               initialDate: currentSelectedDate.value,
@@ -201,13 +209,10 @@ class AddRecurringBillPage extends HookWidget {
                           selectedDate: currentSelectedDate.value,
                           recurringBill: newRecurringBill));
                     }
-
-                    //Pop page
-                    added.value = true;
                   }
                 },
                 child: Text(
-                  recurringBill != null ? "Edit" : "Add",
+                  "Save",
                 ),
               ),
             ],
