@@ -87,7 +87,7 @@ class DateSelection {
   DateSelection(this.label, this.type);
 }
 
-DateFilterType enumFromString(String value) {
+DateFilterType dateFilterTypeFromString(String value) {
   return DateFilterType.values
       .firstWhere((e) => e.toString().split('.').last == value);
 }

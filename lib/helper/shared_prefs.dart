@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../presentation/settings/appearance/appearance_page.dart';
 import 'date_helper.dart';
 
 class SharedPrefs {
@@ -19,6 +20,7 @@ class SharedPrefs {
   static const String KEY_CURRENCY_CODE = "key_currency_code";
   static const String KEY_BASE_CURRENCY_RATE = "key_base_currency_rate";
   static const String KEY_CURRENCY_RATE = "key_currency_rate";
+  static const String KEY_APPEARANCE = "key_appearance";
 
   Future setFinishedOnboarding(bool isFinished) async {
     await _preferences?.setBool(KEY_IS_FINISHED, isFinished);
@@ -74,17 +76,17 @@ class SharedPrefs {
   String getCurrencyCode() =>
       _preferences?.getString(KEY_CURRENCY_CODE) ?? "USD";
 
-  Future setBaseCurrencyRate(double baseCurrencyRate) async {
-    await _preferences?.setDouble(KEY_BASE_CURRENCY_RATE, baseCurrencyRate);
-  }
-
-  double getBaseCurrencyRate() =>
-      _preferences?.getDouble(KEY_BASE_CURRENCY_RATE) ?? 0.00;
-
   Future setCurrencyRate(double currencyRate) async {
     await _preferences?.setDouble(KEY_CURRENCY_RATE, currencyRate);
   }
 
   double getCurrencyRate() =>
       _preferences?.getDouble(KEY_CURRENCY_RATE) ?? 0.00;
+
+  Future setAppearance(String apperance) async {
+    await _preferences?.setString(KEY_APPEARANCE, apperance);
+  }
+
+  String getAppearance() =>
+      _preferences?.getString(KEY_APPEARANCE) ?? AppearanceType.system.name;
 }

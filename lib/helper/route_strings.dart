@@ -6,4 +6,6 @@ class RouteStrings {
   static const String addCategory = '/addCategory';
   static const String recurringBills = '/recurringBills';
   static const String addRecurringBill = '/addRecurringBill';
+  static const String summary = '/summary';
+  static const String appearance = '/appearance';
 }

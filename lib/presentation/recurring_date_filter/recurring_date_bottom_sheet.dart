@@ -34,7 +34,7 @@ class RecurringDateBottomSheet extends HookWidget {
     final sharedPrefs = getIt<SharedPrefs>();
 
     final _selectedFilterType = useState<DateFilterType>(
-        enumFromString(sharedPrefs.getRecurringSelectedDateFilterType()));
+        dateFilterTypeFromString(sharedPrefs.getRecurringSelectedDateFilterType()));
     final _selectedDate = useState<DateTime>(
       sharedPrefs.getRecurringSelectedDate().isNotEmpty
           ? DateTime.parse(sharedPrefs.getRecurringSelectedDate())

@@ -76,7 +76,7 @@ class ExpensesPage extends HookWidget {
                             );
                           }
                           return Text(
-                            getMonthText(enumFromString(currentDateFilterType),
+                            getMonthText(dateFilterTypeFromString(currentDateFilterType),
                                 currentSelectedDate),
                             style: TextStyle(
                               fontSize: 16.0,
@@ -106,7 +106,7 @@ class ExpensesPage extends HookWidget {
                       budget: state.totalBudget,
                     );
                   }
-                  return Text("Empty categories");
+                  return Text("No categories");
                 },
               ),
               SizedBox(
@@ -162,7 +162,7 @@ class ExpensesPage extends HookWidget {
                         ),
                       );
                     }
-                    return Center(child: Text("Empty categories"));
+                    return Center(child: Text("No categories"));
                   },
                 ),
               )),
@@ -246,7 +246,7 @@ class ExpensesPage extends HookWidget {
                             }
                             return Text(
                               decimalFormatter(item.getTotalByDate(
-                                  enumFromString(currentDateFilterType),
+                                  dateFilterTypeFromString(currentDateFilterType),
                                   currentSelectedDate)),
                               style: TextStyle(
                                 fontSize: 16.0,
@@ -302,15 +302,15 @@ class ExpensesPage extends HookWidget {
                           child: LinearProgressIndicator(
                             value: item
                                     .getTotalPercentage(
-                                        enumFromString(currentDateFilterType),
+                                        dateFilterTypeFromString(currentDateFilterType),
                                         currentSelectedDate)
                                     .isNaN
                                 ? 0.0
                                 : item.getTotalPercentage(
-                                    enumFromString(currentDateFilterType),
+                                    dateFilterTypeFromString(currentDateFilterType),
                                     currentSelectedDate),
                             color: item.isExceeded(
-                                    enumFromString(currentDateFilterType),
+                                    dateFilterTypeFromString(currentDateFilterType),
                                     currentSelectedDate)
                                 ? Colors.red
                                 : null,

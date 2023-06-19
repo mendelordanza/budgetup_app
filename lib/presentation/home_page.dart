@@ -32,10 +32,10 @@ class HomePage extends HookWidget {
         backgroundColor: Colors.transparent,
         leading: IconButton(
           onPressed: () {
-            Navigator.pushNamed(context, RouteStrings.settings);
+            Navigator.pushNamed(context, RouteStrings.summary);
           },
           icon: SvgPicture.asset(
-            "assets/icons/ic_summary.svg",
+            "assets/icons/ic_summary_thin.svg",
             height: 24.0,
             color: Theme.of(context).colorScheme.onSurface,
           ),

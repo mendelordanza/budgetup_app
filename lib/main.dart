@@ -7,6 +7,7 @@ import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_b
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
+import 'package:budgetup_app/presentation/settings/appearance/bloc/appearance_cubit.dart';
 import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currency_cubit.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
@@ -35,49 +36,65 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => getIt<DashboardCubit>(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<ModifyExpensesBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<ExpenseBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<TransactionsModifyBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<ExpenseTxnBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<RecurringModifyBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<RecurringBillBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<ExpenseDateFilterBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<RecurringDateFilterBloc>(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<ConvertCurrencyCubit>(),
-        ),
-        BlocProvider(
-          create: (context) => getIt<SingleCategoryCubit>(),
-        ),
-      ],
-      child: MaterialApp(
-        title: 'BudgetUp',
-        themeMode: ThemeMode.system,
-        theme: MyThemes.lightTheme,
-        darkTheme: MyThemes.darkTheme,
-        onGenerateRoute: RouteGenerator.generateRoute,
-        initialRoute: RouteStrings.landing,
-      ),
-    );
+        providers: [
+          BlocProvider(
+            create: (context) => getIt<DashboardCubit>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<ModifyExpensesBloc>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<ExpenseBloc>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<TransactionsModifyBloc>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<ExpenseTxnBloc>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<RecurringModifyBloc>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<RecurringBillBloc>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<ExpenseDateFilterBloc>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<RecurringDateFilterBloc>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<ConvertCurrencyCubit>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<SingleCategoryCubit>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<AppearanceCubit>(),
+          ),
+        ],
+        child: BlocBuilder<AppearanceCubit, AppearanceState>(
+          builder: (context, state) {
+            if (state is AppearanceLoaded) {
+              return MaterialApp(
+                title: 'BudgetUp',
+                themeMode: state.themeMode,
+                theme: MyThemes.lightTheme,
+                darkTheme: MyThemes.darkTheme,
+                onGenerateRoute: RouteGenerator.generateRoute,
+                initialRoute: RouteStrings.landing,
+              );
+            }
+            return MaterialApp(
+              title: 'BudgetUp',
+              themeMode: ThemeMode.system,
+              theme: MyThemes.lightTheme,
+              darkTheme: MyThemes.darkTheme,
+              onGenerateRoute: RouteGenerator.generateRoute,
+              initialRoute: RouteStrings.landing,
+            );
+          },
+        ));
   }
 }

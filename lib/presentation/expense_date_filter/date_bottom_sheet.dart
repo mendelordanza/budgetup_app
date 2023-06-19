@@ -34,7 +34,7 @@ class ExpenseDateBottomSheet extends HookWidget {
     final sharedPrefs = getIt<SharedPrefs>();
 
     final _selectedFilterType = useState<DateFilterType>(
-        enumFromString(sharedPrefs.getSelectedDateFilterType()));
+        dateFilterTypeFromString(sharedPrefs.getSelectedDateFilterType()));
     final _selectedDate = useState<DateTime>(
       sharedPrefs.getExpenseSelectedDate().isNotEmpty
           ? DateTime.parse(sharedPrefs.getExpenseSelectedDate())

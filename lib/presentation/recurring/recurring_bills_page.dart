@@ -79,7 +79,7 @@ class RecurringBillsPage extends HookWidget {
                             );
                           }
                           return Text(
-                            getMonthText(enumFromString(currentDateFilterType),
+                            getMonthText(dateFilterTypeFromString(currentDateFilterType),
                                 currentSelectedDate),
                             style: TextStyle(
                               fontSize: 16.0,
@@ -108,7 +108,7 @@ class RecurringBillsPage extends HookWidget {
                       total: state.total!,
                     );
                   }
-                  return Text("Empty categories");
+                  return Text("No categories");
                 },
               ),
               SizedBox(
@@ -144,7 +144,7 @@ class RecurringBillsPage extends HookWidget {
                   if (state is RecurringBillRemoved ||
                       state is RecurringBillEdited ||
                       state is RecurringBillAdded) {
-                    Navigator.pop(context);
+                    Navigator.maybePop(context);
                   }
                 },
                 child: BlocBuilder<RecurringBillBloc, RecurringBillState>(
@@ -169,7 +169,7 @@ class RecurringBillsPage extends HookWidget {
                         },
                       );
                     }
-                    return Text("Empty Recurring Bills");
+                    return Text("No Recurring Bills");
                   },
                 ),
               )),
@@ -259,16 +259,11 @@ class RecurringBillsPage extends HookWidget {
           ),
         ),
         color: Theme.of(context).cardColor,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 16.0,
-            horizontal: 21.0,
-          ),
-          child: Row(
-            children: [
-              Checkbox(
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
+        child: Row(
+          children: [
+            Container(
+              height: 70.0,
+              child: Checkbox(
                 activeColor: secondaryColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(
@@ -300,40 +295,46 @@ class RecurringBillsPage extends HookWidget {
                   }
                 },
               ),
-              SizedBox(
-                width: 10.0,
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Row(
                   children: [
-                    Text(item.title ?? "hello"),
-                    if (item.isPaid(selectedDate) && txn != null)
-                      Text(
-                        "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",
-                        style: TextStyle(
-                          fontSize: 12.0,
-                        ),
-                      )
-                    else if (item.reminderDate != null)
-                      Text(
-                        "every ${formatDate(item.reminderDate!, "dd")} of the month",
-                        style: TextStyle(
-                          fontSize: 12.0,
-                        ),
-                      )
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(item.title ?? "hello"),
+                          if (item.isPaid(selectedDate) && txn != null)
+                            Text(
+                              "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",
+                              style: TextStyle(
+                                fontSize: 12.0,
+                              ),
+                            )
+                          else if (item.reminderDate != null)
+                            Text(
+                              "every ${formatDate(item.reminderDate!, "dd")} of the month",
+                              style: TextStyle(
+                                fontSize: 12.0,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      decimalFormatter(item.amount ?? 0.00),
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              Text(
-                decimalFormatter(item.amount ?? 0.00),
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
