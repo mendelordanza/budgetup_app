@@ -1,11 +1,14 @@
 import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 
-class SummaryPage extends StatelessWidget {
+class SummaryPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
+    final _currentYear = useState(DateTime.now().year);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Summary Reports"),
@@ -34,14 +37,20 @@ class SummaryPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        _currentYear.value = _currentYear.value - 1;
+                      },
                       icon: SvgPicture.asset(
                         "assets/icons/ic_arrow_left.svg",
                       ),
                     ),
-                    Text("2023"),
+                    Text("${_currentYear.value}"),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        if (_currentYear.value != DateTime.now().year) {
+                          _currentYear.value = _currentYear.value + 1;
+                        }
+                      },
                       icon: SvgPicture.asset(
                         "assets/icons/ic_arrow_right.svg",
                       ),
@@ -51,11 +60,12 @@ class SummaryPage extends StatelessWidget {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: 10,
+                  itemCount: generateMonthList(_currentYear.value).length,
                   itemBuilder: (context, index) {
+                    final date = generateMonthList(_currentYear.value)[index];
                     return _summaryItem(
                       context,
-                      date: DateTime.now(),
+                      date: date,
                     );
                   },
                 ),
@@ -75,6 +85,7 @@ class SummaryPage extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12.0),
       child: GestureDetector(
         onTap: () {
+          print("DATE: ${date}");
           // Navigator.pushNamed(
           //   context,
           //   RouteStrings.addTransaction,
@@ -98,7 +109,7 @@ class SummaryPage extends StatelessWidget {
             child: Text(
               formatDate(
                 date,
-                "MMMM dd, yyyy",
+                "MMMM yyyy",
               ),
             ),
           ),

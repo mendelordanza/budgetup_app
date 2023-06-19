@@ -39,7 +39,7 @@ getFirstDayOfMonth(DateTime date) {
   return DateTime(date.year, date.month, 0);
 }
 
-getLastDayOfMonth(DateTime date) {
+DateTime getLastDayOfMonth(DateTime date) {
   return DateTime(date.year, date.month + 1, 1);
 }
 
@@ -111,4 +111,13 @@ String getDayOfMonthSuffix(int dayNum) {
     default:
       return 'th';
   }
+}
+
+List<DateTime> generateMonthList(int year) {
+  List<DateTime> months = [];
+  for (int i = 1; i <= 12; i++) {
+    DateTime lastDayOfMonth = DateTime(year, i + 1, 0);
+    months.add(lastDayOfMonth);
+  }
+  return months;
 }

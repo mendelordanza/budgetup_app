@@ -260,9 +260,16 @@ class AddExpenseTxnPage extends HookWidget {
                           );
                     }
 
-                    Navigator.pushReplacementNamed(
-                        context, RouteStrings.transactions,
-                        arguments: args.expenseCategory);
+                    //Clear textfields
+                    amountTextController.text =
+                        "${sharedPrefs.getCurrencySymbol()} 0.00";
+                    notesTextController.clear();
+
+                    Navigator.pushNamed(
+                      context,
+                      RouteStrings.transactions,
+                      arguments: args.expenseCategory,
+                    );
                   }
                 },
                 child: Text(

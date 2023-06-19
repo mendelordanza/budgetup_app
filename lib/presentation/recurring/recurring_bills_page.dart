@@ -79,7 +79,8 @@ class RecurringBillsPage extends HookWidget {
                             );
                           }
                           return Text(
-                            getMonthText(dateFilterTypeFromString(currentDateFilterType),
+                            getMonthText(
+                                dateFilterTypeFromString(currentDateFilterType),
                                 currentSelectedDate),
                             style: TextStyle(
                               fontSize: 16.0,
@@ -149,7 +150,8 @@ class RecurringBillsPage extends HookWidget {
                 },
                 child: BlocBuilder<RecurringBillBloc, RecurringBillState>(
                   builder: (context, state) {
-                    if (state is RecurringBillsLoaded) {
+                    if (state is RecurringBillsLoaded &&
+                        state.recurringBills.isNotEmpty) {
                       return ListView.builder(
                         shrinkWrap: true,
                         itemCount: state.recurringBills.length,
@@ -169,7 +171,7 @@ class RecurringBillsPage extends HookWidget {
                         },
                       );
                     }
-                    return Text("No Recurring Bills");
+                    return Center(child: Text("No Recurring Bills"));
                   },
                 ),
               )),
