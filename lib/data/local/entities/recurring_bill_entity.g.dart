@@ -28,18 +28,23 @@ const RecurringBillEntitySchema = CollectionSchema(
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
-    r'reminderDate': PropertySchema(
+    r'interval': PropertySchema(
       id: 2,
+      name: r'interval',
+      type: IsarType.string,
+    ),
+    r'reminderDate': PropertySchema(
+      id: 3,
       name: r'reminderDate',
       type: IsarType.dateTime,
     ),
     r'title': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'title',
       type: IsarType.string,
     ),
     r'updatedAt': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -72,6 +77,12 @@ int _recurringBillEntityEstimateSize(
 ) {
   var bytesCount = offsets.last;
   {
+    final value = object.interval;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.title;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -88,9 +99,10 @@ void _recurringBillEntitySerialize(
 ) {
   writer.writeDouble(offsets[0], object.amount);
   writer.writeDateTime(offsets[1], object.createdAt);
-  writer.writeDateTime(offsets[2], object.reminderDate);
-  writer.writeString(offsets[3], object.title);
-  writer.writeDateTime(offsets[4], object.updatedAt);
+  writer.writeString(offsets[2], object.interval);
+  writer.writeDateTime(offsets[3], object.reminderDate);
+  writer.writeString(offsets[4], object.title);
+  writer.writeDateTime(offsets[5], object.updatedAt);
 }
 
 RecurringBillEntity _recurringBillEntityDeserialize(
@@ -103,9 +115,10 @@ RecurringBillEntity _recurringBillEntityDeserialize(
   object.amount = reader.readDoubleOrNull(offsets[0]);
   object.createdAt = reader.readDateTimeOrNull(offsets[1]);
   object.id = id;
-  object.reminderDate = reader.readDateTimeOrNull(offsets[2]);
-  object.title = reader.readStringOrNull(offsets[3]);
-  object.updatedAt = reader.readDateTimeOrNull(offsets[4]);
+  object.interval = reader.readStringOrNull(offsets[2]);
+  object.reminderDate = reader.readDateTimeOrNull(offsets[3]);
+  object.title = reader.readStringOrNull(offsets[4]);
+  object.updatedAt = reader.readDateTimeOrNull(offsets[5]);
   return object;
 }
 
@@ -121,10 +134,12 @@ P _recurringBillEntityDeserializeProp<P>(
     case 1:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 2:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 3:
       return (reader.readStringOrNull(offset)) as P;
+    case 3:
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 4:
+      return (reader.readStringOrNull(offset)) as P;
+    case 5:
       return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -439,6 +454,160 @@ extension RecurringBillEntityQueryFilter on QueryBuilder<RecurringBillEntity,
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      intervalIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'interval',
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      intervalIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'interval',
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      intervalEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'interval',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      intervalGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'interval',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      intervalLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'interval',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      intervalBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'interval',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      intervalStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'interval',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      intervalEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'interval',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      intervalContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'interval',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      intervalMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'interval',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      intervalIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'interval',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      intervalIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'interval',
+        value: '',
       ));
     });
   }
@@ -845,6 +1014,20 @@ extension RecurringBillEntityQuerySortBy
   }
 
   QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      sortByInterval() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'interval', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      sortByIntervalDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'interval', Sort.desc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
       sortByReminderDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'reminderDate', Sort.asc);
@@ -932,6 +1115,20 @@ extension RecurringBillEntityQuerySortThenBy
   }
 
   QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      thenByInterval() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'interval', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      thenByIntervalDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'interval', Sort.desc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
       thenByReminderDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'reminderDate', Sort.asc);
@@ -991,6 +1188,13 @@ extension RecurringBillEntityQueryWhereDistinct
   }
 
   QueryBuilder<RecurringBillEntity, RecurringBillEntity, QDistinct>
+      distinctByInterval({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'interval', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QDistinct>
       distinctByReminderDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'reminderDate');
@@ -1031,6 +1235,13 @@ extension RecurringBillEntityQueryProperty
       createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, String?, QQueryOperations>
+      intervalProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'interval');
     });
   }
 

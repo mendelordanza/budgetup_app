@@ -9,15 +9,29 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:iconsax/iconsax.dart';
 
+import '../../helper/colors.dart';
 import '../../helper/date_helper.dart';
 import 'bloc/recurring_modify_bloc.dart';
+
+enum RecurringBillInterval {
+  monthly,
+  quarterly,
+  yearly,
+}
 
 class AddRecurringBillPage extends HookWidget {
   final RecurringBill? recurringBill;
   final _formKey = GlobalKey<FormState>();
 
   AddRecurringBillPage({this.recurringBill, Key? key}) : super(key: key);
+
+  final intervals = [
+    RecurringBillInterval.monthly,
+    RecurringBillInterval.quarterly,
+    RecurringBillInterval.yearly,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +43,7 @@ class AddRecurringBillPage extends HookWidget {
         text: recurringBill != null
             ? decimalFormatter(recurringBill!.amount ?? 0.00)
             : "0.00");
+    final focusNode = FocusNode();
 
     final dateTextController = useTextEditingController();
     final currentSelectedDate = useState<DateTime>(
@@ -36,19 +51,15 @@ class AddRecurringBillPage extends HookWidget {
             ? recurringBill!.reminderDate!
             : DateTime.now());
 
-    final added = useState<bool>(false);
+    final selectedInterval = useState<RecurringBillInterval>(
+      recurringBill != null && recurringBill!.interval != null
+          ? RecurringBillInterval.values
+              .firstWhere((element) => element.name == recurringBill!.interval)
+          : RecurringBillInterval.monthly,
+    );
 
     useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (added.value) {
-          Navigator.pop(context);
-        }
-      });
-      return null;
-    }, [added.value]);
-
-    useEffect(() {
-      dateTextController.text = formatDate(currentSelectedDate.value, "dd");
+      dateTextController.text = formatDate(currentSelectedDate.value, "MMMM d");
       return null;
     }, [currentSelectedDate.value]);
 
@@ -68,6 +79,17 @@ class AddRecurringBillPage extends HookWidget {
             ),
           ),
         ),
+        actions: [
+          if (recurringBill != null)
+            IconButton(
+              icon: Icon(Iconsax.trash),
+              onPressed: () {
+                context.read<RecurringModifyBloc>().add(RemoveRecurringBill(
+                    selectedDate: currentSelectedDate.value,
+                    recurringBill: recurringBill!));
+              },
+            )
+        ],
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
@@ -88,7 +110,7 @@ class AddRecurringBillPage extends HookWidget {
                           child: Column(
                             children: [
                               Text("${sharedPrefs.getCurrencyCode()}"),
-                              TextField(
+                              TextFormField(
                                 controller: amountTextController,
                                 decoration: InputDecoration(
                                   fillColor: Colors.transparent,
@@ -107,6 +129,14 @@ class AddRecurringBillPage extends HookWidget {
                                   FilteringTextInputFormatter.digitsOnly,
                                   NumberInputFormatter(),
                                 ],
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Amount is required';
+                                  } else if (removeFormatting(value) == "0.0") {
+                                    return 'Please enter a valid number';
+                                  }
+                                  return null;
+                                },
                               ),
                             ],
                           ),
@@ -122,34 +152,16 @@ class AddRecurringBillPage extends HookWidget {
                             return null;
                           },
                         ),
-                        // CustomTextField(
-                        //   label: "Amount",
-                        //   inputFormatters: [
-                        //     FilteringTextInputFormatter.digitsOnly,
-                        //     NumberInputFormatter(),
-                        //   ],
-                        //   controller: amountTextController,
-                        //   validator: (value) {
-                        //     if (value == null || value.isEmpty) {
-                        //       return 'Amount is required';
-                        //     }
-                        //     return null;
-                        //   },
-                        // ),
-                        // CustomTextField(
-                        //   label: "Interval",
-                        //   controller: amountTextController,
-                        //   validator: (value) {
-                        //     if (value == null || value.isEmpty) {
-                        //       return 'Amount is required';
-                        //     }
-                        //     return null;
-                        //   },
-                        // ),
                         CustomTextField(
-                          label: "Remind me to pay monthly every...",
+                          focusNode: focusNode,
+                          label: "Remind me to start paying on...",
                           controller: dateTextController,
+                          prefixIcon: Icon(
+                            Iconsax.calendar,
+                            size: 18,
+                          ),
                           onTap: () async {
+                            focusNode.unfocus();
                             await showDatePicker(
                               context: context,
                               initialDate: currentSelectedDate.value,
@@ -168,6 +180,29 @@ class AddRecurringBillPage extends HookWidget {
                             return null;
                           },
                         ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: 8.0),
+                              child: Text("Every..."),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: intervals.map((element) {
+                                return _tab(
+                                  context,
+                                  label:
+                                      "${element.name[0].toUpperCase()}${element.name.substring(1)}",
+                                  isSelected: selectedInterval.value == element,
+                                  onSelect: () {
+                                    selectedInterval.value = element;
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        )
                       ],
                     ),
                   ),
@@ -182,6 +217,7 @@ class AddRecurringBillPage extends HookWidget {
                         title: titleTextController.text,
                         amount: convertRecurringBill(sharedPrefs,
                             amount: amountTextController.text),
+                        interval: selectedInterval.value.name,
                         reminderDate: currentSelectedDate.value,
                       );
                       context.read<RecurringModifyBloc>().add(EditRecurringBill(
@@ -193,6 +229,7 @@ class AddRecurringBillPage extends HookWidget {
                         title: titleTextController.text,
                         amount: convertRecurringBill(sharedPrefs,
                             amount: amountTextController.text),
+                        interval: selectedInterval.value.name,
                         reminderDate: currentSelectedDate.value,
                         createdAt: DateTime.now(),
                         updatedAt: DateTime.now(),
@@ -201,13 +238,10 @@ class AddRecurringBillPage extends HookWidget {
                           selectedDate: currentSelectedDate.value,
                           recurringBill: newRecurringBill));
                     }
-
-                    //Pop page
-                    added.value = true;
                   }
                 },
                 child: Text(
-                  recurringBill != null ? "Edit" : "Add",
+                  "Save",
                 ),
               ),
             ],
@@ -222,5 +256,32 @@ class AddRecurringBillPage extends HookWidget {
         ? double.parse(removeFormatting(amount))
         : double.parse(removeFormatting(amount)) /
             sharedPrefs.getCurrencyRate();
+  }
+
+  Widget _tab(
+    BuildContext context, {
+    required String label,
+    required bool isSelected,
+    required Function() onSelect,
+  }) {
+    return GestureDetector(
+      onTap: onSelect,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          vertical: 5.0,
+          horizontal: 16.0,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? secondaryColor : Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../../domain/expense_category.dart';
 import '../../helper/string.dart';
@@ -37,17 +38,6 @@ class AddExpenseCategoryPage extends HookWidget {
             ? expenseCategory!.icon!
             : Emoji.travelPlaces[0]);
 
-    final added = useState<bool>(false);
-
-    useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (added.value) {
-          Navigator.pop(context);
-        }
-      });
-      return null;
-    }, [added.value]);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -64,6 +54,16 @@ class AddExpenseCategoryPage extends HookWidget {
             ),
           ),
         ),
+        actions: [
+          if (expenseCategory != null)
+            IconButton(
+              icon: Icon(Iconsax.trash),
+              onPressed: () {
+                context.read<ModifyExpensesBloc>().add(
+                    RemoveExpenseCategory(expenseCategory: expenseCategory!));
+              },
+            )
+        ],
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
@@ -145,7 +145,7 @@ class AddExpenseCategoryPage extends HookWidget {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter some text';
-                          } else if (value == "0.00") {
+                          } else if (removeFormatting(value) == "0.0") {
                             return 'Please enter a valid number';
                           }
                           return null;
@@ -182,13 +182,10 @@ class AddExpenseCategoryPage extends HookWidget {
                       context.read<ModifyExpensesBloc>().add(
                           AddExpenseCategory(expenseCategory: newCategory));
                     }
-
-                    //Pop page
-                    added.value = true;
                   }
                 },
                 child: Text(
-                  expenseCategory != null ? "Edit" : "Add",
+                  "Save",
                 ),
               ),
             ],

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:budgetup_app/data/expenses_repository.dart';
+import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:meta/meta.dart';
@@ -14,37 +15,20 @@ import '../../../helper/date_helper.dart';
 part 'dashboard_state.dart';
 
 class DashboardCubit extends Cubit<DashboardState> {
+  final SharedPrefs sharedPrefs;
   final ExpensesRepository expensesRepository;
   final RecurringBillsRepository recurringBillsRepository;
   final TransactionsModifyBloc transactionsModifyBloc;
   final RecurringModifyBloc recurringModifyBloc;
   StreamSubscription? _expenseTxnSubscription;
-  StreamSubscription? _recurringTxnSubscription;
 
   DashboardCubit({
+    required this.sharedPrefs,
     required this.expensesRepository,
     required this.recurringBillsRepository,
     required this.transactionsModifyBloc,
     required this.recurringModifyBloc,
-  }) : super(DashboardInitial()) {
-    _expenseTxnSubscription = transactionsModifyBloc.stream.listen((state) {
-      if (state is ExpenseTxnAdded ||
-          state is ExpenseTxnEdited ||
-          state is ExpenseTxnRemoved) {
-        getSummary();
-      }
-    });
-
-    _recurringTxnSubscription = recurringModifyBloc.stream.listen((state) {
-      if (state is RecurringBillAdded ||
-          state is RecurringBillEdited ||
-          state is RecurringBillRemoved ||
-          state is MarkAsPaid ||
-          state is UnmarkAsPaid) {
-        getSummary();
-      }
-    });
-  }
+  }) : super(DashboardInitial());
 
   @override
   Future<void> close() async {
@@ -52,30 +36,61 @@ class DashboardCubit extends Cubit<DashboardState> {
     return super.close();
   }
 
-  getSummary() async {
+  getSummary(DateTime date) async {
+    print("DATE: $date");
     final dashboardCategories =
-        await expensesRepository.getExpenseCategoriesByDate(DateTime.now());
+        await expensesRepository.getExpenseCategoriesByDate(date);
+
+    final convertedCategories = dashboardCategories.map((category) {
+      final convertedBudget = sharedPrefs.getCurrencyCode() == "USD"
+          ? (category.budget ?? 0.00)
+          : (category.budget ?? 0.00) * sharedPrefs.getCurrencyRate();
+
+      final convertedTxns = category.expenseTransactions?.map((txn) {
+        final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
+            ? (txn.amount ?? 0.00)
+            : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
+        final newTxn = txn.copy(
+          amount: convertedAmount,
+        );
+        return newTxn;
+      }).toList();
+
+      final newCategory = category.copy(
+        budget: convertedBudget,
+        expenseTransactions: convertedTxns,
+      );
+
+      return newCategory;
+    }).toList();
 
     var expensesTotal = 0.0;
-    dashboardCategories.forEach((element) {
-      expensesTotal +=
-          element.getTotalByDate(DateFilterType.monthly, DateTime.now());
+    convertedCategories.forEach((element) {
+      final totalByDate = element.getTotalByDate(DateFilterType.monthly, date);
+      expensesTotal += totalByDate;
     });
 
     final paidRecurringBills =
-        await recurringBillsRepository.getPaidRecurringBills(DateTime.now());
+        await recurringBillsRepository.getPaidRecurringBills(date);
+
+    final convertedPaidRecurringBills = paidRecurringBills.map((bill) {
+      final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
+          ? (bill.amount ?? 0.00)
+          : (bill.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
+      return bill.copy(amount: convertedAmount);
+    }).toList();
 
     var recurringBillTotal = 0.0;
-    paidRecurringBills.forEach((element) {
+    convertedPaidRecurringBills.forEach((element) {
       recurringBillTotal += element.amount ?? 0.0;
     });
 
     emit(
       DashboardLoaded(
         overallTotal: expensesTotal + recurringBillTotal,
-        expensesCategories: dashboardCategories,
+        expensesCategories: convertedCategories,
         expensesTotal: expensesTotal,
-        paidRecurringBills: paidRecurringBills,
+        paidRecurringBills: convertedPaidRecurringBills,
         recurringBillTotal: recurringBillTotal,
       ),
     );

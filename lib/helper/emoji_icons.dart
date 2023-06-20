@@ -1,21 +1,13 @@
-import 'package:emoji_data/emoji_data.dart';
+import 'package:budgetup_app/helper/emoji_data_copy.dart';
 
 List<EmojiData> emojis = [
-  EmojiData("smileys", Emoji.smileys),
-  EmojiData("gesturesAndBodyParts", Emoji.gesturesAndBodyParts),
-  EmojiData("peopleAndFantasy", Emoji.peopleAndFantasy),
-  EmojiData("clothingAndAccessories", Emoji.clothingAndAccessories),
-  EmojiData("paleEmojis", Emoji.paleEmojis),
-  EmojiData("creamWhiteEmojis", Emoji.creamWhiteEmojis),
-  EmojiData("brownEmojis", Emoji.brownEmojis),
-  EmojiData("blackEmojis", Emoji.blackEmojis),
-  EmojiData("animalsNature", Emoji.animalsNature),
-  EmojiData("foodDrink", Emoji.foodDrink),
-  EmojiData("activityAndSports", Emoji.activityAndSports),
-  EmojiData("travelPlaces", Emoji.travelPlaces),
-  EmojiData("objects", Emoji.objects),
-  EmojiData("symbols", Emoji.symbols),
-  EmojiData("flags", Emoji.flags),
+  EmojiData("clothingAndAccessories", EmojiCopy.clothingAndAccessories),
+  EmojiData("animalsNature", EmojiCopy.animalsNature),
+  EmojiData("foodDrink", EmojiCopy.foodDrink),
+  EmojiData("activityAndSports", EmojiCopy.activityAndSports),
+  EmojiData("travelPlaces", EmojiCopy.travelPlaces),
+  EmojiData("objects", EmojiCopy.objects),
+  EmojiData("flags", EmojiCopy.flags),
 ];
 
 class EmojiData {

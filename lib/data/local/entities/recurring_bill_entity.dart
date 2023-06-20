@@ -9,6 +9,7 @@ class RecurringBillEntity {
 
   String? title;
   double? amount;
+  String? interval;
   DateTime? reminderDate;
   DateTime? createdAt;
   DateTime? updatedAt;
@@ -19,6 +20,7 @@ class RecurringBillEntity {
       'id': id,
       'title': title,
       'amount': amount,
+      'interval': interval,
       'reminderDate': reminderDate,
       'recurringBillTxns': recurringBillTxns,
       'createdAt': createdAt,

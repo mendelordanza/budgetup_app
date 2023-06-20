@@ -5,7 +5,7 @@ removeTimeFromDate(DateTime date) {
 }
 
 getMonthFromDate(DateTime date) {
-  return DateFormat.MMMM().format(date);
+  return DateFormat.MMMM().add_y().format(date);
 }
 
 getYearFromDate(DateTime date) {
@@ -39,7 +39,7 @@ getFirstDayOfMonth(DateTime date) {
   return DateTime(date.year, date.month, 0);
 }
 
-getLastDayOfMonth(DateTime date) {
+DateTime getLastDayOfMonth(DateTime date) {
   return DateTime(date.year, date.month + 1, 1);
 }
 
@@ -56,19 +56,13 @@ String getMonthText(DateFilterType dateFilterType, DateTime date) {
           DateTime.now().isBefore(getEndDate(date))) {
         return "This week";
       } else {
-        return "${formatDate(getStartDate(date), 'MM/dd/yyyy')} - ${formatDate(getEndDate(date), 'MM/dd/yyyy')}";
+        return "${formatDate(getStartDate(date), 'MMM dd, yyyy')} - ${formatDate(getEndDate(date), 'MMM dd, yyyy')}";
       }
     case DateFilterType.monthly:
       if (date.month == DateTime.now().month) {
         return "This month - ${formatDate(date, 'MMMM yyyy')}";
       } else {
         return "${formatDate(date, 'MMMM yyyy')}";
-      }
-    case DateFilterType.yearly:
-      if (date.year == DateTime.now().year) {
-        return "This year";
-      } else {
-        return getYearFromDate(date);
       }
   }
 }
@@ -77,7 +71,6 @@ enum DateFilterType {
   daily,
   weekly,
   monthly,
-  yearly,
 }
 
 class DateSelection {
@@ -87,7 +80,7 @@ class DateSelection {
   DateSelection(this.label, this.type);
 }
 
-DateFilterType enumFromString(String value) {
+DateFilterType dateFilterTypeFromString(String value) {
   return DateFilterType.values
       .firstWhere((e) => e.toString().split('.').last == value);
 }
@@ -110,5 +103,32 @@ String getDayOfMonthSuffix(int dayNum) {
       return 'rd';
     default:
       return 'th';
+  }
+}
+
+List<DateTime> generateMonthList(int year) {
+  List<DateTime> months = [];
+  for (int i = 1; i <= 12; i++) {
+    DateTime lastDayOfMonth = DateTime(year, i + 1, 0);
+    months.add(lastDayOfMonth);
+  }
+  return months;
+}
+
+List<DateTime> getPrevMonths(int year) {
+  final now = DateTime.now();
+  final currentYear = now.year;
+  final currentMonth = now.month;
+
+  if (year > currentYear) {
+    return List.empty();
+  } else if (year == currentYear) {
+    return List<DateTime>.generate(currentMonth, (index) {
+      return DateTime(now.year, index + 1, 0);
+    }).reversed.toList();
+  } else {
+    return List<DateTime>.generate(12, (index) {
+      return DateTime(year, index + 1, 0);
+    }).reversed.toList();
   }
 }

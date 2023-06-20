@@ -7,6 +7,10 @@ class ModifyExpensesInitial extends ModifyExpensesState {}
 
 class ExpenseAdded extends ModifyExpensesState {}
 
-class ExpenseEdited extends ModifyExpensesState {}
+class ExpenseEdited extends ModifyExpensesState {
+  final ExpenseCategory updatedCategory;
+
+  ExpenseEdited(this.updatedCategory);
+}
 
 class ExpenseRemoved extends ModifyExpensesState {}

@@ -1,3 +1,4 @@
+import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/presentation/paywall/paywall.dart';
 import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currency_cubit.dart';
 import 'package:currency_picker/currency_picker.dart';
@@ -52,41 +53,49 @@ class SettingsPage extends StatelessWidget {
                             iconBackgroundColor: Color(0xFF666666),
                             label: "Subscribe to BudgetUp Pro",
                             subtitle: "Unlock all features!",
+                            suffix: SvgPicture.asset(
+                              "assets/icons/ic_arrow_right.svg",
+                            ),
                           ),
                         ],
                       ),
                       SettingsContainer(
                         settingItems: [
                           SettingItem(
-                              onTap: () {},
-                              icon: "assets/icons/ic_summary.svg",
-                              iconBackgroundColor: Color(0xFFfc7f03),
-                              label: "Summary Reports"),
+                            onTap: () {
+                              Navigator.pushNamed(
+                                  context, RouteStrings.appearance);
+                            },
+                            icon: "assets/icons/ic_moon.svg",
+                            iconBackgroundColor: Color(0xFF9300ED),
+                            label: "Appearance",
+                            suffix: SvgPicture.asset(
+                              "assets/icons/ic_arrow_right.svg",
+                            ),
+                          ),
                           Divider(),
                           SettingItem(
-                              onTap: () {},
-                              icon: "assets/icons/ic_moon.svg",
-                              iconBackgroundColor: Color(0xFF9300ED),
-                              label: "Appearance"),
-                          Divider(),
-                          SettingItem(
-                              onTap: () {
-                                showCurrencyPicker(
-                                  context: context,
-                                  showFlag: true,
-                                  showCurrencyName: true,
-                                  showCurrencyCode: true,
-                                  onSelect: (Currency currency) {
-                                    context
-                                        .read<ConvertCurrencyCubit>()
-                                        .changeCurrency(
-                                            currency.symbol, currency.code);
-                                  },
-                                );
-                              },
-                              icon: "assets/icons/ic_currency.svg",
-                              iconBackgroundColor: Color(0xFF00A61B),
-                              label: "Currency"),
+                            onTap: () {
+                              showCurrencyPicker(
+                                context: context,
+                                showFlag: true,
+                                showCurrencyName: true,
+                                showCurrencyCode: true,
+                                onSelect: (Currency currency) {
+                                  context
+                                      .read<ConvertCurrencyCubit>()
+                                      .changeCurrency(
+                                          currency.symbol, currency.code);
+                                },
+                              );
+                            },
+                            icon: "assets/icons/ic_currency.svg",
+                            iconBackgroundColor: Color(0xFF00A61B),
+                            label: "Currency",
+                            suffix: SvgPicture.asset(
+                              "assets/icons/ic_arrow_right.svg",
+                            ),
+                          ),
                           // Divider(),
                           // SettingItem(
                           //     icon: "assets/icons/ic_import_export.svg",
@@ -97,22 +106,34 @@ class SettingsPage extends StatelessWidget {
                       SettingsContainer(
                         settingItems: [
                           SettingItem(
-                              onTap: () {},
-                              icon: "assets/icons/ic_star.svg",
-                              iconBackgroundColor: Color(0xFFFFC700),
-                              label: "Rate the app"),
+                            onTap: () {},
+                            icon: "assets/icons/ic_star.svg",
+                            iconBackgroundColor: Color(0xFFFFC700),
+                            label: "Rate the app",
+                            suffix: SvgPicture.asset(
+                              "assets/icons/ic_arrow_right.svg",
+                            ),
+                          ),
                           Divider(),
                           SettingItem(
-                              onTap: () {},
-                              icon: "assets/icons/ic_share.svg",
-                              iconBackgroundColor: Color(0xFFB43D3D),
-                              label: "Share the app"),
+                            onTap: () {},
+                            icon: "assets/icons/ic_share.svg",
+                            iconBackgroundColor: Color(0xFFB43D3D),
+                            label: "Share the app",
+                            suffix: SvgPicture.asset(
+                              "assets/icons/ic_arrow_right.svg",
+                            ),
+                          ),
                           Divider(),
                           SettingItem(
-                              onTap: () {},
-                              icon: "assets/icons/ic_send.svg",
-                              iconBackgroundColor: Color(0xFF0069B6),
-                              label: "Send feedback"),
+                            onTap: () {},
+                            icon: "assets/icons/ic_send.svg",
+                            iconBackgroundColor: Color(0xFF0069B6),
+                            label: "Send feedback",
+                            suffix: SvgPicture.asset(
+                              "assets/icons/ic_arrow_right.svg",
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -188,19 +209,21 @@ class SettingsContainer extends StatelessWidget {
 
 class SettingItem extends StatelessWidget {
   final Function() onTap;
-  final String icon;
+  final String? icon;
   final String? iconSize;
-  final Color iconBackgroundColor;
+  final Color? iconBackgroundColor;
   final String label;
   final String? subtitle;
+  final Widget? suffix;
 
   SettingItem({
     required this.onTap,
-    required this.icon,
+    this.icon,
     this.iconSize,
-    required this.iconBackgroundColor,
+    this.iconBackgroundColor,
     required this.label,
     this.subtitle,
+    this.suffix,
   });
 
   @override
@@ -211,40 +234,40 @@ class SettingItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 4.0),
         child: Row(
           children: [
-            Container(
-              height: 30.0,
-              width: 30.0,
-              padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-              child: SvgPicture.asset(
-                icon,
+            if (icon != null && iconBackgroundColor != null)
+              Container(
+                height: 30.0,
+                width: 30.0,
+                padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                child: SvgPicture.asset(
+                  icon!,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4.0),
+                  color: iconBackgroundColor,
+                ),
               ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4.0),
-                color: iconBackgroundColor,
-              ),
-            ),
             SizedBox(
               width: 10.0,
             ),
             Expanded(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  label,
-                ),
-                if (subtitle != null)
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                   Text(
-                    subtitle!,
-                    style: TextStyle(
-                      fontSize: 12.0,
-                    ),
+                    label,
                   ),
-              ],
-            )),
-            SvgPicture.asset(
-              "assets/icons/ic_arrow_right.svg",
+                  if (subtitle != null)
+                    Text(
+                      subtitle!,
+                      style: TextStyle(
+                        fontSize: 12.0,
+                      ),
+                    ),
+                ],
+              ),
             ),
+            if (suffix != null) suffix!,
           ],
         ),
       ),

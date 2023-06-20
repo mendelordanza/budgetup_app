@@ -16,6 +16,7 @@ class TransactionsPage extends HookWidget {
       tabController.addListener(() {
         _currentIndex.value = tabController.index;
       });
+      return null;
     }, []);
 
     return Scaffold(
@@ -61,7 +62,7 @@ class TransactionsPage extends HookWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Iconsax.money_send,
+                          Iconsax.refresh,
                           size: 18,
                         ),
                         SizedBox(

@@ -20,12 +20,12 @@ class TransactionsModifyBloc
     required this.sharedPrefs,
   }) : super(TransactionsModifyInitial()) {
     on<AddExpenseTxn>((event, emit) async {
-      expensesRepository.addTransaction(
+      await expensesRepository.addTransaction(
           event.expenseCategory, event.expenseTxn);
       emit(ExpenseTxnAdded(event.expenseCategory));
     });
     on<EditExpenseTxn>((event, emit) async {
-      expensesRepository.editTransaction(event.expenseTxn);
+      await expensesRepository.editTransaction(event.expenseTxn);
       emit(ExpenseTxnEdited(event.expenseCategory));
     });
     on<RemoveExpenseTxn>((event, emit) async {

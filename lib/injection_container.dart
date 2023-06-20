@@ -7,10 +7,12 @@ import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/presentation/dashboard/bloc/dashboard_cubit.dart';
 import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
+import 'package:budgetup_app/presentation/expenses/bloc/single_category_cubit.dart';
 import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
+import 'package:budgetup_app/presentation/settings/appearance/bloc/appearance_cubit.dart';
 import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currency_cubit.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
@@ -22,6 +24,7 @@ Future<void> setup() async {
   //Bloc
   getIt.registerLazySingleton(
     () => DashboardCubit(
+      sharedPrefs: getIt(),
       expensesRepository: getIt(),
       recurringBillsRepository: getIt(),
       transactionsModifyBloc: getIt(),
@@ -45,6 +48,7 @@ Future<void> setup() async {
   getIt.registerLazySingleton(
     () => ModifyExpensesBloc(
       expensesRepository: getIt(),
+      sharedPrefs: getIt(),
     ),
   );
   getIt.registerLazySingleton(
@@ -74,6 +78,15 @@ Future<void> setup() async {
       currencyRepository: getIt(),
       sharedPrefs: getIt(),
     ),
+  );
+  getIt.registerLazySingleton(
+    () => SingleCategoryCubit(
+      expensesRepository: getIt(),
+      modifyExpensesBloc: getIt(),
+    ),
+  );
+  getIt.registerFactory(
+    () => AppearanceCubit(sharedPrefs: getIt()),
   );
   getIt.registerFactory(
     () => ExpenseDateFilterBloc(sharedPrefs: getIt()),

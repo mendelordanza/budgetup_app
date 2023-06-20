@@ -12,9 +12,8 @@ class ExpenseCategoryLoaded extends ExpenseState {
   final double total;
   final double totalBudget;
 
-  ExpenseCategoryLoaded({
-    required this.expenseCategories,
-    this.total = 0.00,
-    this.totalBudget = 0.00
-  });
+  ExpenseCategoryLoaded(
+      {required this.expenseCategories,
+      this.total = 0.00,
+      this.totalBudget = 0.00});
 }

@@ -24,6 +24,11 @@ class ExpensesRepository {
     }).toList();
   }
 
+  Future<ExpenseCategory> getExpenseCategoryById(int categoryId) async {
+    final category = await _isarService.getCategoryById(categoryId);
+    return ExpenseCategory.fromJson(category!.toJson());
+  }
+
   Future<List<ExpenseCategory>> getExpenseCategoriesByDate(
       DateTime date) async {
     final objects = await _isarService.getAllExpenseCategoriesByDate(date);
@@ -88,15 +93,13 @@ class ExpensesRepository {
 
   Future<void> editTransaction(ExpenseTxn expenseTxn) async {
     final txnObject = ExpenseTxnEntity()
-      ..id = expenseTxn.id!
+      ..id = expenseTxn.id != null ? expenseTxn.id! : Isar.autoIncrement
       ..notes = expenseTxn.notes
       ..amount = expenseTxn.amount
       ..createdAt = expenseTxn.createdAt
       ..updatedAt = expenseTxn.updatedAt;
 
-    if (expenseTxn.id != null) {
-      await _isarService.editTransaction(txnObject);
-    }
+    await _isarService.editTransaction(txnObject);
   }
 
   Future<void> bulkEditTxns(List<ExpenseTxn> txns) async {

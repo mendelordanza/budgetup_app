@@ -35,6 +35,12 @@ class IsarService {
     return list;
   }
 
+  Future<ExpenseCategoryEntity?> getCategoryById(int categoryId) async {
+    final isar = await db;
+    final category = await isar.expenseCategoryEntitys.get(categoryId);
+    return category;
+  }
+
   Future<List<ExpenseCategoryEntity>> getAllExpenseCategoriesByDate(
       DateTime date) async {
     final isar = await db;
@@ -95,7 +101,8 @@ class IsarService {
 
   Future<void> editTransaction(ExpenseTxnEntity expenseTxn) async {
     final isar = await db;
-    isar.writeTxnSync<int>(() => isar.expenseTxnEntitys.putSync(expenseTxn));
+    await isar.writeTxn<int>(
+        () async => await isar.expenseTxnEntitys.put(expenseTxn));
   }
 
   Future<void> bulkEditTxns(List<ExpenseTxnEntity> updatedTxns) async {

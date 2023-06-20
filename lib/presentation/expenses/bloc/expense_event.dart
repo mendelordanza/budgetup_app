@@ -12,6 +12,13 @@ class LoadExpenseCategories extends ExpenseEvent {
   LoadExpenseCategories({this.dateFilterType, this.selectedDate});
 }
 
+
+class ViewCategory extends ExpenseEvent {
+  final ExpenseCategory expenseCategory;
+
+  ViewCategory({required this.expenseCategory});
+}
+
 //Convert Expense Budget
 class ConvertExpenseBudget extends ExpenseEvent {
   final String currencyCode;

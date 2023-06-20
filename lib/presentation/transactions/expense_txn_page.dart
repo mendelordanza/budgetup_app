@@ -3,6 +3,7 @@ import 'package:budgetup_app/domain/expense_txn.dart';
 import 'package:budgetup_app/helper/colors.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/helper/string.dart';
+import 'package:budgetup_app/presentation/expenses/bloc/single_category_cubit.dart';
 import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/add_expense_txn_page.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
@@ -18,6 +19,8 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../helper/date_helper.dart';
+import '../../helper/shared_prefs.dart';
+import '../../injection_container.dart';
 
 class ExpenseTxnPage extends HookWidget {
   final ExpenseCategory expenseCategory;
@@ -26,6 +29,11 @@ class ExpenseTxnPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sharedPrefs = getIt<SharedPrefs>();
+    final currentSelectedDate =
+        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
+    final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
+
     useEffect(() {
       context
           .read<ExpenseTxnBloc>()
@@ -33,19 +41,10 @@ class ExpenseTxnPage extends HookWidget {
       return null;
     }, []);
 
-    // useEffect(() {
-    //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //     if (modifySuccess.value) {
-    //       Navigator.pop(context);
-    //     }
-    //   });
-    //   return null;
-    // }, [modifySuccess.value]);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "${expenseCategory.icon ?? Emoji.objects[49]} ${expenseCategory.title}",
+          "Transaction History",
         ),
         leading: InkWell(
           onTap: () {
@@ -61,31 +60,53 @@ class ExpenseTxnPage extends HookWidget {
         elevation: 0,
         backgroundColor: Colors.transparent,
         actions: [
-          PopupMenuButton(
-              // add icon, by default "3 dot" icon
-              icon: Icon(Iconsax.more),
-              itemBuilder: (context) {
-                return [
-                  PopupMenuItem<int>(
-                    value: 0,
-                    child: Text("Edit Category"),
-                  ),
-                  PopupMenuItem<int>(
-                    value: 1,
-                    child: Text("Delete Category"),
-                  ),
-                ];
-              },
-              onSelected: (value) {
-                if (value == 0) {
-                  Navigator.pushNamed(context, RouteStrings.addCategory,
-                      arguments: expenseCategory);
-                } else if (value == 1) {
-                  //TODO show alert dialog
-                  context.read<ModifyExpensesBloc>().add(
-                      RemoveExpenseCategory(expenseCategory: expenseCategory));
-                }
-              }),
+          BlocBuilder<SingleCategoryCubit, SingleCategoryState>(
+            builder: (context, state) {
+              if (state is SingleCategoryLoaded) {
+                return PopupMenuButton(
+                    // add icon, by default "3 dot" icon
+                    icon: Icon(Iconsax.more),
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem<int>(
+                          value: 0,
+                          child: Text("Edit"),
+                        ),
+                        PopupMenuItem<int>(
+                          value: 1,
+                          child: Text("Delete"),
+                        ),
+                      ];
+                    },
+                    onSelected: (value) {
+                      if (value == 0) {
+                        Navigator.pushNamed(context, RouteStrings.addCategory,
+                            arguments: state.expenseCategory);
+                      } else if (value == 1) {
+                        //TODO show alert dialog
+                        context.read<ModifyExpensesBloc>().add(
+                            RemoveExpenseCategory(
+                                expenseCategory: state.expenseCategory));
+                      }
+                    });
+              }
+              return PopupMenuButton(
+                  icon: Icon(Iconsax.more),
+                  itemBuilder: (context) {
+                    return [
+                      PopupMenuItem<int>(
+                        value: 0,
+                        child: Text("Edit"),
+                      ),
+                      PopupMenuItem<int>(
+                        value: 1,
+                        child: Text("Delete"),
+                      ),
+                    ];
+                  },
+                  onSelected: (value) {});
+            },
+          ),
         ],
       ),
       body: SafeArea(
@@ -97,6 +118,20 @@ class ExpenseTxnPage extends HookWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              BlocBuilder<SingleCategoryCubit, SingleCategoryState>(
+                builder: (context, state) {
+                  if (state is SingleCategoryLoaded) {
+                    return Text(
+                      "${expenseCategory.icon ?? Emoji.objects[49]} ${expenseCategory.title}",
+                      textAlign: TextAlign.center,
+                    );
+                  }
+                  return Text("Title");
+                },
+              ),
+              SizedBox(
+                height: 16.0,
+              ),
               Text(
                 "Overall Total",
                 textAlign: TextAlign.center,
@@ -124,17 +159,30 @@ class ExpenseTxnPage extends HookWidget {
                 },
               ),
               SizedBox(
-                height: 24.0,
+                height: 16.0,
               ),
               Column(
                 children: [
                   Text(
                     "Monthly Budget",
                   ),
-                  Text(
-                    decimalFormatter(expenseCategory.budget ?? 0.00),
+                  BlocBuilder<SingleCategoryCubit, SingleCategoryState>(
+                    builder: (context, state) {
+                      if (state is SingleCategoryLoaded) {
+                        return Text(
+                          decimalFormatter(
+                              state.expenseCategory.budget ?? 0.00),
+                        );
+                      }
+                      return Text(
+                        decimalFormatter(0.00),
+                      );
+                    },
                   ),
                 ],
+              ),
+              SizedBox(
+                height: 24.0,
               ),
               Expanded(
                 child: BlocListener<TransactionsModifyBloc,
@@ -160,7 +208,7 @@ class ExpenseTxnPage extends HookWidget {
                         return GroupedListView(
                           elements: state.expenseTxns,
                           groupBy: (element) =>
-                              "${getMonthFromDate(element.updatedAt!)} ${element.updatedAt?.year}",
+                              "${getMonthFromDate(element.updatedAt!)}",
                           itemComparator: (item1, item2) {
                             return item2.updatedAt!.compareTo(item1.updatedAt!);
                           },
@@ -309,6 +357,19 @@ class ExpenseTxnPage extends HookWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget budgetProgress({required double value, required Color color}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        height: 12,
+        child: LinearProgressIndicator(
+          value: value,
+          color: color,
         ),
       ),
     );

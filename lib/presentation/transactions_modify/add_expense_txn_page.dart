@@ -15,6 +15,7 @@ import 'package:iconsax/iconsax.dart';
 
 import '../../helper/route_strings.dart';
 import '../../helper/string.dart';
+import '../expenses/bloc/single_category_cubit.dart';
 
 class ExpenseTxnArgs {
   final ExpenseCategory expenseCategory;
@@ -49,12 +50,20 @@ class AddExpenseTxnPage extends HookWidget {
         text: args.expenseTxn != null
             ? decimalFormatter(args.expenseTxn!.amount ?? 0.00)
             : "${sharedPrefs.getCurrencySymbol()} 0.00");
+    final focusNode = useFocusNode();
 
     final dateTextController = useTextEditingController();
     final currentSelectedDate = useState<DateTime>(
         args.expenseTxn != null && args.expenseTxn!.updatedAt != null
             ? args.expenseTxn!.updatedAt!
             : DateTime.now());
+
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<SingleCategoryCubit>().getCategory(args.expenseCategory);
+      });
+      return null;
+    }, []);
 
     useEffect(() {
       dateTextController.text =
@@ -85,7 +94,7 @@ class AddExpenseTxnPage extends HookWidget {
                     Navigator.pushNamed(context, RouteStrings.transactions,
                         arguments: args.expenseCategory);
                   },
-                  icon: Icon(Iconsax.layer),
+                  icon: Icon(Iconsax.document_text),
                 )
               ]
             : null,
@@ -108,13 +117,40 @@ class AddExpenseTxnPage extends HookWidget {
                           padding: const EdgeInsets.only(bottom: 16.0),
                           child: Column(
                             children: [
-                              Text(
-                                "${args.expenseCategory.icon} ${args.expenseCategory.title}",
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                              BlocBuilder<SingleCategoryCubit,
+                                      SingleCategoryState>(
+                                  builder: (context, state) {
+                                if (state is SingleCategoryLoaded) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        RouteStrings.addCategory,
+                                        arguments: state.expenseCategory,
+                                      );
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          "${state.expenseCategory.icon} ${state.expenseCategory.title}",
+                                        ),
+                                        SizedBox(
+                                          width: 5.0,
+                                        ),
+                                        Icon(
+                                          Iconsax.edit,
+                                          size: 12,
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                }
+                                return Text("No category");
+                              }),
                               SizedBox(
                                 height: 20,
                               ),
@@ -140,7 +176,7 @@ class AddExpenseTxnPage extends HookWidget {
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Amount is required';
-                                  } else if (value == "0.00") {
+                                  } else if (removeFormatting(value) == "0.0") {
                                     return 'Please enter a valid number';
                                   }
                                   return null;
@@ -150,10 +186,16 @@ class AddExpenseTxnPage extends HookWidget {
                           ),
                         ),
                         CustomTextField(
+                          focusNode: focusNode,
                           controller: dateTextController,
                           textInputType: TextInputType.datetime,
-                          label: "Date",
+                          label: "Transaction Date",
+                          prefixIcon: Icon(
+                            Iconsax.calendar,
+                            size: 16,
+                          ),
                           onTap: () async {
+                            focusNode.unfocus();
                             await showDatePicker(
                               context: context,
                               initialDate: currentSelectedDate.value,
@@ -169,7 +211,11 @@ class AddExpenseTxnPage extends HookWidget {
                         CustomTextField(
                           controller: notesTextController,
                           label: "Notes (optional)",
-                          maxLines: 3,
+                          maxLines: null,
+                          prefixIcon: Icon(
+                            Iconsax.receipt_edit,
+                            size: 16,
+                          ),
                         ),
                       ],
                     ),
@@ -210,13 +256,20 @@ class AddExpenseTxnPage extends HookWidget {
                           );
                     }
 
-                    Navigator.pushReplacementNamed(
-                        context, RouteStrings.transactions,
-                        arguments: args.expenseCategory);
+                    //Clear textfields
+                    amountTextController.text =
+                        "${sharedPrefs.getCurrencySymbol()} 0.00";
+                    notesTextController.clear();
+
+                    Navigator.pushNamed(
+                      context,
+                      RouteStrings.transactions,
+                      arguments: args.expenseCategory,
+                    );
                   }
                 },
                 child: Text(
-                  args.expenseTxn != null ? "Edit" : "Add",
+                  "Save",
                 ),
               ),
             ],

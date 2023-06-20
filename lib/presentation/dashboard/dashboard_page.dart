@@ -1,45 +1,55 @@
 import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:budgetup_app/helper/string.dart';
+import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/custom/balance.dart';
 import 'package:budgetup_app/presentation/dashboard/bloc/dashboard_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:collection/collection.dart';
 
 import '../../helper/colors.dart';
+import '../../helper/shared_prefs.dart';
 
 class DashboardPage extends HookWidget {
-  const DashboardPage({super.key});
+  final DateTime date;
+
+  DashboardPage({required this.date, super.key});
 
   @override
   Widget build(BuildContext context) {
-    final currentMonth = formatDate(DateTime.now(), "MMMM yyyy");
+    final currentMonth = formatDate(date, "MMMM yyyy");
 
     useEffect(() {
-      context.read<DashboardCubit>().getSummary();
+      context.read<DashboardCubit>().getSummary(date);
       return null;
     }, []);
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text("$currentMonth Summary Report"),
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SvgPicture.asset(
+              "assets/icons/ic_arrow_left.svg",
+            ),
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                "This month - $currentMonth",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
               BlocBuilder<DashboardCubit, DashboardState>(
                 builder: (context, state) {
                   if (state is DashboardLoaded) {
@@ -51,6 +61,7 @@ class DashboardPage extends HookWidget {
                           triggerMode: TooltipTriggerMode.tap,
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text("Total"),
                               SizedBox(
@@ -155,8 +166,7 @@ class DashboardPage extends HookWidget {
                                       ),
                                     ),
                                     Text(decimalFormatter(item.getTotalByDate(
-                                        DateFilterType.monthly,
-                                        DateTime.now()))),
+                                        DateFilterType.monthly, date))),
                                   ],
                                 ),
                               );
@@ -191,8 +201,7 @@ class DashboardPage extends HookWidget {
                     )
                   : Center(
                       child: Text(
-                        "Your expenses for $currentMonth will show here.\nGo to "
-                        "transactions tab to start tracking",
+                        "Your expenses for $currentMonth will show here.",
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -201,6 +210,13 @@ class DashboardPage extends HookWidget {
         );
       },
     );
+  }
+
+  convertAmount({required double amount}) {
+    final sharedPrefs = getIt<SharedPrefs>();
+    return sharedPrefs.getCurrencyCode() == "USD"
+        ? amount
+        : amount / sharedPrefs.getCurrencyRate();
   }
 
   Widget _billsPaid(String currentMonth) {
@@ -231,7 +247,8 @@ class DashboardPage extends HookWidget {
                           final item = state.paidRecurringBills[index];
                           final txn = item.recurringBillTxns?.firstWhereOrNull(
                             (element) =>
-                                element.datePaid?.month == DateTime.now().month,
+                                getMonthFromDate(element.datePaid!) ==
+                                getMonthFromDate(date),
                           );
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 16.0),
@@ -296,8 +313,7 @@ class DashboardPage extends HookWidget {
                   )
                 : Center(
                     child: Text(
-                      "Your bills paid for $currentMonth will show here.\nGo to "
-                      "transactions tab to start tracking",
+                      "Your bills paid for $currentMonth will show here.",
                       textAlign: TextAlign.center,
                     ),
                   ),
