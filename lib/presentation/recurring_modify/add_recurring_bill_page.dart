@@ -11,14 +11,43 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../helper/colors.dart';
 import '../../helper/date_helper.dart';
 import 'bloc/recurring_modify_bloc.dart';
+
+enum RecurringBillInterval {
+  monthly,
+  quarterly,
+  yearly,
+}
+
+class RecurringBillIntervalSelection {
+  final String label;
+  final RecurringBillInterval type;
+
+  RecurringBillIntervalSelection(this.label, this.type);
+}
 
 class AddRecurringBillPage extends HookWidget {
   final RecurringBill? recurringBill;
   final _formKey = GlobalKey<FormState>();
 
   AddRecurringBillPage({this.recurringBill, Key? key}) : super(key: key);
+
+  final intervals = [
+    RecurringBillIntervalSelection(
+      "Monthly",
+      RecurringBillInterval.monthly,
+    ),
+    RecurringBillIntervalSelection(
+      "Quarterly",
+      RecurringBillInterval.quarterly,
+    ),
+    RecurringBillIntervalSelection(
+      "Yearly",
+      RecurringBillInterval.yearly,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +66,9 @@ class AddRecurringBillPage extends HookWidget {
         recurringBill != null && recurringBill!.reminderDate != null
             ? recurringBill!.reminderDate!
             : DateTime.now());
+
+    final _selectedInterval =
+        useState<RecurringBillInterval>(RecurringBillInterval.monthly);
 
     useEffect(() {
       dateTextController.text = formatDate(currentSelectedDate.value, "dd");
@@ -124,33 +156,9 @@ class AddRecurringBillPage extends HookWidget {
                             return null;
                           },
                         ),
-                        // CustomTextField(
-                        //   label: "Amount",
-                        //   inputFormatters: [
-                        //     FilteringTextInputFormatter.digitsOnly,
-                        //     NumberInputFormatter(),
-                        //   ],
-                        //   controller: amountTextController,
-                        //   validator: (value) {
-                        //     if (value == null || value.isEmpty) {
-                        //       return 'Amount is required';
-                        //     }
-                        //     return null;
-                        //   },
-                        // ),
-                        // CustomTextField(
-                        //   label: "Interval",
-                        //   controller: amountTextController,
-                        //   validator: (value) {
-                        //     if (value == null || value.isEmpty) {
-                        //       return 'Amount is required';
-                        //     }
-                        //     return null;
-                        //   },
-                        // ),
                         CustomTextField(
                           focusNode: focusNode,
-                          label: "Remind me to pay monthly every...",
+                          label: "Remind me to pay on...",
                           controller: dateTextController,
                           prefixIcon: Icon(
                             Iconsax.calendar,
@@ -176,6 +184,29 @@ class AddRecurringBillPage extends HookWidget {
                             return null;
                           },
                         ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Text("Every..."),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: intervals.map((element) {
+                                return _tab(
+                                  context,
+                                  label: element.label,
+                                  isSelected:
+                                      _selectedInterval.value == element.type,
+                                  onSelect: () {
+                                    _selectedInterval.value = element.type;
+                                  },
+                                );
+                              }).toList(),
+                            ),
+                          ],
+                        )
                       ],
                     ),
                   ),
@@ -227,5 +258,32 @@ class AddRecurringBillPage extends HookWidget {
         ? double.parse(removeFormatting(amount))
         : double.parse(removeFormatting(amount)) /
             sharedPrefs.getCurrencyRate();
+  }
+
+  Widget _tab(
+    BuildContext context, {
+    required String label,
+    required bool isSelected,
+    required Function() onSelect,
+  }) {
+    return GestureDetector(
+      onTap: onSelect,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          vertical: 5.0,
+          horizontal: 16.0,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? secondaryColor : Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(30.0),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+      ),
+    );
   }
 }

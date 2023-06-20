@@ -77,24 +77,21 @@ class MyApp extends StatelessWidget {
         child: BlocBuilder<AppearanceCubit, AppearanceState>(
           builder: (context, state) {
             if (state is AppearanceLoaded) {
-              return MaterialApp(
-                title: 'BudgetUp',
-                themeMode: state.themeMode,
-                theme: MyThemes.lightTheme,
-                darkTheme: MyThemes.darkTheme,
-                onGenerateRoute: RouteGenerator.generateRoute,
-                initialRoute: RouteStrings.landing,
-              );
+              return app(state.themeMode);
             }
-            return MaterialApp(
-              title: 'BudgetUp',
-              themeMode: ThemeMode.system,
-              theme: MyThemes.lightTheme,
-              darkTheme: MyThemes.darkTheme,
-              onGenerateRoute: RouteGenerator.generateRoute,
-              initialRoute: RouteStrings.landing,
-            );
+            return app(ThemeMode.system);
           },
         ));
+  }
+
+  Widget app(ThemeMode themeMode) {
+    return MaterialApp(
+      title: 'BudgetUp',
+      themeMode: themeMode,
+      theme: MyThemes.lightTheme,
+      darkTheme: MyThemes.darkTheme,
+      onGenerateRoute: RouteGenerator.generateRoute,
+      initialRoute: RouteStrings.landing,
+    );
   }
 }

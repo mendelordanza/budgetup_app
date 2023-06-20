@@ -5,7 +5,7 @@ removeTimeFromDate(DateTime date) {
 }
 
 getMonthFromDate(DateTime date) {
-  return DateFormat.MMMM().format(date);
+  return DateFormat.MMMM().add_y().format(date);
 }
 
 getYearFromDate(DateTime date) {
@@ -56,19 +56,13 @@ String getMonthText(DateFilterType dateFilterType, DateTime date) {
           DateTime.now().isBefore(getEndDate(date))) {
         return "This week";
       } else {
-        return "${formatDate(getStartDate(date), 'MM/dd/yyyy')} - ${formatDate(getEndDate(date), 'MM/dd/yyyy')}";
+        return "${formatDate(getStartDate(date), 'MMM dd, yyyy')} - ${formatDate(getEndDate(date), 'MMM dd, yyyy')}";
       }
     case DateFilterType.monthly:
       if (date.month == DateTime.now().month) {
         return "This month - ${formatDate(date, 'MMMM yyyy')}";
       } else {
         return "${formatDate(date, 'MMMM yyyy')}";
-      }
-    case DateFilterType.yearly:
-      if (date.year == DateTime.now().year) {
-        return "This year";
-      } else {
-        return getYearFromDate(date);
       }
   }
 }
@@ -77,7 +71,6 @@ enum DateFilterType {
   daily,
   weekly,
   monthly,
-  yearly,
 }
 
 class DateSelection {

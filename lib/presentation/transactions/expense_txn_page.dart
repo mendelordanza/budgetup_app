@@ -19,6 +19,8 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../helper/date_helper.dart';
+import '../../helper/shared_prefs.dart';
+import '../../injection_container.dart';
 
 class ExpenseTxnPage extends HookWidget {
   final ExpenseCategory expenseCategory;
@@ -27,6 +29,11 @@ class ExpenseTxnPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sharedPrefs = getIt<SharedPrefs>();
+    final currentSelectedDate =
+        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
+    final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
+
     useEffect(() {
       context
           .read<ExpenseTxnBloc>()
@@ -167,6 +174,22 @@ class ExpenseTxnPage extends HookWidget {
                   ),
                 ],
               ),
+              // budgetProgress(
+              //   value: expenseCategory
+              //           .getTotalPercentage(
+              //               dateFilterTypeFromString(currentDateFilterType),
+              //               currentSelectedDate)
+              //           .isNaN
+              //       ? 0.0
+              //       : expenseCategory.getTotalPercentage(
+              //           dateFilterTypeFromString(currentDateFilterType),
+              //           currentSelectedDate),
+              //   color: expenseCategory.isExceeded(
+              //           dateFilterTypeFromString(currentDateFilterType),
+              //           currentSelectedDate)
+              //       ? red
+              //       : green,
+              // ),
               Expanded(
                 child: BlocListener<TransactionsModifyBloc,
                     TransactionsModifyState>(
@@ -191,7 +214,7 @@ class ExpenseTxnPage extends HookWidget {
                         return GroupedListView(
                           elements: state.expenseTxns,
                           groupBy: (element) =>
-                              "${getMonthFromDate(element.updatedAt!)} ${element.updatedAt?.year}",
+                              "${getMonthFromDate(element.updatedAt!)}",
                           itemComparator: (item1, item2) {
                             return item2.updatedAt!.compareTo(item1.updatedAt!);
                           },
@@ -340,6 +363,19 @@ class ExpenseTxnPage extends HookWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget budgetProgress({required double value, required Color color}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        height: 12,
+        child: LinearProgressIndicator(
+          value: value,
+          color: color,
         ),
       ),
     );

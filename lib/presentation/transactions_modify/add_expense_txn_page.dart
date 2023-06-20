@@ -94,7 +94,7 @@ class AddExpenseTxnPage extends HookWidget {
                     Navigator.pushNamed(context, RouteStrings.transactions,
                         arguments: args.expenseCategory);
                   },
-                  icon: Icon(Iconsax.layer),
+                  icon: Icon(Iconsax.document_text),
                 )
               ]
             : null,
@@ -180,7 +180,7 @@ class AddExpenseTxnPage extends HookWidget {
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Amount is required';
-                                  } else if (value == "0.00") {
+                                  } else if (removeFormatting(value) == "0.0") {
                                     return 'Please enter a valid number';
                                   }
                                   return null;

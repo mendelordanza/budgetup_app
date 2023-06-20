@@ -3,8 +3,8 @@ import 'package:budgetup_app/helper/colors.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/custom/balance.dart';
+import 'package:budgetup_app/presentation/custom/date_filter_button.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
-import 'package:budgetup_app/presentation/recurring_date_filter/recurring_date_bottom_sheet.dart';
 import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
@@ -12,21 +12,38 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../domain/recurring_bill_txn.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
+import '../custom/date_filter_bottom_sheet.dart';
 import '../recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
 
 class RecurringBillsPage extends HookWidget {
-  const RecurringBillsPage({Key? key}) : super(key: key);
+  RecurringBillsPage({Key? key}) : super(key: key);
+
+  final types = [
+    DateSelection(
+      "Monthly",
+      DateFilterType.monthly,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
+
+    final selectedFilterType = useState<DateFilterType>(
+        dateFilterTypeFromString(
+            sharedPrefs.getRecurringSelectedDateFilterType()));
+    final selectedDate = useState<DateTime>(
+      sharedPrefs.getRecurringSelectedDate().isNotEmpty
+          ? DateTime.parse(sharedPrefs.getRecurringSelectedDate())
+          : DateTime.now(),
+    );
+
     final currentSelectedDate =
         DateTime.parse(sharedPrefs.getRecurringSelectedDate());
     final currentDateFilterType =
@@ -49,14 +66,62 @@ class RecurringBillsPage extends HookWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: GestureDetector(
                   onTap: () {
                     showModalBottomSheet(
                       backgroundColor: Colors.transparent,
                       context: context,
                       builder: (context) {
-                        return RecurringDateBottomSheet();
+                        return StatefulBuilder(builder: (context, setState) {
+                          return DateFilterBottomSheet(
+                            types: types,
+                            onSelectFilterType: (type) {
+                              selectedFilterType.value = type;
+                              context.read<RecurringDateFilterBloc>().add(
+                                  RecurringSelectDate(
+                                      type, selectedDate.value));
+                              context.read<RecurringBillBloc>().add(
+                                    LoadRecurringBills(selectedDate.value),
+                                  );
+                              setState(() {});
+                            },
+                            onSelectDate: (date) {
+                              selectedDate.value = date;
+                              context.read<RecurringDateFilterBloc>().add(
+                                  RecurringSelectDate(
+                                      selectedFilterType.value, date));
+                              context.read<RecurringBillBloc>().add(
+                                    LoadRecurringBills(date),
+                                  );
+                              setState(() {});
+                            },
+                            onSelectYear: (year) {
+                              context
+                                  .read<RecurringDateFilterBloc>()
+                                  .add(RecurringSelectDate(
+                                      selectedFilterType.value,
+                                      DateTime(
+                                        year,
+                                        selectedDate.value.month,
+                                        selectedDate.value.day,
+                                      )));
+                              context.read<RecurringBillBloc>().add(
+                                    LoadRecurringBills(
+                                      DateTime(
+                                        year,
+                                        selectedDate.value.month,
+                                        selectedDate.value.day,
+                                      ),
+                                    ),
+                                  );
+                            },
+                            selectedFilterType: selectedFilterType,
+                            selectedDate: selectedDate,
+                          );
+                        });
+
+                        //return RecurringDateBottomSheet();
                       },
                       isScrollControlled: true,
                     );
@@ -68,34 +133,17 @@ class RecurringBillsPage extends HookWidget {
                           RecurringDateFilterState>(
                         builder: (context, state) {
                           if (state is RecurringDateFilterSelected) {
-                            return Text(
-                              getMonthText(
+                            return DateFilterButton(
+                              text: getMonthText(
                                   state.dateFilterType, state.selectedDate),
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w500,
-                                color: Theme.of(context).primaryColor,
-                              ),
                             );
                           }
-                          return Text(
-                            getMonthText(
+                          return DateFilterButton(
+                            text: getMonthText(
                                 dateFilterTypeFromString(currentDateFilterType),
                                 currentSelectedDate),
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w500,
-                              color: Theme.of(context).primaryColor,
-                            ),
                           );
                         },
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: SvgPicture.asset(
-                          "assets/icons/ic_arrow_down.svg",
-                          color: Theme.of(context).primaryColor,
-                        ),
                       ),
                     ],
                   ),
@@ -112,28 +160,29 @@ class RecurringBillsPage extends HookWidget {
                   return Text("No categories");
                 },
               ),
-              SizedBox(
-                height: 27.0,
-              ),
-              Row(
-                children: [
-                  Spacer(),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(
-                          context, RouteStrings.addRecurringBill);
-                    },
-                    child: Row(
-                      children: [
-                        Icon(
-                          Iconsax.add,
-                          size: 20.0,
-                        ),
-                        Text("Add Recurring Bill"),
-                      ],
+              Divider(),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                            context, RouteStrings.addRecurringBill);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Iconsax.add,
+                            size: 20.0,
+                          ),
+                          Text("Add Recurring Bill"),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               SizedBox(
                 height: 10.0,
@@ -171,7 +220,20 @@ class RecurringBillsPage extends HookWidget {
                         },
                       );
                     }
-                    return Center(child: Text("No Recurring Bills"));
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text("No recurring bills"),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          "ex. Things you pay monthly, quarterly, or yearly – Internet, Phone Bill, Netflix etc.",
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    );
                   },
                 ),
               )),

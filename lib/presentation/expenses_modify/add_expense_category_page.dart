@@ -145,7 +145,7 @@ class AddExpenseCategoryPage extends HookWidget {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter some text';
-                          } else if (value == "0.00") {
+                          } else if (removeFormatting(value) == "0.0") {
                             return 'Please enter a valid number';
                           }
                           return null;

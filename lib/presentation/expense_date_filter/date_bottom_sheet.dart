@@ -6,23 +6,25 @@ import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../helper/date_helper.dart';
 
 class ExpenseDateBottomSheet extends HookWidget {
+
   ExpenseDateBottomSheet({Key? key}) : super(key: key);
 
   final types = [
-    // DateSelection(
-    //   "Daily",
-    //   DateFilterType.daily,
-    // ),
-    // DateSelection(
-    //   "Weekly",
-    //   DateFilterType.weekly,
-    // ),
+    DateSelection(
+      "Daily",
+      DateFilterType.daily,
+    ),
+    DateSelection(
+      "Weekly",
+      DateFilterType.weekly,
+    ),
     DateSelection(
       "Monthly",
       DateFilterType.monthly,
@@ -40,6 +42,7 @@ class ExpenseDateBottomSheet extends HookWidget {
           ? DateTime.parse(sharedPrefs.getExpenseSelectedDate())
           : DateTime.now(),
     );
+    final _currentYear = useState(DateTime.now().year);
 
     return SingleChildScrollView(
       child: Container(
@@ -48,7 +51,7 @@ class ExpenseDateBottomSheet extends HookWidget {
         ),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: Theme.of(context).scaffoldBackgroundColor,
           borderRadius: const BorderRadius.all(Radius.circular(16.0)),
         ),
         child: BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
@@ -78,67 +81,164 @@ class ExpenseDateBottomSheet extends HookWidget {
                     );
                   }).toList(),
                 ),
-                TableCalendar(
-                  firstDay: DateTime.utc(2010, 10, 16),
-                  lastDay: DateTime.utc(2030, 3, 14),
-                  focusedDay: _selectedDate.value,
-                  headerStyle: HeaderStyle(
-                    titleCentered: true,
-                    formatButtonVisible: false,
-                  ),
-                  availableGestures: AvailableGestures.all,
-                  locale: "en_US",
-                  selectedDayPredicate: (day) {
-                    return isSameDay(day, _selectedDate.value);
-                  },
-                  onDaySelected: (selectedDay, focusedDay) {
-                    _selectedDate.value = selectedDay;
-                    context.read<ExpenseDateFilterBloc>().add(ExpenseSelectDate(
-                        _selectedFilterType.value, selectedDay));
-                    context.read<ExpenseBloc>().add(
-                          LoadExpenseCategories(
-                            dateFilterType: _selectedFilterType.value,
-                            selectedDate: selectedDay,
-                          ),
-                        );
-                  },
-                  startingDayOfWeek: StartingDayOfWeek.monday,
-                  calendarBuilders: CalendarBuilders(
-                    defaultBuilder: (context, day, date) {
-                      final text = DateFormat.d().format(day);
-
-                      return Center(
-                        child: Text(
-                          text,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      );
+                if (_selectedFilterType.value != DateFilterType.monthly)
+                  TableCalendar(
+                    firstDay: DateTime.utc(2010, 10, 16),
+                    lastDay: DateTime.utc(2030, 3, 14),
+                    focusedDay: _selectedDate.value,
+                    headerStyle: HeaderStyle(
+                      titleCentered: true,
+                      formatButtonVisible: false,
+                    ),
+                    availableGestures: AvailableGestures.all,
+                    locale: "en_US",
+                    selectedDayPredicate: (day) {
+                      return isSameDay(day, _selectedDate.value);
                     },
-                    dowBuilder: (context, day) {
-                      if (day.weekday == DateTime.sunday) {
-                        final text = DateFormat.E().format(day);
+                    onDaySelected: (selectedDay, focusedDay) {
+                      _selectedDate.value = selectedDay;
+                      context.read<ExpenseDateFilterBloc>().add(
+                          ExpenseSelectDate(
+                              _selectedFilterType.value, selectedDay));
+                      context.read<ExpenseBloc>().add(
+                            LoadExpenseCategories(
+                              dateFilterType: _selectedFilterType.value,
+                              selectedDate: selectedDay,
+                            ),
+                          );
+                    },
+                    startingDayOfWeek: StartingDayOfWeek.monday,
+                    calendarBuilders: CalendarBuilders(
+                      defaultBuilder: (context, day, date) {
+                        final text = DateFormat.d().format(day);
 
                         return Center(
                           child: Text(
                             text,
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        );
-                      } else {
-                        return Center(
-                          child: Text(
-                            DateFormat.E().format(day),
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         );
-                      }
-                    },
+                      },
+                      dowBuilder: (context, day) {
+                        if (day.weekday == DateTime.sunday) {
+                          final text = DateFormat.E().format(day);
+
+                          return Center(
+                            child: Text(
+                              text,
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          );
+                        } else {
+                          return Center(
+                            child: Text(
+                              DateFormat.E().format(day),
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  )
+                else
+                  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                _currentYear.value = _currentYear.value - 1;
+                                context
+                                    .read<ExpenseDateFilterBloc>()
+                                    .add(ExpenseSelectDate(
+                                        _selectedFilterType.value,
+                                        DateTime(
+                                          _currentYear.value,
+                                          _selectedDate.value.month,
+                                          _selectedDate.value.day,
+                                        )));
+                                context.read<ExpenseBloc>().add(
+                                      LoadExpenseCategories(
+                                        dateFilterType:
+                                            _selectedFilterType.value,
+                                        selectedDate: DateTime(
+                                          _currentYear.value,
+                                          _selectedDate.value.month,
+                                          _selectedDate.value.day,
+                                        ),
+                                      ),
+                                    );
+                              },
+                              icon: SvgPicture.asset(
+                                "assets/icons/ic_arrow_left.svg",
+                              ),
+                            ),
+                            Text("${_currentYear.value}"),
+                            IconButton(
+                              onPressed: () {
+                                if (_currentYear.value != DateTime.now().year) {
+                                  _currentYear.value = _currentYear.value + 1;
+                                  context
+                                      .read<ExpenseDateFilterBloc>()
+                                      .add(ExpenseSelectDate(
+                                          _selectedFilterType.value,
+                                          DateTime(
+                                            _currentYear.value,
+                                            _selectedDate.value.month,
+                                            _selectedDate.value.day,
+                                          )));
+                                  context.read<ExpenseBloc>().add(
+                                        LoadExpenseCategories(
+                                          dateFilterType:
+                                              _selectedFilterType.value,
+                                          selectedDate: DateTime(
+                                            _currentYear.value,
+                                            _selectedDate.value.month,
+                                            _selectedDate.value.day,
+                                          ),
+                                        ),
+                                      );
+                                }
+                              },
+                              icon: SvgPicture.asset(
+                                "assets/icons/ic_arrow_right.svg",
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Wrap(
+                        children:
+                            generateMonthList(_currentYear.value).map((date) {
+                          return GestureDetector(
+                            onTap: () {
+                              _selectedDate.value = date;
+                              context.read<ExpenseDateFilterBloc>().add(
+                                  ExpenseSelectDate(
+                                      _selectedFilterType.value, date));
+                              context.read<ExpenseBloc>().add(
+                                    LoadExpenseCategories(
+                                      dateFilterType: _selectedFilterType.value,
+                                      selectedDate: date,
+                                    ),
+                                  );
+                            },
+                            child: _monthItem(context,
+                                date: formatDate(date, "MMMM"),
+                                isSelected:
+                                    _selectedDate.value.month == date.month),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ),
-                ),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
@@ -148,6 +248,36 @@ class ExpenseDateBottomSheet extends HookWidget {
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _monthItem(
+    BuildContext context, {
+    required String date,
+    required bool isSelected,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: 10.0,
+          vertical: 8.0,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Theme.of(context).primaryColor
+              : Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Text(
+          date,
+          style: TextStyle(
+            color: isSelected
+                ? Colors.white
+                : Theme.of(context).colorScheme.onSurface,
+          ),
         ),
       ),
     );
@@ -167,13 +297,13 @@ class ExpenseDateBottomSheet extends HookWidget {
           horizontal: 16.0,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? secondaryColor : Color(0xFFF5F5F5),
+          color: isSelected ? secondaryColor : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(30.0),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ),

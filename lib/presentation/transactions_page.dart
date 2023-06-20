@@ -62,7 +62,7 @@ class TransactionsPage extends HookWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Iconsax.money_send,
+                          Iconsax.refresh,
                           size: 18,
                         ),
                         SizedBox(

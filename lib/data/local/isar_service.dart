@@ -101,7 +101,8 @@ class IsarService {
 
   Future<void> editTransaction(ExpenseTxnEntity expenseTxn) async {
     final isar = await db;
-    isar.writeTxnSync<int>(() => isar.expenseTxnEntitys.putSync(expenseTxn));
+    await isar.writeTxn<int>(
+        () async => await isar.expenseTxnEntitys.put(expenseTxn));
   }
 
   Future<void> bulkEditTxns(List<ExpenseTxnEntity> updatedTxns) async {
