@@ -36,10 +36,10 @@ class HomePage extends HookWidget {
         backgroundColor: Colors.transparent,
         leading: IconButton(
           onPressed: () {
-            Navigator.pushNamed(context, RouteStrings.summary);
+            Navigator.pushNamed(context, RouteStrings.settings);
           },
           icon: SvgPicture.asset(
-            "assets/icons/ic_summary_thin.svg",
+            "assets/icons/ic_setting.svg",
             height: 24.0,
             color: Theme.of(context).colorScheme.onSurface,
           ),
@@ -47,10 +47,10 @@ class HomePage extends HookWidget {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, RouteStrings.settings);
+              Navigator.pushNamed(context, RouteStrings.summary);
             },
             icon: SvgPicture.asset(
-              "assets/icons/ic_setting.svg",
+              "assets/icons/ic_summary_thin.svg",
               height: 24.0,
               color: Theme.of(context).colorScheme.onSurface,
             ),

@@ -51,8 +51,12 @@ class AddRecurringBillPage extends HookWidget {
             ? recurringBill!.reminderDate!
             : DateTime.now());
 
-    final selectedInterval =
-        useState<RecurringBillInterval>(RecurringBillInterval.monthly);
+    final selectedInterval = useState<RecurringBillInterval>(
+      recurringBill != null && recurringBill!.interval != null
+          ? RecurringBillInterval.values
+              .firstWhere((element) => element.name == recurringBill!.interval)
+          : RecurringBillInterval.monthly,
+    );
 
     useEffect(() {
       dateTextController.text = formatDate(currentSelectedDate.value, "MMMM d");
