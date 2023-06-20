@@ -1,10 +1,15 @@
 import 'package:budgetup_app/domain/recurring_bill_txn.dart';
+import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:equatable/equatable.dart';
+import 'package:isar/isar.dart';
+
+import '../data/local/entities/recurring_bill_entity.dart';
 
 class RecurringBill extends Equatable {
   final int? id;
   final String? title;
   final double? amount;
+  final String? interval;
   final DateTime? reminderDate;
   final List<RecurringBillTxn>? recurringBillTxns;
   final DateTime? createdAt;
@@ -14,6 +19,7 @@ class RecurringBill extends Equatable {
     this.id,
     this.title,
     this.amount,
+    this.interval,
     this.reminderDate,
     this.recurringBillTxns,
     this.createdAt,
@@ -22,7 +28,8 @@ class RecurringBill extends Equatable {
 
   isPaid(DateTime selectedDate) {
     final paid = recurringBillTxns?.where((element) {
-      return element.datePaid!.month == selectedDate.month;
+      return getMonthFromDate(element.datePaid!) ==
+          getMonthFromDate(selectedDate);
     }).toList();
     return paid?.isNotEmpty;
   }
@@ -31,6 +38,7 @@ class RecurringBill extends Equatable {
         id: json["id"],
         title: json["title"],
         amount: json["amount"],
+        interval: json["interval"],
         reminderDate: json["reminderDate"],
         recurringBillTxns: List<RecurringBillTxn>.from(json["recurringBillTxns"]
             .map((txn) => RecurringBillTxn.fromJson(txn.toJson()))),
@@ -42,15 +50,28 @@ class RecurringBill extends Equatable {
         "id": id,
         "title": title,
         "amount": amount,
+        "interval": interval,
         "recurringBillTxns": recurringBillTxns,
         "createdAt": createdAt,
         "updatedAt": updatedAt,
       };
 
+  RecurringBillEntity toIsarObject() {
+    return RecurringBillEntity()
+      ..id = id != null ? id! : Isar.autoIncrement
+      ..title = title
+      ..amount = amount
+      ..interval = interval
+      ..reminderDate = reminderDate
+      ..createdAt = createdAt
+      ..updatedAt = updatedAt;
+  }
+
   RecurringBill copy({
     int? id,
     String? title,
     double? amount,
+    String? interval,
     DateTime? reminderDate,
     List<RecurringBillTxn>? recurringBillTxns,
     DateTime? createdAt,
@@ -60,6 +81,7 @@ class RecurringBill extends Equatable {
         id: id ?? this.id,
         title: title ?? this.title,
         amount: amount ?? this.amount,
+        interval: interval ?? this.interval,
         reminderDate: reminderDate ?? this.reminderDate,
         recurringBillTxns: recurringBillTxns ?? this.recurringBillTxns,
         createdAt: createdAt ?? this.createdAt,
@@ -72,6 +94,7 @@ class RecurringBill extends Equatable {
         id,
         title,
         amount,
+        interval,
         reminderDate,
         recurringBillTxns,
         createdAt,

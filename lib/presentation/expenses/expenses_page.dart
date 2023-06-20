@@ -11,6 +11,7 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../helper/date_helper.dart';
@@ -361,50 +362,35 @@ class ExpensesPage extends HookWidget {
                   SizedBox(
                     height: 10.0,
                   ),
-                  BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
-                    builder: (context, state) {
-                      if (state is ExpenseDateFilterSelected) {
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Container(
-                            height: 12,
-                            child: LinearProgressIndicator(
-                              value: item.getTotalPercentage(
-                                  state.dateFilterType, state.selectedDate),
-                              color: item.isExceeded(
-                                      state.dateFilterType, state.selectedDate)
-                                  ? red
-                                  : green,
-                            ),
-                          ),
-                        );
-                      }
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Container(
-                          height: 12,
-                          child: LinearProgressIndicator(
-                            value: item
-                                    .getTotalPercentage(
-                                        dateFilterTypeFromString(
-                                            currentDateFilterType),
-                                        currentSelectedDate)
-                                    .isNaN
-                                ? 0.0
-                                : item.getTotalPercentage(
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: BlocBuilder<ExpenseDateFilterBloc,
+                            ExpenseDateFilterState>(
+                          builder: (context, state) {
+                            if (state is ExpenseDateFilterSelected) {
+                              final percentage = item.getTotalPercentage(
+                                  state.dateFilterType, state.selectedDate);
+                              return budgetProgress(
+                                value: percentage.isNaN ? 0.0 : percentage,
+                                isExceeded: item.isExceeded(
+                                    state.dateFilterType, state.selectedDate),
+                              );
+                            }
+                            final percentage = item.getTotalPercentage(
+                                dateFilterTypeFromString(currentDateFilterType),
+                                currentSelectedDate);
+                            return budgetProgress(
+                                value: percentage.isNaN ? 0.0 : percentage,
+                                isExceeded: item.isExceeded(
                                     dateFilterTypeFromString(
                                         currentDateFilterType),
-                                    currentSelectedDate),
-                            color: item.isExceeded(
-                                    dateFilterTypeFromString(
-                                        currentDateFilterType),
-                                    currentSelectedDate)
-                                ? red
-                                : green,
-                          ),
+                                    currentSelectedDate));
+                          },
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -422,6 +408,41 @@ class ExpensesPage extends HookWidget {
         //       },
         //       icon: Icon(Iconsax.close_circle)),
         // ),
+      ],
+    );
+  }
+
+  Widget budgetProgress({
+    required double value,
+    required bool isExceeded,
+  }) {
+    return Row(
+      children: [
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              height: 12,
+              child: LinearProgressIndicator(
+                value: value,
+                color: isExceeded ? red : green,
+              ),
+            ),
+          ),
+        ),
+        Padding(
+            padding: const EdgeInsets.only(left: 5.0),
+            child: (!isExceeded)
+                ? const Icon(
+                    Iconsax.tick_square,
+                    color: green,
+                    size: 16.0,
+                  )
+                : SvgPicture.asset(
+                    "assets/icons/ic_warning.svg",
+                    color: red,
+                    height: 16.0,
+                  )),
       ],
     );
   }

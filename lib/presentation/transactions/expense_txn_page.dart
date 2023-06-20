@@ -43,15 +43,8 @@ class ExpenseTxnPage extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: BlocBuilder<SingleCategoryCubit, SingleCategoryState>(
-          builder: (context, state) {
-            if (state is SingleCategoryLoaded) {
-              return Text(
-                "${state.expenseCategory.icon ?? Emoji.objects[49]} ${state.expenseCategory.title}",
-              );
-            }
-            return Text("Title");
-          },
+        title: Text(
+          "Transaction History",
         ),
         leading: InkWell(
           onTap: () {
@@ -125,6 +118,20 @@ class ExpenseTxnPage extends HookWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              BlocBuilder<SingleCategoryCubit, SingleCategoryState>(
+                builder: (context, state) {
+                  if (state is SingleCategoryLoaded) {
+                    return Text(
+                      "${expenseCategory.icon ?? Emoji.objects[49]} ${expenseCategory.title}",
+                      textAlign: TextAlign.center,
+                    );
+                  }
+                  return Text("Title");
+                },
+              ),
+              SizedBox(
+                height: 16.0,
+              ),
               Text(
                 "Overall Total",
                 textAlign: TextAlign.center,
@@ -152,7 +159,7 @@ class ExpenseTxnPage extends HookWidget {
                 },
               ),
               SizedBox(
-                height: 24.0,
+                height: 16.0,
               ),
               Column(
                 children: [
@@ -174,22 +181,9 @@ class ExpenseTxnPage extends HookWidget {
                   ),
                 ],
               ),
-              // budgetProgress(
-              //   value: expenseCategory
-              //           .getTotalPercentage(
-              //               dateFilterTypeFromString(currentDateFilterType),
-              //               currentSelectedDate)
-              //           .isNaN
-              //       ? 0.0
-              //       : expenseCategory.getTotalPercentage(
-              //           dateFilterTypeFromString(currentDateFilterType),
-              //           currentSelectedDate),
-              //   color: expenseCategory.isExceeded(
-              //           dateFilterTypeFromString(currentDateFilterType),
-              //           currentSelectedDate)
-              //       ? red
-              //       : green,
-              // ),
+              SizedBox(
+                height: 24.0,
+              ),
               Expanded(
                 child: BlocListener<TransactionsModifyBloc,
                     TransactionsModifyState>(

@@ -24,6 +24,7 @@ Future<void> setup() async {
   //Bloc
   getIt.registerLazySingleton(
     () => DashboardCubit(
+      sharedPrefs: getIt(),
       expensesRepository: getIt(),
       recurringBillsRepository: getIt(),
       transactionsModifyBloc: getIt(),

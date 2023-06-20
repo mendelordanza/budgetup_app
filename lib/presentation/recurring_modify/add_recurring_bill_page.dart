@@ -21,13 +21,6 @@ enum RecurringBillInterval {
   yearly,
 }
 
-class RecurringBillIntervalSelection {
-  final String label;
-  final RecurringBillInterval type;
-
-  RecurringBillIntervalSelection(this.label, this.type);
-}
-
 class AddRecurringBillPage extends HookWidget {
   final RecurringBill? recurringBill;
   final _formKey = GlobalKey<FormState>();
@@ -35,18 +28,9 @@ class AddRecurringBillPage extends HookWidget {
   AddRecurringBillPage({this.recurringBill, Key? key}) : super(key: key);
 
   final intervals = [
-    RecurringBillIntervalSelection(
-      "Monthly",
-      RecurringBillInterval.monthly,
-    ),
-    RecurringBillIntervalSelection(
-      "Quarterly",
-      RecurringBillInterval.quarterly,
-    ),
-    RecurringBillIntervalSelection(
-      "Yearly",
-      RecurringBillInterval.yearly,
-    ),
+    RecurringBillInterval.monthly,
+    RecurringBillInterval.quarterly,
+    RecurringBillInterval.yearly,
   ];
 
   @override
@@ -67,11 +51,11 @@ class AddRecurringBillPage extends HookWidget {
             ? recurringBill!.reminderDate!
             : DateTime.now());
 
-    final _selectedInterval =
+    final selectedInterval =
         useState<RecurringBillInterval>(RecurringBillInterval.monthly);
 
     useEffect(() {
-      dateTextController.text = formatDate(currentSelectedDate.value, "dd");
+      dateTextController.text = formatDate(currentSelectedDate.value, "MMMM d");
       return null;
     }, [currentSelectedDate.value]);
 
@@ -122,7 +106,7 @@ class AddRecurringBillPage extends HookWidget {
                           child: Column(
                             children: [
                               Text("${sharedPrefs.getCurrencyCode()}"),
-                              TextField(
+                              TextFormField(
                                 controller: amountTextController,
                                 decoration: InputDecoration(
                                   fillColor: Colors.transparent,
@@ -141,6 +125,14 @@ class AddRecurringBillPage extends HookWidget {
                                   FilteringTextInputFormatter.digitsOnly,
                                   NumberInputFormatter(),
                                 ],
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Amount is required';
+                                  } else if (removeFormatting(value) == "0.0") {
+                                    return 'Please enter a valid number';
+                                  }
+                                  return null;
+                                },
                               ),
                             ],
                           ),
@@ -158,7 +150,7 @@ class AddRecurringBillPage extends HookWidget {
                         ),
                         CustomTextField(
                           focusNode: focusNode,
-                          label: "Remind me to pay on...",
+                          label: "Remind me to start paying on...",
                           controller: dateTextController,
                           prefixIcon: Icon(
                             Iconsax.calendar,
@@ -187,8 +179,8 @@ class AddRecurringBillPage extends HookWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: 8.0),
                               child: Text("Every..."),
                             ),
                             Row(
@@ -196,11 +188,11 @@ class AddRecurringBillPage extends HookWidget {
                               children: intervals.map((element) {
                                 return _tab(
                                   context,
-                                  label: element.label,
-                                  isSelected:
-                                      _selectedInterval.value == element.type,
+                                  label:
+                                      "${element.name[0].toUpperCase()}${element.name.substring(1)}",
+                                  isSelected: selectedInterval.value == element,
                                   onSelect: () {
-                                    _selectedInterval.value = element.type;
+                                    selectedInterval.value = element;
                                   },
                                 );
                               }).toList(),
@@ -221,6 +213,7 @@ class AddRecurringBillPage extends HookWidget {
                         title: titleTextController.text,
                         amount: convertRecurringBill(sharedPrefs,
                             amount: amountTextController.text),
+                        interval: selectedInterval.value.name,
                         reminderDate: currentSelectedDate.value,
                       );
                       context.read<RecurringModifyBloc>().add(EditRecurringBill(
@@ -232,6 +225,7 @@ class AddRecurringBillPage extends HookWidget {
                         title: titleTextController.text,
                         amount: convertRecurringBill(sharedPrefs,
                             amount: amountTextController.text),
+                        interval: selectedInterval.value.name,
                         reminderDate: currentSelectedDate.value,
                         createdAt: DateTime.now(),
                         updatedAt: DateTime.now(),

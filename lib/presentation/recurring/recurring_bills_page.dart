@@ -5,6 +5,7 @@ import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/custom/balance.dart';
 import 'package:budgetup_app/presentation/custom/date_filter_button.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
+import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
 import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
@@ -265,7 +266,8 @@ class RecurringBillsPage extends HookWidget {
             if (state is RecurringDateFilterSelected) {
               final txn = item.recurringBillTxns?.firstWhereOrNull(
                 (element) =>
-                    element.datePaid?.month == state.selectedDate.month,
+                    getMonthFromDate(element.datePaid!) ==
+                    getMonthFromDate(state.selectedDate),
               );
               return _checkboxItem(context,
                   selectedDate: state.selectedDate, item: item, txn: txn);
@@ -377,9 +379,20 @@ class RecurringBillsPage extends HookWidget {
                                 fontSize: 12.0,
                               ),
                             )
-                          else if (item.reminderDate != null)
+                          else if (item.reminderDate != null &&
+                              item.interval !=
+                                  RecurringBillInterval.yearly.name)
                             Text(
-                              "every ${formatDate(item.reminderDate!, "dd")} of the month",
+                              "every ${item.reminderDate!.day}${getDayOfMonthSuffix(item.reminderDate!.day)} ${item.interval}",
+                              style: TextStyle(
+                                fontSize: 12.0,
+                              ),
+                            )
+                          else
+                            Text(
+                              "every ${formatDate(item.reminderDate!, "MMMM")} "
+                              "${item.reminderDate!.day}${getDayOfMonthSuffix(item.reminderDate!.day)} "
+                              "${item.interval}",
                               style: TextStyle(
                                 fontSize: 12.0,
                               ),

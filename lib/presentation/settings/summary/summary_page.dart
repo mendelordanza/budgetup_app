@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../../helper/route_strings.dart';
+
 class SummaryPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
@@ -60,9 +62,9 @@ class SummaryPage extends HookWidget {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: generateMonthList(_currentYear.value).length,
+                  itemCount: getPrevMonths(_currentYear.value).length,
                   itemBuilder: (context, index) {
-                    final date = generateMonthList(_currentYear.value)[index];
+                    final date = getPrevMonths(_currentYear.value)[index];
                     return _summaryItem(
                       context,
                       date: date,
@@ -85,16 +87,11 @@ class SummaryPage extends HookWidget {
       padding: const EdgeInsets.only(bottom: 12.0),
       child: GestureDetector(
         onTap: () {
-          print("DATE: ${date}");
-          // Navigator.pushNamed(
-          //   context,
-          //   RouteStrings.addTransaction,
-          //   arguments: ExpenseTxnArgs(
-          //     expenseCategory: expenseCategory,
-          //     expenseTxn: item,
-          //     from: From.txnPage,
-          //   ),
-          // );
+          Navigator.pushNamed(
+            context,
+            RouteStrings.summaryDetail,
+            arguments: date,
+          );
         },
         child: Material(
           shape: SmoothRectangleBorder(

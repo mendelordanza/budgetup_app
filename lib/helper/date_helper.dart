@@ -114,3 +114,21 @@ List<DateTime> generateMonthList(int year) {
   }
   return months;
 }
+
+List<DateTime> getPrevMonths(int year) {
+  final now = DateTime.now();
+  final currentYear = now.year;
+  final currentMonth = now.month;
+
+  if (year > currentYear) {
+    return List.empty();
+  } else if (year == currentYear) {
+    return List<DateTime>.generate(currentMonth, (index) {
+      return DateTime(now.year, index + 1, 0);
+    }).reversed.toList();
+  } else {
+    return List<DateTime>.generate(12, (index) {
+      return DateTime(year, index + 1, 0);
+    }).reversed.toList();
+  }
+}

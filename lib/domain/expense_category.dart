@@ -54,7 +54,6 @@ class ExpenseCategory extends Equatable {
               getMonthFromDate(selectedDate);
         }).toList();
         break;
-        break;
     }
 
     filteredList?.forEach((e) {

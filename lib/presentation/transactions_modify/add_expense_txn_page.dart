@@ -137,17 +137,13 @@ class AddExpenseTxnPage extends HookWidget {
                                       children: [
                                         Text(
                                           "${state.expenseCategory.icon} ${state.expenseCategory.title}",
-                                          style: TextStyle(
-                                            fontSize: 18.0,
-                                            fontWeight: FontWeight.w600,
-                                          ),
                                         ),
                                         SizedBox(
                                           width: 5.0,
                                         ),
                                         Icon(
                                           Iconsax.edit,
-                                          size: 14,
+                                          size: 12,
                                         )
                                       ],
                                     ),
