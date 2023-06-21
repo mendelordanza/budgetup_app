@@ -47,10 +47,8 @@ class IsarService {
     final list = await isar.expenseCategoryEntitys
         .where()
         .filter()
-        .expenseTransactions(
-            (q) => q.updatedAtGreaterThan(getFirstDayOfMonth(date)))
-        .expenseTransactions(
-            (q) => q.updatedAtLessThan(getLastDayOfMonth(date)))
+        .expenseTransactions((q) => q.updatedAtBetween(
+            getFirstDayOfMonth(date), getLastDayOfMonth(date)))
         .findAll();
     return list;
   }
@@ -141,10 +139,8 @@ class IsarService {
     return await isar.recurringBillEntitys
         .where()
         .filter()
-        .recurringBillTxns(
-            (q) => q.datePaidGreaterThan(getFirstDayOfMonth(datePaid)))
-        .recurringBillTxns(
-            (q) => q.datePaidLessThan(getLastDayOfMonth(datePaid)))
+        .recurringBillTxns((q) => q.datePaidBetween(
+            getFirstDayOfMonth(datePaid), getLastDayOfMonth(datePaid)))
         .findAll();
   }
 

@@ -74,6 +74,7 @@ class ExpensesPage extends HookWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
                   onTap: () {
                     showModalBottomSheet(
                       isScrollControlled: true,
@@ -165,13 +166,33 @@ class ExpensesPage extends HookWidget {
                 builder: (context, state) {
                   if (state is ExpenseCategoryLoaded) {
                     return Balance(
-                      headerLabel: Text("Total Expenses"),
+                      headerLabel: Tooltip(
+                        message:
+                            'Sum of all the categories for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), currentSelectedDate)}',
+                        textAlign: TextAlign.center,
+                        triggerMode: TooltipTriggerMode.tap,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Total Spent"),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Icon(
+                              Iconsax.info_circle,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                        showDuration: Duration(seconds: 3),
+                      ),
                       total: state.total,
                       budget: state.totalBudget,
                     );
                   }
                   return Balance(
-                    headerLabel: Text("Total Expenses"),
+                    headerLabel: Text("Total Spent"),
                     total: 0.00,
                     budget: 0.00,
                   );
@@ -196,12 +217,10 @@ class ExpensesPage extends HookWidget {
                           Text("Add Category"),
                         ],
                       ),
+                      behavior: HitTestBehavior.translucent,
                     ),
                   ],
                 ),
-              ),
-              SizedBox(
-                height: 10.0,
               ),
               Expanded(
                   child: BlocListener<ModifyExpensesBloc, ModifyExpensesState>(
@@ -425,24 +444,19 @@ class ExpensesPage extends HookWidget {
               height: 12,
               child: LinearProgressIndicator(
                 value: value,
-                color: isExceeded ? red : green,
+                color: isExceeded ? red : secondaryColor,
               ),
             ),
           ),
         ),
-        Padding(
-            padding: const EdgeInsets.only(left: 5.0),
-            child: (!isExceeded)
-                ? const Icon(
-                    Iconsax.tick_square,
-                    color: green,
-                    size: 16.0,
-                  )
-                : SvgPicture.asset(
-                    "assets/icons/ic_warning.svg",
-                    color: red,
-                    height: 16.0,
-                  )),
+        if (isExceeded)
+          Padding(
+              padding: const EdgeInsets.only(left: 5.0),
+              child: SvgPicture.asset(
+                "assets/icons/ic_warning.svg",
+                color: red,
+                height: 16.0,
+              )),
       ],
     );
   }

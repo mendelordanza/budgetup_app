@@ -36,11 +36,11 @@ getEndDate(DateTime date) {
 }
 
 getFirstDayOfMonth(DateTime date) {
-  return DateTime(date.year, date.month, 0);
+  return DateTime(date.year, date.month, 1);
 }
 
 DateTime getLastDayOfMonth(DateTime date) {
-  return DateTime(date.year, date.month + 1, 1);
+  return DateTime(date.year, date.month + 1, 0);
 }
 
 String getMonthText(DateFilterType dateFilterType, DateTime date) {

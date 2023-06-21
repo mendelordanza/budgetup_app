@@ -56,12 +56,11 @@ class DashboardPage extends HookWidget {
                     return Balance(
                         headerLabel: Tooltip(
                           message:
-                              'Total Expenses + Total Paid Recurring Bills for the month of $currentMonth',
+                              'Total Spent + Total Paid Recurring Bills for the month of $currentMonth',
                           textAlign: TextAlign.center,
                           triggerMode: TooltipTriggerMode.tap,
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text("Total"),
                               SizedBox(
@@ -80,7 +79,7 @@ class DashboardPage extends HookWidget {
                   return Balance(
                     headerLabel: Tooltip(
                       message:
-                          'Total Expenses + Total Paid Recurring Bills for the month of $currentMonth',
+                          'Total Spent + Total Paid Recurring Bills for the month of $currentMonth',
                       textAlign: TextAlign.center,
                       triggerMode: TooltipTriggerMode.tap,
                       child: Row(
@@ -104,17 +103,27 @@ class DashboardPage extends HookWidget {
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        _yourExpenses(currentMonth),
-                        SizedBox(
-                          height: 20,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        "assets/icons/ic_receipt_bg.svg",
+                        width: MediaQuery.of(context).size.width,
+                        color: Theme.of(context).cardColor,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            _yourExpenses(currentMonth),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            _billsPaid(currentMonth),
+                          ],
                         ),
-                        _billsPaid(currentMonth),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               )

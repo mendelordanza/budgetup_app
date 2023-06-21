@@ -11,35 +11,25 @@ class DateFilterButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 5.0),
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 10.0,
-          vertical: 8.0,
-        ),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: Row(
-          children: [
-            Text(
-              text,
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.w500,
-                color: secondaryColor,
-              ),
+      padding: const EdgeInsets.only(top: 24.0),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: SvgPicture.asset(
+              "assets/icons/ic_calendar.svg",
+              color: Theme.of(context).primaryColor,
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: SvgPicture.asset(
-                "assets/icons/ic_arrow_down.svg",
-                color: secondaryColor,
-              ),
+          ),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).primaryColor,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

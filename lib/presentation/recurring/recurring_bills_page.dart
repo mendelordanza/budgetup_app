@@ -154,11 +154,34 @@ class RecurringBillsPage extends HookWidget {
                 builder: (context, state) {
                   if (state is RecurringBillsLoaded && state.total != null) {
                     return Balance(
-                      headerLabel: Text("Total Paid Recurring Bills"),
+                      headerLabel: Tooltip(
+                        message:
+                            'Sum of all checked recurring bills for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), currentSelectedDate)}',
+                        textAlign: TextAlign.center,
+                        triggerMode: TooltipTriggerMode.tap,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Total Paid"),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Icon(
+                              Iconsax.info_circle,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                        showDuration: Duration(seconds: 3),
+                      ),
                       total: state.total!,
                     );
                   }
-                  return Text("No categories");
+                  return Balance(
+                    headerLabel: Text("Total Paid"),
+                    total: 0.00,
+                  );
                 },
               ),
               Divider(),
