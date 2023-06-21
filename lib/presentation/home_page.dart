@@ -29,6 +29,7 @@ class HomePage extends HookWidget {
         title: Text(
           "BudgetUp",
         ),
+        centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(

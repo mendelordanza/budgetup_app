@@ -39,7 +39,7 @@ class TransactionsPage extends HookWidget {
               child: Container(
                 height: 45.0,
                 decoration: BoxDecoration(
-                  color: Colors.grey,
+                  color: Color(0xFFB7B7B7),
                   borderRadius: BorderRadius.circular(30.0),
                 ),
                 child: TabBar(

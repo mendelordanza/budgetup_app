@@ -61,6 +61,7 @@ class DashboardPage extends HookWidget {
                           triggerMode: TooltipTriggerMode.tap,
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text("Total"),
                               SizedBox(

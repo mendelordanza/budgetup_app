@@ -43,6 +43,7 @@ class AddExpenseCategoryPage extends HookWidget {
         title: Text(
           expenseCategory != null ? "Edit Category" : "Add Category",
         ),
+        centerTitle: true,
         leading: InkWell(
           onTap: () {
             Navigator.pop(context);
@@ -74,84 +75,86 @@ class AddExpenseCategoryPage extends HookWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Text("Select Emoji Icon"),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: GestureDetector(
-                          onTap: () {
-                            showModalBottomSheet(
-                              context: context,
-                              backgroundColor: Colors.transparent,
-                              builder: (context) {
-                                return CustomEmojiPicker();
-                              },
-                              isScrollControlled: true,
-                            ).then((value) {
-                              if (value != null) {
-                                selectedEmoji.value = value;
-                              }
-                            });
-                          },
-                          child: Material(
-                            shape: SmoothRectangleBorder(
-                              borderRadius: SmoothBorderRadius(
-                                cornerRadius: 16,
-                                cornerSmoothing: 1.0,
-                              ),
-                            ),
-                            child: Padding(
-                              child: Text(
-                                selectedEmoji.value,
-                                style: TextStyle(
-                                  fontSize: 30.0,
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Text("Select Emoji Icon"),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) {
+                                  return CustomEmojiPicker();
+                                },
+                                isScrollControlled: true,
+                              ).then((value) {
+                                if (value != null) {
+                                  selectedEmoji.value = value;
+                                }
+                              });
+                            },
+                            child: Material(
+                              shape: SmoothRectangleBorder(
+                                borderRadius: SmoothBorderRadius(
+                                  cornerRadius: 16,
+                                  cornerSmoothing: 1.0,
                                 ),
                               ),
-                              padding: EdgeInsets.symmetric(
-                                vertical: 10.0,
-                                horizontal: 16.0,
+                              child: Padding(
+                                child: Text(
+                                  selectedEmoji.value,
+                                  style: TextStyle(
+                                    fontSize: 30.0,
+                                  ),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 10.0,
+                                  horizontal: 16.0,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      CustomTextField(
-                        controller: titleTextController,
-                        label: "Title",
-                        hintText: "eg. Transporation",
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        },
-                      ),
-                      CustomTextField(
-                        controller: budgetTextController,
-                        label: "Monthly Budget",
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          NumberInputFormatter(),
-                        ],
-                        textInputType: TextInputType.numberWithOptions(
-                          decimal: true,
+                        CustomTextField(
+                          controller: titleTextController,
+                          label: "Title",
+                          hintText: "eg. Transporation",
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          },
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          } else if (removeFormatting(value) == "0.0") {
-                            return 'Please enter a valid number';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
+                        CustomTextField(
+                          controller: budgetTextController,
+                          label: "Monthly Budget",
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            NumberInputFormatter(),
+                          ],
+                          textInputType: TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            } else if (removeFormatting(value) == "0.0") {
+                              return 'Please enter a valid number';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
