@@ -29,7 +29,7 @@ class ConvertCurrencyCubit extends Cubit<ConvertCurrencyState> {
     String currencyCode,
   ) async {
     //Update currencies first
-    await currencyRepository.updateCurrencies("USD");
+    //await currencyRepository.updateCurrencies("USD");
 
     //Then load list from DB
     final currencies = await currencyRepository.loadCurrencies();

@@ -154,10 +154,10 @@ class AddRecurringBillPage extends HookWidget {
                         ),
                         CustomTextField(
                           focusNode: focusNode,
-                          label: "Remind me to start paying on...",
+                          label: "Remind me starting on...",
                           controller: dateTextController,
                           prefixIcon: Icon(
-                            Iconsax.calendar,
+                            Iconsax.notification,
                             size: 18,
                           ),
                           onTap: () async {
@@ -165,7 +165,7 @@ class AddRecurringBillPage extends HookWidget {
                             await showDatePicker(
                               context: context,
                               initialDate: currentSelectedDate.value,
-                              firstDate: DateTime(2015, 8),
+                              firstDate: DateTime.now(),
                               lastDate: DateTime(2101),
                             ).then((date) {
                               if (date != null) {

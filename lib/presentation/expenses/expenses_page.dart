@@ -250,19 +250,23 @@ class ExpensesPage extends HookWidget {
                         ),
                       );
                     }
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text("No categories"),
-                        SizedBox(
-                          height: 10,
+                    return Center(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text("No categories"),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              "ex. Your daily expenses – \nTransporation, Grocery, Food etc.",
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
-                        Text(
-                          "ex. Your daily expenses – \nTransporation, Grocery, Food etc.",
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                      ),
                     );
                   },
                 ),

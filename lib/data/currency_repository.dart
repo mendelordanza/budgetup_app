@@ -13,7 +13,23 @@ class CurrencyRepository {
 
   Future<List<CurrencyRateEntity>> loadCurrencies() async {
     final savedCurrencies = await isarService.getAllCurrencies();
-    return savedCurrencies;
+
+    List<CurrencyRateEntity> currencies = [];
+    if (savedCurrencies.isEmpty) {
+      final currencyData =
+          await httpService.getCurrencies(baseCurrencyCode: "USD");
+      currencies = currencyData.conversionRates.entries.map((entry) {
+        final currencyEntity = CurrencyRateEntity()
+          ..country = entry.key
+          ..rate = double.parse(entry.value.toString());
+        isarService.addCurrency(currencyEntity);
+        return currencyEntity;
+      }).toList();
+    } else {
+      currencies = savedCurrencies;
+    }
+
+    return currencies;
   }
 
   Future<void> updateCurrencies(String baseCurrencyCode) async {
