@@ -204,6 +204,7 @@ class RecurringBillsPage extends HookWidget {
                           Text("Add Recurring Bill"),
                         ],
                       ),
+                      behavior: HitTestBehavior.translucent,
                     ),
                   ],
                 ),

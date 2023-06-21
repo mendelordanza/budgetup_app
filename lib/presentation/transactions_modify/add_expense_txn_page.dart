@@ -13,6 +13,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../helper/colors.dart';
 import '../../helper/route_strings.dart';
 import '../../helper/string.dart';
 import '../expenses/bloc/single_category_cubit.dart';
@@ -62,6 +63,13 @@ class AddExpenseTxnPage extends HookWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<SingleCategoryCubit>().getCategory(args.expenseCategory);
       });
+
+      // amountTextController.addListener(() {
+      //   final amountValue =
+      //       double.parse(removeFormatting(amountTextController.text));
+      //   currentProgress.value = amountValue;
+      //   print("VL:${amountValue}");
+      // });
       return null;
     }, []);
 
@@ -151,9 +159,17 @@ class AddExpenseTxnPage extends HookWidget {
                                 }
                                 return Text("No category");
                               }),
-                              SizedBox(
-                                height: 20,
-                              ),
+                              // Padding(
+                              //   padding:
+                              //       const EdgeInsets.symmetric(vertical: 24.0),
+                              //   child: _budgetProgress(
+                              //       value: currentProgress.value,
+                              //       isExceeded: currentProgress.value >
+                              //           (args.expenseCategory.budget ?? 0.00),
+                              //       isHalf: currentProgress.value >=
+                              //           ((args.expenseCategory.budget ?? 0.0) *
+                              //               0.8)),
+                              // ),
                               TextFormField(
                                 controller: amountTextController,
                                 decoration: InputDecoration(
@@ -254,18 +270,17 @@ class AddExpenseTxnPage extends HookWidget {
                               expenseCategory: args.expenseCategory,
                             ),
                           );
+                      Navigator.pushNamed(
+                        context,
+                        RouteStrings.transactions,
+                        arguments: args.expenseCategory,
+                      );
                     }
 
                     //Clear textfields
                     amountTextController.text =
                         "${sharedPrefs.getCurrencySymbol()} 0.00";
                     notesTextController.clear();
-
-                    Navigator.pushNamed(
-                      context,
-                      RouteStrings.transactions,
-                      arguments: args.expenseCategory,
-                    );
                   }
                 },
                 child: Text(
@@ -285,4 +300,40 @@ class AddExpenseTxnPage extends HookWidget {
         : double.parse(removeFormatting(amount)) /
             sharedPrefs.getCurrencyRate();
   }
+
+// Widget _budgetProgress({
+//   required double value,
+//   required bool isExceeded,
+//   required bool isHalf,
+// }) {
+//   return Row(
+//     children: [
+//       Expanded(
+//         child: ClipRRect(
+//           borderRadius: BorderRadius.circular(8),
+//           child: Container(
+//             height: 12,
+//             child: LinearProgressIndicator(
+//               value: (value / 100),
+//               color: isExceeded
+//                   ? red
+//                   : isHalf
+//                       ? secondaryColor
+//                       : green,
+//             ),
+//           ),
+//         ),
+//       ),
+//       if (isExceeded)
+//         Padding(
+//           padding: const EdgeInsets.only(left: 5.0),
+//           child: SvgPicture.asset(
+//             "assets/icons/ic_warning.svg",
+//             color: red,
+//             height: 16.0,
+//           ),
+//         ),
+//     ],
+//   );
+// }
 }

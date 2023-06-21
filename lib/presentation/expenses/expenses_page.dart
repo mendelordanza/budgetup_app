@@ -395,17 +395,23 @@ class ExpensesPage extends HookWidget {
                             if (state is ExpenseDateFilterSelected) {
                               final percentage = item.getTotalPercentage(
                                   state.dateFilterType, state.selectedDate);
-                              return budgetProgress(
+                              return _budgetProgress(
                                 value: percentage.isNaN ? 0.0 : percentage,
                                 isExceeded: item.isExceeded(
+                                    state.dateFilterType, state.selectedDate),
+                                isHalf: item.isMoreThanEighty(
                                     state.dateFilterType, state.selectedDate),
                               );
                             }
                             final percentage = item.getTotalPercentage(
                                 dateFilterTypeFromString(currentDateFilterType),
                                 currentSelectedDate);
-                            return budgetProgress(
+                            return _budgetProgress(
                                 value: percentage.isNaN ? 0.0 : percentage,
+                                isHalf: item.isMoreThanEighty(
+                                    dateFilterTypeFromString(
+                                        currentDateFilterType),
+                                    currentSelectedDate),
                                 isExceeded: item.isExceeded(
                                     dateFilterTypeFromString(
                                         currentDateFilterType),
@@ -435,9 +441,10 @@ class ExpensesPage extends HookWidget {
     );
   }
 
-  Widget budgetProgress({
+  Widget _budgetProgress({
     required double value,
     required bool isExceeded,
+    required bool isHalf,
   }) {
     return Row(
       children: [
@@ -448,19 +455,24 @@ class ExpensesPage extends HookWidget {
               height: 12,
               child: LinearProgressIndicator(
                 value: value,
-                color: isExceeded ? red : secondaryColor,
+                color: isExceeded
+                    ? red
+                    : isHalf
+                        ? secondaryColor
+                        : green,
               ),
             ),
           ),
         ),
         if (isExceeded)
           Padding(
-              padding: const EdgeInsets.only(left: 5.0),
-              child: SvgPicture.asset(
-                "assets/icons/ic_warning.svg",
-                color: red,
-                height: 16.0,
-              )),
+            padding: const EdgeInsets.only(left: 5.0),
+            child: SvgPicture.asset(
+              "assets/icons/ic_warning.svg",
+              color: red,
+              height: 16.0,
+            ),
+          ),
       ],
     );
   }

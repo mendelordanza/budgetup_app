@@ -29,11 +29,6 @@ class ExpenseTxnPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sharedPrefs = getIt<SharedPrefs>();
-    final currentSelectedDate =
-        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
-    final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
-
     useEffect(() {
       context
           .read<ExpenseTxnBloc>()
@@ -43,8 +38,16 @@ class ExpenseTxnPage extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Transaction History",
+        title: BlocBuilder<SingleCategoryCubit, SingleCategoryState>(
+          builder: (context, state) {
+            if (state is SingleCategoryLoaded) {
+              return Text(
+                "${expenseCategory.icon ?? Emoji.objects[49]} ${expenseCategory.title}",
+                textAlign: TextAlign.center,
+              );
+            }
+            return Text("Transaction History");
+          },
         ),
         leading: InkWell(
           onTap: () {
@@ -118,20 +121,6 @@ class ExpenseTxnPage extends HookWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              BlocBuilder<SingleCategoryCubit, SingleCategoryState>(
-                builder: (context, state) {
-                  if (state is SingleCategoryLoaded) {
-                    return Text(
-                      "${expenseCategory.icon ?? Emoji.objects[49]} ${expenseCategory.title}",
-                      textAlign: TextAlign.center,
-                    );
-                  }
-                  return Text("Title");
-                },
-              ),
-              SizedBox(
-                height: 16.0,
-              ),
               Text(
                 "Overall Total",
                 textAlign: TextAlign.center,
@@ -193,6 +182,7 @@ class ExpenseTxnPage extends HookWidget {
                           const SnackBar(content: Text("Transaction added")));
                       Navigator.pop(context);
                     } else if (state is ExpenseTxnEdited) {
+                      print("STATE: $state");
                       ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("Transaction edited")));
                       Navigator.pop(context);
@@ -357,19 +347,6 @@ class ExpenseTxnPage extends HookWidget {
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget budgetProgress({required double value, required Color color}) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        height: 12,
-        child: LinearProgressIndicator(
-          value: value,
-          color: color,
         ),
       ),
     );

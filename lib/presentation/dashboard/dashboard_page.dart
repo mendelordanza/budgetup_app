@@ -104,30 +104,53 @@ class DashboardPage extends HookWidget {
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        "assets/icons/ic_receipt_bg.svg",
-                        width: MediaQuery.of(context).size.width,
-                        color: Theme.of(context).cardColor,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            _yourExpenses(currentMonth),
-                            SizedBox(
-                              height: 20,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24.0),
+                    child: Column(
+                      children: [
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20.0),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                color: Theme.of(context).cardColor,
+                                child: Column(
+                                  children: [
+                                    _yourExpenses(currentMonth),
+                                    SizedBox(
+                                      height: 20,
+                                    ),
+                                    _billsPaid(currentMonth),
+                                  ],
+                                ),
+                              ),
                             ),
-                            _billsPaid(currentMonth),
+                            Positioned(
+                              top: -20,
+                              left: 0,
+                              right: 0,
+                              child: SvgPicture.asset(
+                                "assets/icons/ic_receipt_up.svg",
+                                width: MediaQuery.of(context).size.width,
+                                color: Theme.of(context).cardColor,
+                                fit: BoxFit.fill,
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                    ],
+                        SvgPicture.asset(
+                          "assets/icons/ic_receipt_down.svg",
+                          width: MediaQuery.of(context).size.width,
+                          color: Theme.of(context).cardColor,
+                          fit: BoxFit.fill,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
