@@ -86,6 +86,10 @@ class SettingsPage extends StatelessWidget {
                                       .read<ConvertCurrencyCubit>()
                                       .changeCurrency(
                                           currency.symbol, currency.code);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              "Curreny updated to ${currency.code}")));
                                 },
                               );
                             },

@@ -124,11 +124,11 @@ List<DateTime> getPrevMonths(int year) {
     return List.empty();
   } else if (year == currentYear) {
     return List<DateTime>.generate(currentMonth, (index) {
-      return DateTime(now.year, index + 1, 0);
+      return DateTime(now.year, (index + 1) + 1, 0);
     }).reversed.toList();
   } else {
     return List<DateTime>.generate(12, (index) {
-      return DateTime(year, index + 1, 0);
+      return DateTime(year, (index + 1) + 1, 0);
     }).reversed.toList();
   }
 }
