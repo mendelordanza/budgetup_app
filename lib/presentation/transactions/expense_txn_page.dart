@@ -206,15 +206,36 @@ class ExpenseTxnPage extends HookWidget {
                             return item2.compareTo(item1);
                           },
                           groupSeparatorBuilder: (value) {
+                            final totalByMonth = expenseCategory.getTotalByDate(
+                                DateFilterType.monthly, value);
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Text(
-                                formatDate(value, "MMMM yyyy"),
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    formatDate(value, "MMMM yyyy"),
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    "----------------",
+                                    style: TextStyle(
+                                      color: Colors.white24,
+                                    ),
+                                  ),
+                                  Text(
+                                    decimalFormatter(totalByMonth),
+                                    style: TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
                             );
                           },

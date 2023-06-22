@@ -13,7 +13,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
 
-import '../../helper/colors.dart';
 import '../../helper/route_strings.dart';
 import '../../helper/string.dart';
 import '../expenses/bloc/single_category_cubit.dart';
@@ -137,6 +136,7 @@ class AddExpenseTxnPage extends HookWidget {
                                         arguments: state.expenseCategory,
                                       );
                                     },
+                                    behavior: HitTestBehavior.translucent,
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
@@ -159,6 +159,9 @@ class AddExpenseTxnPage extends HookWidget {
                                 }
                                 return Text("No category");
                               }),
+                              SizedBox(
+                                height: 10.0,
+                              ),
                               // Padding(
                               //   padding:
                               //       const EdgeInsets.symmetric(vertical: 24.0),
