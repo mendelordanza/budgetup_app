@@ -19,8 +19,6 @@ import 'package:grouped_list/grouped_list.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../helper/date_helper.dart';
-import '../../helper/shared_prefs.dart';
-import '../../injection_container.dart';
 
 class ExpenseTxnPage extends HookWidget {
   final ExpenseCategory expenseCategory;
@@ -197,17 +195,22 @@ class ExpenseTxnPage extends HookWidget {
                           state.expenseTxns.isNotEmpty) {
                         return GroupedListView(
                           elements: state.expenseTxns,
-                          groupBy: (element) =>
-                              "${getMonthFromDate(element.updatedAt!)}",
+                          groupBy: (element) => DateTime(
+                              element.updatedAt!.year,
+                              element.updatedAt!.month),
                           itemComparator: (item1, item2) {
-                            return item2.updatedAt!.compareTo(item1.updatedAt!);
+                            return getMonthFromDate(item1.updatedAt!)
+                                .compareTo(getMonthFromDate(item2.updatedAt!));
+                          },
+                          groupComparator: (item1, item2) {
+                            return item2.compareTo(item1);
                           },
                           groupSeparatorBuilder: (value) {
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 8.0),
                               child: Text(
-                                value,
+                                formatDate(value, "MMMM yyyy"),
                                 style: TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.w600,
