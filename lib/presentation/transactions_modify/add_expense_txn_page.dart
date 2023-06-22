@@ -44,19 +44,27 @@ class AddExpenseTxnPage extends HookWidget {
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
 
+    final focusNode = useFocusNode();
     final notesTextController = useTextEditingController(
         text: args.expenseTxn != null ? args.expenseTxn!.notes : "");
     final amountTextController = useTextEditingController(
         text: args.expenseTxn != null
-            ? decimalFormatter(args.expenseTxn!.amount ?? 0.00)
+            ? decimalFormatterWithSymbol(args.expenseTxn!.amount ?? 0.00)
             : "${sharedPrefs.getCurrencySymbol()} 0.00");
-    final focusNode = useFocusNode();
-
     final dateTextController = useTextEditingController();
-    final currentSelectedDate = useState<DateTime>(
+    final currentTransactionDate = useState<DateTime>(
         args.expenseTxn != null && args.expenseTxn!.updatedAt != null
             ? args.expenseTxn!.updatedAt!
             : DateTime.now());
+
+    // final currentSelectedDate =
+    //     DateTime.parse(sharedPrefs.getExpenseSelectedDate());
+    // final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
+    // final currentProgress = useState(args.expenseCategory.getTotalPercentage(
+    //     dateFilterTypeFromString(currentDateFilterType), currentSelectedDate));
+    // final newProgress = useState(0.0);
+    // final isExceeded = useState(false);
+    // final isMoreThanEighty = useState(false);
 
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -66,17 +74,21 @@ class AddExpenseTxnPage extends HookWidget {
       // amountTextController.addListener(() {
       //   final amountValue =
       //       double.parse(removeFormatting(amountTextController.text));
-      //   currentProgress.value = amountValue;
-      //   print("VL:${amountValue}");
+      //   newProgress.value = amountValue / (args.expenseCategory.budget ?? 0.00);
+      //   isExceeded.value = newProgress.value + currentProgress.value > 1.0;
+      //   isMoreThanEighty.value =
+      //       newProgress.value + currentProgress.value >= 0.8;
+      //
+      //   print("VL:${newProgress.value}");
       // });
       return null;
     }, []);
 
     useEffect(() {
       dateTextController.text =
-          formatDate(currentSelectedDate.value, "MMM dd, yyyy");
+          formatDate(currentTransactionDate.value, "MMM dd, yyyy");
       return null;
-    }, [currentSelectedDate.value]);
+    }, [currentTransactionDate.value]);
 
     return Scaffold(
       appBar: AppBar(
@@ -159,20 +171,6 @@ class AddExpenseTxnPage extends HookWidget {
                                 }
                                 return Text("No category");
                               }),
-                              SizedBox(
-                                height: 10.0,
-                              ),
-                              // Padding(
-                              //   padding:
-                              //       const EdgeInsets.symmetric(vertical: 24.0),
-                              //   child: _budgetProgress(
-                              //       value: currentProgress.value,
-                              //       isExceeded: currentProgress.value >
-                              //           (args.expenseCategory.budget ?? 0.00),
-                              //       isHalf: currentProgress.value >=
-                              //           ((args.expenseCategory.budget ?? 0.0) *
-                              //               0.8)),
-                              // ),
                               TextFormField(
                                 controller: amountTextController,
                                 decoration: InputDecoration(
@@ -201,6 +199,16 @@ class AddExpenseTxnPage extends HookWidget {
                                   return null;
                                 },
                               ),
+                              // Padding(
+                              //   padding:
+                              //       const EdgeInsets.symmetric(vertical: 16.0),
+                              //   child: _budgetProgress(
+                              //     value:
+                              //         newProgress.value + currentProgress.value,
+                              //     isExceeded: isExceeded.value,
+                              //     isHalf: isMoreThanEighty.value,
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
@@ -217,12 +225,12 @@ class AddExpenseTxnPage extends HookWidget {
                             focusNode.unfocus();
                             await showDatePicker(
                               context: context,
-                              initialDate: currentSelectedDate.value,
+                              initialDate: currentTransactionDate.value,
                               firstDate: DateTime(2015, 8),
                               lastDate: DateTime(2101),
                             ).then((date) {
                               if (date != null) {
-                                currentSelectedDate.value = date;
+                                currentTransactionDate.value = date;
                               }
                             });
                           },
@@ -251,7 +259,7 @@ class AddExpenseTxnPage extends HookWidget {
                             amount: amountTextController.text),
                         notes: notesTextController.text,
                         updatedAt:
-                            removeTimeFromDate(currentSelectedDate.value),
+                            removeTimeFromDate(currentTransactionDate.value),
                       );
                       context.read<TransactionsModifyBloc>().add(EditExpenseTxn(
                           expenseCategory: args.expenseCategory,
@@ -263,9 +271,9 @@ class AddExpenseTxnPage extends HookWidget {
                             amount: amountTextController.text),
                         notes: notesTextController.text,
                         createdAt:
-                            removeTimeFromDate(currentSelectedDate.value),
+                            removeTimeFromDate(currentTransactionDate.value),
                         updatedAt:
-                            removeTimeFromDate(currentSelectedDate.value),
+                            removeTimeFromDate(currentTransactionDate.value),
                       );
                       context.read<TransactionsModifyBloc>().add(
                             AddExpenseTxn(
@@ -314,10 +322,10 @@ class AddExpenseTxnPage extends HookWidget {
 //       Expanded(
 //         child: ClipRRect(
 //           borderRadius: BorderRadius.circular(8),
-//           child: Container(
+//           child: SizedBox(
 //             height: 12,
 //             child: LinearProgressIndicator(
-//               value: (value / 100),
+//               value: value,
 //               color: isExceeded
 //                   ? red
 //                   : isHalf

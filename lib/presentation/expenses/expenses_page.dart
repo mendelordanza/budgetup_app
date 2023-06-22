@@ -341,7 +341,7 @@ class ExpensesPage extends HookWidget {
                           builder: (context, state) {
                             if (state is ExpenseDateFilterSelected) {
                               return Text(
-                                decimalFormatter(
+                                decimalFormatterWithSymbol(
                                   item.getTotalByDate(
                                       state.dateFilterType, state.selectedDate),
                                 ),
@@ -352,7 +352,7 @@ class ExpensesPage extends HookWidget {
                               );
                             }
                             return Text(
-                              decimalFormatter(item.getTotalByDate(
+                              decimalFormatterWithSymbol(item.getTotalByDate(
                                   dateFilterTypeFromString(
                                       currentDateFilterType),
                                   currentSelectedDate)),
@@ -375,7 +375,7 @@ class ExpensesPage extends HookWidget {
                         ),
                       ),
                       Text(
-                        decimalFormatter(item.budget ?? 0.00),
+                        decimalFormatterWithSymbol(item.budget ?? 0.00),
                         style: TextStyle(
                           fontSize: 12.0,
                         ),

@@ -429,7 +429,7 @@ class RecurringBillsPage extends HookWidget {
                       ),
                     ),
                     Text(
-                      decimalFormatter(item.amount ?? 0.00),
+                      decimalFormatterWithSymbol(item.amount ?? 0.00),
                       style: TextStyle(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w600,

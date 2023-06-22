@@ -198,7 +198,7 @@ class DashboardPage extends HookWidget {
                                         ),
                                       ),
                                     ),
-                                    Text(decimalFormatter(item.getTotalByDate(
+                                    Text(decimalFormatterWithSymbol(item.getTotalByDate(
                                         DateFilterType.monthly, date))),
                                   ],
                                 ),
@@ -221,7 +221,7 @@ class DashboardPage extends HookWidget {
                                 ),
                               ),
                               Text(
-                                decimalFormatter(state.expensesTotal),
+                                decimalFormatterWithSymbol(state.expensesTotal),
                                 style: TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.w600,
@@ -312,7 +312,7 @@ class DashboardPage extends HookWidget {
                                   ),
                                 ),
                                 Text(
-                                  decimalFormatter(item.amount ?? 0.00),
+                                  decimalFormatterWithSymbol(item.amount ?? 0.00),
                                 ),
                               ],
                             ),
@@ -333,7 +333,7 @@ class DashboardPage extends HookWidget {
                               ),
                             ),
                             Text(
-                              decimalFormatter(state.recurringBillTotal),
+                              decimalFormatterWithSymbol(state.recurringBillTotal),
                               style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.w600,

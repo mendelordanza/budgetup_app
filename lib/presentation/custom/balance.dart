@@ -22,7 +22,7 @@ class Balance extends HookWidget {
             height: 5.0,
           ),
           Text(
-            decimalFormatter(total),
+            decimalFormatterWithSymbol(total),
             style: TextStyle(
               fontSize: 36.0,
               fontWeight: FontWeight.w700,

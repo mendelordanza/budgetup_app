@@ -4,11 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-String decimalFormatter(double number) {
+String decimalFormatterWithSymbol(double number) {
   final sharedPrefs = getIt<SharedPrefs>();
   double roundedNumber = double.parse(number.toStringAsFixed(2));
   final formatter = NumberFormat("#,##0.00");
   return "${sharedPrefs.getCurrencySymbol()} ${formatter.format(roundedNumber)}";
+}
+
+String decimalFormatter(double number) {
+  double roundedNumber = double.parse(number.toStringAsFixed(2));
+  final formatter = NumberFormat("#,##0.00");
+  return "${formatter.format(roundedNumber)}";
 }
 
 removeFormatting(String formattedValue) {

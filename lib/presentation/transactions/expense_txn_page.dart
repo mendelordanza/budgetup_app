@@ -40,11 +40,14 @@ class ExpenseTxnPage extends HookWidget {
           builder: (context, state) {
             if (state is SingleCategoryLoaded) {
               return Text(
-                "${expenseCategory.icon ?? Emoji.objects[49]} ${expenseCategory.title}",
+                "${state.expenseCategory.icon ?? Emoji.objects[49]} ${state.expenseCategory.title}",
                 textAlign: TextAlign.center,
               );
             }
-            return Text("Transaction History");
+            return Text(
+              "${expenseCategory.icon ?? Emoji.objects[49]} ${expenseCategory.title}",
+              textAlign: TextAlign.center,
+            );
           },
         ),
         leading: InkWell(
@@ -127,7 +130,7 @@ class ExpenseTxnPage extends HookWidget {
                 builder: (context, state) {
                   if (state is ExpenseTxnLoaded) {
                     return Text(
-                      decimalFormatter(state.total),
+                      decimalFormatterWithSymbol(state.total),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24.0,
@@ -157,12 +160,12 @@ class ExpenseTxnPage extends HookWidget {
                     builder: (context, state) {
                       if (state is SingleCategoryLoaded) {
                         return Text(
-                          decimalFormatter(
+                          decimalFormatterWithSymbol(
                               state.expenseCategory.budget ?? 0.00),
                         );
                       }
                       return Text(
-                        decimalFormatter(0.00),
+                        decimalFormatterWithSymbol(0.00),
                       );
                     },
                   ),
@@ -229,7 +232,7 @@ class ExpenseTxnPage extends HookWidget {
                                     ),
                                   ),
                                   Text(
-                                    decimalFormatter(totalByMonth),
+                                    decimalFormatterWithSymbol(totalByMonth),
                                     style: TextStyle(
                                       fontSize: 16.0,
                                       fontWeight: FontWeight.w600,
@@ -361,7 +364,7 @@ class ExpenseTxnPage extends HookWidget {
                     ),
                   ),
                   Text(
-                    decimalFormatter(item.amount ?? 0.00),
+                    decimalFormatterWithSymbol(item.amount ?? 0.00),
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       color: Colors.red,
