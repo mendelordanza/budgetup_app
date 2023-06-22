@@ -15,8 +15,10 @@ class CustomTextField extends StatelessWidget {
   final Function()? onTap;
   final int? maxLines;
   final List<TextInputFormatter>? inputFormatters;
+  final bool autofocus;
 
   CustomTextField({
+    this.autofocus = true,
     this.focusNode,
     required this.controller,
     this.label,
@@ -54,7 +56,7 @@ class CustomTextField extends StatelessWidget {
             keyboardType: textInputType,
             textInputAction: textInputAction,
             textCapitalization: TextCapitalization.sentences,
-            autofocus: true,
+            autofocus: autofocus,
             maxLines: maxLines,
             decoration: InputDecoration(
               hintText: hintText,

@@ -132,3 +132,8 @@ List<DateTime> getPrevMonths(int year) {
     }).reversed.toList();
   }
 }
+
+bool isDateInQuarter(DateTime date) {
+  int quarter = ((date.month - 1) / 3).ceil();
+  return quarter == 1 || quarter == 2 || quarter == 3 || quarter == 4;
+}

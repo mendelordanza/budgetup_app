@@ -100,11 +100,18 @@ class SettingsPage extends StatelessWidget {
                               "assets/icons/ic_arrow_right.svg",
                             ),
                           ),
-                          // Divider(),
-                          // SettingItem(
-                          //     icon: "assets/icons/ic_import_export.svg",
-                          //     iconBackgroundColor: Color(0xFFC26900),
-                          //     label: "Import / Export Data"),
+                          Divider(),
+                          SettingItem(
+                            onTap: () {
+
+                            },
+                            icon: "assets/icons/ic_import_export.svg",
+                            iconBackgroundColor: Color(0xFFC26900),
+                            label: "Import / Export Data",
+                            suffix: SvgPicture.asset(
+                              "assets/icons/ic_arrow_right.svg",
+                            ),
+                          ),
                         ],
                       ),
                       SettingsContainer(

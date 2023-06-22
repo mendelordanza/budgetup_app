@@ -5,6 +5,7 @@ import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/custom/balance.dart';
 import 'package:budgetup_app/presentation/custom/date_filter_button.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
+import 'package:budgetup_app/presentation/recurring/recurring_confirmation_dialog.dart';
 import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
 import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
 import 'package:figma_squircle/figma_squircle.dart';
@@ -353,11 +354,11 @@ class RecurringBillsPage extends HookWidget {
           ),
         ),
         color: Theme.of(context).cardColor,
-        child: Row(
-          children: [
-            Container(
-              height: 70.0,
-              child: Checkbox(
+        child: Container(
+          height: 70,
+          child: Row(
+            children: [
+              Checkbox(
                 activeColor: secondaryColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(
@@ -375,71 +376,81 @@ class RecurringBillsPage extends HookWidget {
                           ),
                         );
                   } else {
-                    final newRecurringTxn = RecurringBillTxn(
-                      isPaid: true,
-                      datePaid: removeTimeFromDate(selectedDate),
-                    );
-                    context.read<RecurringModifyBloc>().add(
-                          AddRecurringBillTxn(
-                            selectedDate: selectedDate,
-                            recurringBill: item,
-                            recurringBillTxn: newRecurringTxn,
-                          ),
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return RecurringConfirmationDialog();
+                      },
+                    ).then((datePaid) {
+                      if (datePaid != null) {
+                        final newRecurringTxn = RecurringBillTxn(
+                          isPaid: true,
+                          datePaid: removeTimeFromDate(datePaid),
                         );
+                        context.read<RecurringModifyBloc>().add(
+                              AddRecurringBillTxn(
+                                selectedDate: selectedDate,
+                                recurringBill: item,
+                                recurringBillTxn: newRecurringTxn,
+                              ),
+                            );
+                      }
+                    });
                   }
                 },
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(item.title ?? "hello"),
-                          if (item.isPaid(selectedDate) && txn != null)
-                            Text(
-                              "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",
-                              style: TextStyle(
-                                fontSize: 12.0,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(item.title ?? "hello"),
+                            if (item.isPaid(selectedDate) && txn != null)
+                              Text(
+                                "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",
+                                style: TextStyle(
+                                  fontSize: 12.0,
+                                ),
+                              )
+                            else if (item.reminderDate != null &&
+                                item.interval !=
+                                    RecurringBillInterval.yearly.name)
+                              Text(
+                                "every ${item.reminderDate!.day}${getDayOfMonthSuffix(item.reminderDate!.day)} ${item.interval}",
+                                style: TextStyle(
+                                  fontSize: 12.0,
+                                ),
+                              )
+                            else
+                              Text(
+                                "every ${formatDate(item.reminderDate!, "MMMM")} "
+                                "${item.reminderDate!.day}${getDayOfMonthSuffix(item.reminderDate!.day)} "
+                                "${item.interval}",
+                                style: TextStyle(
+                                  fontSize: 12.0,
+                                ),
                               ),
-                            )
-                          else if (item.reminderDate != null &&
-                              item.interval !=
-                                  RecurringBillInterval.yearly.name)
-                            Text(
-                              "every ${item.reminderDate!.day}${getDayOfMonthSuffix(item.reminderDate!.day)} ${item.interval}",
-                              style: TextStyle(
-                                fontSize: 12.0,
-                              ),
-                            )
-                          else
-                            Text(
-                              "every ${formatDate(item.reminderDate!, "MMMM")} "
-                              "${item.reminderDate!.day}${getDayOfMonthSuffix(item.reminderDate!.day)} "
-                              "${item.interval}",
-                              style: TextStyle(
-                                fontSize: 12.0,
-                              ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    Text(
-                      decimalFormatterWithSymbol(item.amount ?? 0.00),
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
+                      Text(
+                        decimalFormatterWithSymbol(item.amount ?? 0.00),
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
