@@ -88,7 +88,9 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
+      matchDateTimeComponents: interval == RecurringBillInterval.monthly.name
+          ? DateTimeComponents.dayOfMonthAndTime
+          : DateTimeComponents.dateAndTime,
     );
 
     // await flutterLocalNotificationsPlugin.periodicallyShow(
@@ -118,24 +120,24 @@ class NotificationService {
         tz.TZDateTime scheduledDate = tz.TZDateTime.from(
             DateTime(
               now.year,
-              now.month,
+              convertedDate.month,
               convertedDate.day,
               convertedDate.hour,
               convertedDate.minute,
             ),
             location);
         if (scheduledDate.isBefore(now)) {
-          // Check if the month has 30 or 31 days
-          if (has31Days(scheduledDate.month + 1)) {
-            //add 31 days
-            scheduledDate = scheduledDate.add(Duration(days: 31));
-          } else {
-            // If the next month has fewer days, adjust the day to the last day of the month
-            scheduledDate = scheduledDate.add(Duration(
-                days:
-                    getNumberOfDays(scheduledDate.year, scheduledDate.month)));
-          }
+          scheduledDate = tz.TZDateTime.from(
+              DateTime(
+                now.year,
+                now.month + 1,
+                convertedDate.day,
+                convertedDate.hour,
+                convertedDate.minute,
+              ),
+              location);
         }
+        print("SCHED: ${scheduledDate}");
         return scheduledDate;
       case RecurringBillInterval.yearly:
         tz.TZDateTime scheduledDate = tz.TZDateTime.from(
