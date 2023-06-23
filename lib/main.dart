@@ -54,19 +54,19 @@ class _MyAppState extends State<MyApp> {
         ?.requestPermission();
   }
 
-  // ensureScheduledNotifications() async {
-  //   final recurringRepo = getIt<RecurringBillsRepository>();
-  //   final recurringBills = await recurringRepo.getRecurringBills();
-  //   recurringBills.forEach((recurring) {
-  //     notificationService.scheduleNotification(
-  //       int.parse("${recurring.title}${recurring.amount}"),
-  //       "Have you paid your bill yet?",
-  //       "${recurring.title} amounting to ${recurring.amount}",
-  //       recurring.reminderDate!.toIso8601String(),
-  //       recurring.interval ?? RecurringBillInterval.monthly.name,
-  //     );
-  //   });
-  // }
+  ensureScheduledNotifications() async {
+    final recurringRepo = getIt<RecurringBillsRepository>();
+    final recurringBills = await recurringRepo.getRecurringBills();
+    recurringBills.forEach((recurring) {
+      notificationService.scheduleNotification(
+        0,
+        "Have you paid your bill yet?",
+        "${recurring.title} amounting to ${recurring.amount}",
+        recurring.reminderDate!.toIso8601String(),
+        recurring.interval ?? RecurringBillInterval.monthly.name,
+      );
+    });
+  }
 
   @override
   void initState() {

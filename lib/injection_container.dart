@@ -65,6 +65,7 @@ Future<void> setup() async {
   getIt.registerLazySingleton(
     () => RecurringModifyBloc(
       recurringBillsRepo: getIt(),
+      notificationService: getIt(),
     ),
   );
   getIt.registerLazySingleton(
@@ -111,6 +112,5 @@ Future<void> setup() async {
   getIt.registerLazySingleton<IsarService>(() => IsarService());
   getIt.registerLazySingleton<HttpService>(() => HttpService());
 
-  getIt.registerLazySingleton<NotificationService>(
-      () => NotificationService());
+  getIt.registerLazySingleton<NotificationService>(() => NotificationService());
 }

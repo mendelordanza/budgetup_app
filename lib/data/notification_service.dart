@@ -161,6 +161,10 @@ class NotificationService {
         return scheduledDate;
     }
   }
+
+  cancelNotif(int id) async {
+    await flutterLocalNotificationsPlugin.cancel(id);
+  }
 }
 
 // @pragma(

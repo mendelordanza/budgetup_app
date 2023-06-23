@@ -296,19 +296,6 @@ class AddRecurringBillPage extends HookWidget {
                           selectedDate: currentSelectedDate.value,
                           recurringBill: newRecurringBill));
                     }
-
-                    //Schedule Notif
-                    notificationService.scheduleNotification(
-                      0,
-                      "Have you paid your bill yet?",
-                      "${titleTextController.text} amounting to ${amountTextController.text}",
-                      currentSelectedDate.value
-                          .copyWith(
-                              hour: currentSelectedTime.value.hour,
-                              minute: currentSelectedTime.value.minute)
-                          .toIso8601String(),
-                      selectedInterval.value.name,
-                    );
                   }
                 },
                 child: Text(

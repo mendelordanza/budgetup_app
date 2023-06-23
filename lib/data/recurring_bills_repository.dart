@@ -26,11 +26,11 @@ class RecurringBillsRepository {
     }).toList();
   }
 
-  Future<void> saveRecurringBill(
+  Future<int> saveRecurringBill(
     RecurringBill recurringBill,
   ) async {
     final newRecurringBill = recurringBill.toIsarObject();
-    _isarService.saveRecurringBill(newRecurringBill);
+    return await _isarService.saveRecurringBill(newRecurringBill);
   }
 
   Future<void> deleteRecurringBill(int recurringBillId) async {
