@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:budgetup_app/domain/recurring_bill.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/helper/string.dart';
@@ -11,13 +13,14 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../data/notification_service.dart';
 import '../../helper/colors.dart';
 import '../../helper/date_helper.dart';
 import 'bloc/recurring_modify_bloc.dart';
 
 enum RecurringBillInterval {
   monthly,
-  quarterly,
+  //quarterly,
   yearly,
 }
 
@@ -29,12 +32,13 @@ class AddRecurringBillPage extends HookWidget {
 
   final intervals = [
     RecurringBillInterval.monthly,
-    RecurringBillInterval.quarterly,
+    //RecurringBillInterval.quarterly,
     RecurringBillInterval.yearly,
   ];
 
   @override
   Widget build(BuildContext context) {
+    final notificationService = getIt<NotificationService>();
     final sharedPrefs = getIt<SharedPrefs>();
 
     final titleTextController = useTextEditingController(
@@ -51,6 +55,12 @@ class AddRecurringBillPage extends HookWidget {
             ? recurringBill!.reminderDate!
             : DateTime.now());
 
+    final timeTextController = useTextEditingController();
+    final currentSelectedTime = useState<TimeOfDay>(
+        recurringBill != null && recurringBill!.reminderDate != null
+            ? TimeOfDay.fromDateTime(recurringBill!.reminderDate!)
+            : TimeOfDay.now());
+
     final selectedInterval = useState<RecurringBillInterval>(
       recurringBill != null && recurringBill!.interval != null
           ? RecurringBillInterval.values
@@ -62,6 +72,12 @@ class AddRecurringBillPage extends HookWidget {
       dateTextController.text = formatDate(currentSelectedDate.value, "MMMM d");
       return null;
     }, [currentSelectedDate.value]);
+
+    useEffect(() {
+      timeTextController.text =
+          "${currentSelectedTime.value.hour}:${currentSelectedTime.value.minute}";
+      return null;
+    }, [currentSelectedTime.value]);
 
     return Scaffold(
       appBar: AppBar(
@@ -152,33 +168,71 @@ class AddRecurringBillPage extends HookWidget {
                             return null;
                           },
                         ),
-                        CustomTextField(
-                          focusNode: focusNode,
-                          label: "Remind me starting on...",
-                          controller: dateTextController,
-                          prefixIcon: Icon(
-                            Iconsax.notification,
-                            size: 18,
-                          ),
-                          onTap: () async {
-                            focusNode.unfocus();
-                            await showDatePicker(
-                              context: context,
-                              initialDate: currentSelectedDate.value,
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime(2101),
-                            ).then((date) {
-                              if (date != null) {
-                                currentSelectedDate.value = date;
-                              }
-                            });
-                          },
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter some text';
-                            }
-                            return null;
-                          },
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CustomTextField(
+                                focusNode: focusNode,
+                                label: "Remind me starting on...",
+                                controller: dateTextController,
+                                prefixIcon: Icon(
+                                  Iconsax.notification,
+                                  size: 18,
+                                ),
+                                onTap: () async {
+                                  focusNode.unfocus();
+                                  await showDatePicker(
+                                    context: context,
+                                    initialDate: currentSelectedDate.value,
+                                    firstDate: DateTime(2015, 8),
+                                    lastDate: DateTime(2101),
+                                  ).then((date) {
+                                    if (date != null) {
+                                      currentSelectedDate.value = date;
+                                    }
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Expanded(
+                              child: CustomTextField(
+                                focusNode: focusNode,
+                                label: "at...",
+                                controller: timeTextController,
+                                prefixIcon: Icon(
+                                  Iconsax.clock,
+                                  size: 18,
+                                ),
+                                onTap: () async {
+                                  focusNode.unfocus();
+                                  await showTimePicker(
+                                          context: context,
+                                          initialTime:
+                                              currentSelectedTime.value)
+                                      .then((time) {
+                                    if (time != null) {
+                                      currentSelectedTime.value = time;
+                                    }
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter some text';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -218,7 +272,9 @@ class AddRecurringBillPage extends HookWidget {
                         amount: convertRecurringBill(sharedPrefs,
                             amount: amountTextController.text),
                         interval: selectedInterval.value.name,
-                        reminderDate: currentSelectedDate.value,
+                        reminderDate: currentSelectedDate.value.copyWith(
+                            hour: currentSelectedTime.value.hour,
+                            minute: currentSelectedTime.value.minute),
                       );
                       context.read<RecurringModifyBloc>().add(EditRecurringBill(
                           selectedDate: currentSelectedDate.value,
@@ -230,7 +286,9 @@ class AddRecurringBillPage extends HookWidget {
                         amount: convertRecurringBill(sharedPrefs,
                             amount: amountTextController.text),
                         interval: selectedInterval.value.name,
-                        reminderDate: currentSelectedDate.value,
+                        reminderDate: currentSelectedDate.value.copyWith(
+                            hour: currentSelectedTime.value.hour,
+                            minute: currentSelectedTime.value.minute),
                         createdAt: DateTime.now(),
                         updatedAt: DateTime.now(),
                       );
@@ -238,6 +296,19 @@ class AddRecurringBillPage extends HookWidget {
                           selectedDate: currentSelectedDate.value,
                           recurringBill: newRecurringBill));
                     }
+
+                    //Schedule Notif
+                    notificationService.scheduleNotification(
+                      0,
+                      "Have you paid your bill yet?",
+                      "${titleTextController.text} amounting to ${amountTextController.text}",
+                      currentSelectedDate.value
+                          .copyWith(
+                              hour: currentSelectedTime.value.hour,
+                              minute: currentSelectedTime.value.minute)
+                          .toIso8601String(),
+                      selectedInterval.value.name,
+                    );
                   }
                 },
                 child: Text(

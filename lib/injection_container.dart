@@ -2,6 +2,7 @@ import 'package:budgetup_app/data/currency_repository.dart';
 import 'package:budgetup_app/data/expenses_repository.dart';
 import 'package:budgetup_app/data/http_service.dart';
 import 'package:budgetup_app/data/local/isar_service.dart';
+import 'package:budgetup_app/data/notification_service.dart';
 import 'package:budgetup_app/data/recurring_bills_repository.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/presentation/dashboard/bloc/dashboard_cubit.dart';
@@ -16,6 +17,7 @@ import 'package:budgetup_app/presentation/settings/appearance/bloc/appearance_cu
 import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currency_cubit.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
 
 final getIt = GetIt.instance;
@@ -108,4 +110,7 @@ Future<void> setup() async {
   getIt.registerLazySingleton<SharedPrefs>(() => SharedPrefs());
   getIt.registerLazySingleton<IsarService>(() => IsarService());
   getIt.registerLazySingleton<HttpService>(() => HttpService());
+
+  getIt.registerLazySingleton<NotificationService>(
+      () => NotificationService());
 }

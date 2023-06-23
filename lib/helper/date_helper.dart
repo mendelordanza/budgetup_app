@@ -137,3 +137,20 @@ bool isDateInQuarter(DateTime date) {
   int quarter = ((date.month - 1) / 3).ceil();
   return quarter == 1 || quarter == 2 || quarter == 3 || quarter == 4;
 }
+
+bool has31Days(int month) {
+  if (month < 1 || month > 12) {
+    throw Exception('Invalid month');
+  }
+
+  return DateTime(DateTime.now().year, month + 1, 0).day == 31;
+}
+
+int getNumberOfDays(int year, int month) {
+  if (month < 1 || month > 12) {
+    throw Exception('Invalid month');
+  }
+
+  return DateTime(year, month + 1, 0).day;
+}
+

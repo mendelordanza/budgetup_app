@@ -79,6 +79,19 @@ dependencies:
   #Slidable
   flutter_slidable: ^3.0.0
 
+  #WorkManager
+  workmanager: ^0.5.1
+
+  #Local Notifs
+  flutter_local_notifications: ^14.1.1
+
+  #Permissions
+  permission_handler: ^10.3.0
+
+  #Timezone
+  flutter_timezone: ^1.0.6
+  timezone: ^0.9.2
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2

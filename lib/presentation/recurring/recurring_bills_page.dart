@@ -16,6 +16,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:iconsax/iconsax.dart';
 
+import '../../data/notification_service.dart';
 import '../../domain/recurring_bill_txn.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
@@ -36,6 +37,7 @@ class RecurringBillsPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
+    final notificationService = getIt<NotificationService>();
 
     final selectedFilterType = useState<DateFilterType>(
         dateFilterTypeFromString(
@@ -257,7 +259,7 @@ class RecurringBillsPage extends HookWidget {
                               height: 10,
                             ),
                             Text(
-                              "ex. Things you pay monthly, quarterly, or yearly – Internet, Phone Bill, Netflix etc.",
+                              "ex. Things you pay monthly or yearly – Internet, Phone Bill, Netflix etc.",
                               textAlign: TextAlign.center,
                             ),
                           ],
