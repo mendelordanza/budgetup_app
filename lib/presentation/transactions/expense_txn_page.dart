@@ -3,6 +3,7 @@ import 'package:budgetup_app/domain/expense_txn.dart';
 import 'package:budgetup_app/helper/colors.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/helper/string.dart';
+import 'package:budgetup_app/presentation/custom/delete_dialog.dart';
 import 'package:budgetup_app/presentation/expenses/bloc/single_category_cubit.dart';
 import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/add_expense_txn_page.dart';
@@ -14,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -50,17 +50,18 @@ class ExpenseTxnPage extends HookWidget {
             );
           },
         ),
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SvgPicture.asset(
-              "assets/icons/ic_arrow_left.svg",
-            ),
-          ),
-        ),
+        // leading: InkWell(
+        //   onTap: () {
+        //     Navigator.pop(context);
+        //   },
+        //   child: Padding(
+        //     padding: const EdgeInsets.all(16.0),
+        //     child: SvgPicture.asset(
+        //       "assets/icons/ic_arrow_left.svg",
+        //     ),
+        //   ),
+        // ),
+        automaticallyImplyLeading: false,
         elevation: 0,
         backgroundColor: Colors.transparent,
         actions: [
@@ -87,10 +88,25 @@ class ExpenseTxnPage extends HookWidget {
                         Navigator.pushNamed(context, RouteStrings.addCategory,
                             arguments: state.expenseCategory);
                       } else if (value == 1) {
-                        //TODO show alert dialog
-                        context.read<ModifyExpensesBloc>().add(
-                            RemoveExpenseCategory(
-                                expenseCategory: state.expenseCategory));
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return DeleteDialog(
+                              title: "Delete Category",
+                              description:
+                                  "Are you sure you want to delete this category?",
+                              onPositive: () {
+                                context.read<ModifyExpensesBloc>().add(
+                                    RemoveExpenseCategory(
+                                        expenseCategory:
+                                            state.expenseCategory));
+                              },
+                              onNegative: () {
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        );
                       }
                     });
               }
@@ -260,8 +276,25 @@ class ExpenseTxnPage extends HookWidget {
           children: [
             SlidableAction(
               onPressed: (context) {
-                context.read<TransactionsModifyBloc>().add(RemoveExpenseTxn(
-                    expenseCategory: expenseCategory, expenseTxn: item));
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return DeleteDialog(
+                      title: "Delete Transaction",
+                      description:
+                          "Are you sure you want to delete this transaction?",
+                      onPositive: () {
+                        context.read<TransactionsModifyBloc>().add(
+                            RemoveExpenseTxn(
+                                expenseCategory: expenseCategory,
+                                expenseTxn: item));
+                      },
+                      onNegative: () {
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                );
               },
               autoClose: true,
               backgroundColor: red,

@@ -102,9 +102,7 @@ class SettingsPage extends StatelessWidget {
                           ),
                           Divider(),
                           SettingItem(
-                            onTap: () {
-
-                            },
+                            onTap: () {},
                             icon: "assets/icons/ic_import_export.svg",
                             iconBackgroundColor: Color(0xFFC26900),
                             label: "Import / Export Data",

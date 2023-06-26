@@ -72,6 +72,7 @@ class CustomEmojiPicker extends HookWidget {
                           ),
                         )),
                       ),
+                      behavior: HitTestBehavior.translucent,
                     );
                   },
                 );

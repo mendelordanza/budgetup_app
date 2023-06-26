@@ -151,13 +151,16 @@ class AddTransaction extends HookWidget {
                                           children: [
                                             Text(
                                               "${state.expenseCategory.icon} ${state.expenseCategory.title}",
+                                              style: TextStyle(
+                                                fontSize: 16.0,
+                                              ),
                                             ),
                                             SizedBox(
                                               width: 5.0,
                                             ),
                                             Icon(
                                               Iconsax.edit,
-                                              size: 12,
+                                              size: 14,
                                             )
                                           ],
                                         ),
@@ -165,6 +168,9 @@ class AddTransaction extends HookWidget {
                                     }
                                     return Text("No category");
                                   }),
+                                  SizedBox(
+                                    height: 5.0,
+                                  ),
                                   TextFormField(
                                     controller: amountTextController,
                                     decoration: InputDecoration(
@@ -307,6 +313,8 @@ class AddTransaction extends HookWidget {
                     //Clear textfields
                     amountTextController.text =
                         "${sharedPrefs.getCurrencySymbol()} 0.00";
+                    amountTextController.selection = TextSelection.collapsed(
+                        offset: amountTextController.text.length);
                     notesTextController.clear();
                   }
                 },

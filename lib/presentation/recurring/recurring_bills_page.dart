@@ -22,6 +22,7 @@ import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
 import '../custom/date_filter_bottom_sheet.dart';
+import '../custom/delete_dialog.dart';
 import '../recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
 
 class RecurringBillsPage extends HookWidget {
@@ -321,8 +322,24 @@ class RecurringBillsPage extends HookWidget {
         children: [
           SlidableAction(
             onPressed: (context) {
-              context.read<RecurringModifyBloc>().add(RemoveRecurringBill(
-                  selectedDate: selectedDate, recurringBill: item));
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return DeleteDialog(
+                    title: "Delete Recurring Bill",
+                    description:
+                        "Are you sure you want to delete this recurring bill?",
+                    onPositive: () {
+                      context.read<RecurringModifyBloc>().add(
+                          RemoveRecurringBill(
+                              selectedDate: selectedDate, recurringBill: item));
+                    },
+                    onNegative: () {
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              );
             },
             autoClose: true,
             backgroundColor: red,
