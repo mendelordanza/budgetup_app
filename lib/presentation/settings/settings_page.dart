@@ -4,9 +4,11 @@ import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currenc
 import 'package:currency_picker/currency_picker.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -15,6 +17,35 @@ class SettingsPage extends StatelessWidget {
   _launchUrl(String url) async {
     if (!await launchUrl(Uri.parse(url))) {
       throw Exception('Could not launch $url');
+    }
+  }
+
+  showPaywall(BuildContext context) async {
+    try {
+      final offerings = await Purchases.getOfferings();
+      if (context.mounted && offerings.current != null) {
+        await showModalBottomSheet(
+          isDismissible: true,
+          isScrollControlled: true,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+          ),
+          context: context,
+          builder: (BuildContext context) {
+            return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setModalState) {
+              return PaywallView(
+                offering: offerings.current!,
+              );
+            });
+          },
+        );
+      }
+    } on PlatformException {
+      await showDialog(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(title: Text("Error")));
     }
   }
 
@@ -51,11 +82,7 @@ class SettingsPage extends StatelessWidget {
                         settingItems: [
                           SettingItem(
                             onTap: () {
-                              showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) {
-                                    return Paywall();
-                                  });
+                              showPaywall(context);
                             },
                             icon: "assets/icons/ic_app_icon.svg",
                             iconBackgroundColor: Color(0xFF666666),

@@ -30,18 +30,22 @@ class DashboardPage extends HookWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("$currentMonth Summary Report"),
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SvgPicture.asset(
-              "assets/icons/ic_arrow_left.svg",
+        actions: [
+          InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SvgPicture.asset(
+                "assets/icons/ic_arrow_right.svg",
+                height: 20.0,
+              ),
             ),
           ),
-        ),
+        ],
         elevation: 0,
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
       ),
       body: SafeArea(
@@ -198,8 +202,9 @@ class DashboardPage extends HookWidget {
                                         ),
                                       ),
                                     ),
-                                    Text(decimalFormatterWithSymbol(item.getTotalByDate(
-                                        DateFilterType.monthly, date))),
+                                    Text(decimalFormatterWithSymbol(
+                                        item.getTotalByDate(
+                                            DateFilterType.monthly, date))),
                                   ],
                                 ),
                               );
@@ -312,7 +317,8 @@ class DashboardPage extends HookWidget {
                                   ),
                                 ),
                                 Text(
-                                  decimalFormatterWithSymbol(item.amount ?? 0.00),
+                                  decimalFormatterWithSymbol(
+                                      item.amount ?? 0.00),
                                 ),
                               ],
                             ),
@@ -333,7 +339,8 @@ class DashboardPage extends HookWidget {
                               ),
                             ),
                             Text(
-                              decimalFormatterWithSymbol(state.recurringBillTotal),
+                              decimalFormatterWithSymbol(
+                                  state.recurringBillTotal),
                               style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.w600,

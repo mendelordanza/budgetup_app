@@ -37,8 +37,9 @@ class RouteGenerator {
         );
       case RouteStrings.summaryDetail:
         if (args is DateTime) {
-          return _navigate(
-            builder: (_) => DashboardPage(date: args),
+          return CustomPageRoute(
+            page: DashboardPage(date: args),
+            offset: Offset(-1.0, 0.0),
           );
         } else {
           return _errorRoute();

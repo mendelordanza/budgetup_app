@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:io';
 
 import 'package:budgetup_app/data/notification_service.dart';
 import 'package:budgetup_app/data/recurring_bills_repository.dart';
@@ -20,7 +20,9 @@ import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
+import 'helper/constant.dart';
 import 'helper/my_themes.dart';
 import 'helper/route.dart';
 import 'helper/route_strings.dart';
@@ -48,6 +50,18 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final notificationService = getIt<NotificationService>();
 
+  initPlatformState() async {
+    await Purchases.setLogLevel(LogLevel.debug);
+
+    if (Platform.isAndroid) {
+      final configuration = PurchasesConfiguration(googleApiKey);
+      await Purchases.configure(configuration);
+    } else if (Platform.isIOS) {
+      final configuration = PurchasesConfiguration(appleApiKey);
+      await Purchases.configure(configuration);
+    }
+  }
+
   notificationPermission() {
     notificationService.flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
@@ -71,6 +85,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+    initPlatformState();
     notificationPermission();
     notificationService.initNotification();
     //ensureScheduledNotifications();
