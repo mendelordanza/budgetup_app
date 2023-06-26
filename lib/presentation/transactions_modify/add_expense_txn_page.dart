@@ -5,6 +5,7 @@ import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/custom/custom_button.dart';
 import 'package:budgetup_app/presentation/custom/custom_text_field.dart';
+import 'package:budgetup_app/presentation/transactions/expense_txn_page.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,14 +37,43 @@ enum From {
 
 class AddExpenseTxnPage extends HookWidget {
   final ExpenseTxnArgs args;
-  final _formKey = GlobalKey<FormState>();
 
   AddExpenseTxnPage({required this.args, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final sharedPrefs = getIt<SharedPrefs>();
+    final pageController = usePageController();
 
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<SingleCategoryCubit>().getCategory(args.expenseCategory);
+      });
+      return null;
+    }, []);
+
+    if (args.expenseTxn != null) {
+      return AddTransaction(args: args);
+    }
+    return PageView(
+      controller: pageController,
+      scrollDirection: Axis.vertical,
+      children: [
+        AddTransaction(args: args),
+        ExpenseTxnPage(expenseCategory: args.expenseCategory),
+      ],
+    );
+  }
+}
+
+class AddTransaction extends HookWidget {
+  final ExpenseTxnArgs args;
+  final _formKey = GlobalKey<FormState>();
+
+  AddTransaction({required this.args, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final sharedPrefs = getIt<SharedPrefs>();
     final focusNode = useFocusNode();
     final notesTextController = useTextEditingController(
         text: args.expenseTxn != null ? args.expenseTxn!.notes : "");
@@ -56,33 +86,6 @@ class AddExpenseTxnPage extends HookWidget {
         args.expenseTxn != null && args.expenseTxn!.updatedAt != null
             ? args.expenseTxn!.updatedAt!
             : DateTime.now());
-
-    // final currentSelectedDate =
-    //     DateTime.parse(sharedPrefs.getExpenseSelectedDate());
-    // final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
-    // final currentProgress = useState(args.expenseCategory.getTotalPercentage(
-    //     dateFilterTypeFromString(currentDateFilterType), currentSelectedDate));
-    // final newProgress = useState(0.0);
-    // final isExceeded = useState(false);
-    // final isMoreThanEighty = useState(false);
-
-    useEffect(() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<SingleCategoryCubit>().getCategory(args.expenseCategory);
-      });
-
-      // amountTextController.addListener(() {
-      //   final amountValue =
-      //       double.parse(removeFormatting(amountTextController.text));
-      //   newProgress.value = amountValue / (args.expenseCategory.budget ?? 0.00);
-      //   isExceeded.value = newProgress.value + currentProgress.value > 1.0;
-      //   isMoreThanEighty.value =
-      //       newProgress.value + currentProgress.value >= 0.8;
-      //
-      //   print("VL:${newProgress.value}");
-      // });
-      return null;
-    }, []);
 
     useEffect(() {
       dateTextController.text =
@@ -106,17 +109,6 @@ class AddExpenseTxnPage extends HookWidget {
             ),
           ),
         ),
-        actions: args.from == From.expensePage
-            ? [
-                IconButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, RouteStrings.transactions,
-                        arguments: args.expenseCategory);
-                  },
-                  icon: Icon(Iconsax.document_text),
-                )
-              ]
-            : null,
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
@@ -128,124 +120,146 @@ class AddExpenseTxnPage extends HookWidget {
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
-                          child: Column(
-                            children: [
-                              BlocBuilder<SingleCategoryCubit,
-                                      SingleCategoryState>(
-                                  builder: (context, state) {
-                                if (state is SingleCategoryLoaded) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        RouteStrings.addCategory,
-                                        arguments: state.expenseCategory,
+                  child: Column(
+                    children: [
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 16.0),
+                              child: Column(
+                                children: [
+                                  BlocBuilder<SingleCategoryCubit,
+                                          SingleCategoryState>(
+                                      builder: (context, state) {
+                                    if (state is SingleCategoryLoaded) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            RouteStrings.addCategory,
+                                            arguments: state.expenseCategory,
+                                          );
+                                        },
+                                        behavior: HitTestBehavior.translucent,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              "${state.expenseCategory.icon} ${state.expenseCategory.title}",
+                                            ),
+                                            SizedBox(
+                                              width: 5.0,
+                                            ),
+                                            Icon(
+                                              Iconsax.edit,
+                                              size: 12,
+                                            )
+                                          ],
+                                        ),
                                       );
-                                    },
-                                    behavior: HitTestBehavior.translucent,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          "${state.expenseCategory.icon} ${state.expenseCategory.title}",
-                                        ),
-                                        SizedBox(
-                                          width: 5.0,
-                                        ),
-                                        Icon(
-                                          Iconsax.edit,
-                                          size: 12,
-                                        )
-                                      ],
+                                    }
+                                    return Text("No category");
+                                  }),
+                                  TextFormField(
+                                    controller: amountTextController,
+                                    decoration: InputDecoration(
+                                      fillColor: Colors.transparent,
+                                      filled: true,
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.zero,
                                     ),
-                                  );
-                                }
-                                return Text("No category");
-                              }),
-                              TextFormField(
-                                controller: amountTextController,
-                                decoration: InputDecoration(
-                                  fillColor: Colors.transparent,
-                                  filled: true,
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                autofocus: true,
-                                textAlign: TextAlign.center,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  NumberInputFormatter(),
+                                    style: TextStyle(
+                                      fontSize: 24.0,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    autofocus: true,
+                                    textAlign: TextAlign.center,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                      NumberInputFormatter(),
+                                    ],
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Amount is required';
+                                      } else if (removeFormatting(value) ==
+                                          "0.0") {
+                                        return 'Please enter a valid number';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  // Padding(
+                                  //   padding:
+                                  //       const EdgeInsets.symmetric(vertical: 16.0),
+                                  //   child: _budgetProgress(
+                                  //     value:
+                                  //         newProgress.value + currentProgress.value,
+                                  //     isExceeded: isExceeded.value,
+                                  //     isHalf: isMoreThanEighty.value,
+                                  //   ),
+                                  // ),
                                 ],
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Amount is required';
-                                  } else if (removeFormatting(value) == "0.0") {
-                                    return 'Please enter a valid number';
-                                  }
-                                  return null;
-                                },
                               ),
-                              // Padding(
-                              //   padding:
-                              //       const EdgeInsets.symmetric(vertical: 16.0),
-                              //   child: _budgetProgress(
-                              //     value:
-                              //         newProgress.value + currentProgress.value,
-                              //     isExceeded: isExceeded.value,
-                              //     isHalf: isMoreThanEighty.value,
-                              //   ),
-                              // ),
-                            ],
-                          ),
+                            ),
+                            CustomTextField(
+                              focusNode: focusNode,
+                              controller: dateTextController,
+                              textInputType: TextInputType.datetime,
+                              label: "Transaction Date",
+                              prefixIcon: Icon(
+                                Iconsax.calendar,
+                                size: 16,
+                              ),
+                              onTap: () async {
+                                focusNode.unfocus();
+                                await showDatePicker(
+                                  context: context,
+                                  initialDate: currentTransactionDate.value,
+                                  firstDate: DateTime(2015, 8),
+                                  lastDate: DateTime(2101),
+                                ).then((date) {
+                                  if (date != null) {
+                                    currentTransactionDate.value = date;
+                                  }
+                                });
+                              },
+                            ),
+                            CustomTextField(
+                              controller: notesTextController,
+                              label: "Notes (optional)",
+                              maxLines: null,
+                              prefixIcon: Icon(
+                                Iconsax.receipt_edit,
+                                size: 16,
+                              ),
+                            ),
+                          ],
                         ),
-                        CustomTextField(
-                          focusNode: focusNode,
-                          controller: dateTextController,
-                          textInputType: TextInputType.datetime,
-                          label: "Transaction Date",
-                          prefixIcon: Icon(
-                            Iconsax.calendar,
-                            size: 16,
-                          ),
-                          onTap: () async {
-                            focusNode.unfocus();
-                            await showDatePicker(
-                              context: context,
-                              initialDate: currentTransactionDate.value,
-                              firstDate: DateTime(2015, 8),
-                              lastDate: DateTime(2101),
-                            ).then((date) {
-                              if (date != null) {
-                                currentTransactionDate.value = date;
-                              }
-                            });
-                          },
+                      ),
+                      if (args.expenseTxn == null)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              "assets/icons/ic_double_arrow_up.svg",
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            SizedBox(
+                              width: 5.0,
+                            ),
+                            Text(
+                              "Swipe up to view transactions",
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
-                        CustomTextField(
-                          controller: notesTextController,
-                          label: "Notes (optional)",
-                          maxLines: null,
-                          prefixIcon: Icon(
-                            Iconsax.receipt_edit,
-                            size: 16,
-                          ),
-                        ),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
               ),
@@ -281,11 +295,13 @@ class AddExpenseTxnPage extends HookWidget {
                               expenseCategory: args.expenseCategory,
                             ),
                           );
-                      Navigator.pushNamed(
-                        context,
-                        RouteStrings.transactions,
-                        arguments: args.expenseCategory,
-                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Transaction added")));
+                      // Navigator.pushNamed(
+                      //   context,
+                      //   RouteStrings.transactions,
+                      //   arguments: args.expenseCategory,
+                      // );
                     }
 
                     //Clear textfields
@@ -311,40 +327,4 @@ class AddExpenseTxnPage extends HookWidget {
         : double.parse(removeFormatting(amount)) /
             sharedPrefs.getCurrencyRate();
   }
-
-// Widget _budgetProgress({
-//   required double value,
-//   required bool isExceeded,
-//   required bool isHalf,
-// }) {
-//   return Row(
-//     children: [
-//       Expanded(
-//         child: ClipRRect(
-//           borderRadius: BorderRadius.circular(8),
-//           child: SizedBox(
-//             height: 12,
-//             child: LinearProgressIndicator(
-//               value: value,
-//               color: isExceeded
-//                   ? red
-//                   : isHalf
-//                       ? secondaryColor
-//                       : green,
-//             ),
-//           ),
-//         ),
-//       ),
-//       if (isExceeded)
-//         Padding(
-//           padding: const EdgeInsets.only(left: 5.0),
-//           child: SvgPicture.asset(
-//             "assets/icons/ic_warning.svg",
-//             color: red,
-//             height: 16.0,
-//           ),
-//         ),
-//     ],
-//   );
-// }
 }

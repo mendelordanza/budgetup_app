@@ -144,8 +144,7 @@ class IsarService {
         .findAll();
   }
 
-  Future<int> saveRecurringBill(
-      RecurringBillEntity recurringBillEntity) async {
+  Future<int> saveRecurringBill(RecurringBillEntity recurringBillEntity) async {
     final isar = await db;
     return isar.writeTxnSync<int>(
         () => isar.recurringBillEntitys.putSync(recurringBillEntity));

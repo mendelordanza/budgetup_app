@@ -155,18 +155,10 @@ class ExpenseTxnPage extends HookWidget {
                 child: BlocListener<TransactionsModifyBloc,
                     TransactionsModifyState>(
                   listener: (contex, state) {
-                    if (state is ExpenseTxnAdded) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Transaction added")));
-                      Navigator.pop(context);
-                    } else if (state is ExpenseTxnEdited) {
-                      print("STATE: $state");
+                    if (state is ExpenseTxnEdited) {
                       ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("Transaction edited")));
                       Navigator.pop(context);
-                    } else if (state is ExpenseTxnRemoved) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Transaction removed")));
                     }
                   },
                   child: BlocBuilder<ExpenseTxnBloc, ExpenseTxnState>(
