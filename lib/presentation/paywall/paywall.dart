@@ -58,6 +58,36 @@ class PaywallView extends HookWidget {
                     SvgPicture.asset(
                       "assets/icons/ic_icon_pro.svg",
                     ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          featureItem(
+                            icon: Icon(Iconsax.document_text),
+                            title: "Unlimited Lists",
+                            desc:
+                                "unlimited expense categories and recurring bills",
+                          ),
+                          featureItem(
+                            icon: Icon(Iconsax.calendar),
+                            title: "Summary Report",
+                            desc: "summary report every month",
+                          ),
+                          featureItem(
+                            icon: Icon(Iconsax.back_square),
+                            title: "Data Backup - coming soon!",
+                            desc:
+                                "import and export data to continue using on other device",
+                          ),
+                          featureItem(
+                            icon: Icon(Iconsax.home_hashtag),
+                            title: "Home Screen Widget - coming soon!",
+                            desc: "overview of balance in your home screen",
+                          ),
+                        ],
+                      ),
+                    ),
                     ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
@@ -74,33 +104,6 @@ class PaywallView extends HookWidget {
                         );
                       },
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          featureItem(
-                            title: "Unlimited Lists",
-                            desc:
-                                "unlimited expense categories and recurring bills",
-                          ),
-                          featureItem(
-                            title: "Summary Report",
-                            desc: "summary report at the end of every month",
-                          ),
-                          featureItem(
-                            title: "Data Backup - coming soon!",
-                            desc:
-                                "import and export data to continue using on other device",
-                          ),
-                          featureItem(
-                            title: "Home Screen Widget - coming soon!",
-                            desc:
-                                "overview of your total expense in your home screen",
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -112,6 +115,7 @@ class PaywallView extends HookWidget {
                   await Purchases.purchaseStoreProduct(selectedProduct.value!)
                       .then((value) {
                     isLoading.value = false;
+                    Navigator.pop(context);
                   }).onError((error, stackTrace) {
                     isLoading.value = false;
                   });
@@ -119,7 +123,9 @@ class PaywallView extends HookWidget {
                   isLoading.value = false;
                 }
               },
-              color: selectedProduct.value == null ? dark : primaryColor,
+              color: selectedProduct.value == null
+                  ? Colors.grey.shade400
+                  : primaryColor,
               child: isLoading.value
                   ? CircularProgressIndicator(
                       color: Colors.white,
@@ -136,15 +142,16 @@ class PaywallView extends HookWidget {
   }
 
   Widget featureItem({
+    required Widget icon,
     required String title,
     required String desc,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
+      padding: const EdgeInsets.only(bottom: 20.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Iconsax.document_text),
+          icon,
           SizedBox(
             width: 13.0,
           ),
@@ -154,9 +161,9 @@ class PaywallView extends HookWidget {
               children: [
                 Text(
                   title,
-                ),
-                SizedBox(
-                  height: 6.0,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 Text(
                   desc,
@@ -219,7 +226,8 @@ class PaywallView extends HookWidget {
                           Text(
                             item.storeProduct.title,
                             style: TextStyle(
-                              fontWeight: FontWeight.w600,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                           Text(
@@ -234,6 +242,7 @@ class PaywallView extends HookWidget {
                     Text(
                       item.storeProduct.priceString,
                       style: TextStyle(
+                        fontSize: 16.0,
                         fontWeight: FontWeight.w700,
                       ),
                     )

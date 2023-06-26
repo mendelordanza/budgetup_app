@@ -10,19 +10,21 @@ import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_pa
 import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
-import '../../data/notification_service.dart';
 import '../../domain/recurring_bill_txn.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
 import '../custom/date_filter_bottom_sheet.dart';
 import '../custom/delete_dialog.dart';
+import '../paywall/paywall.dart';
 import '../recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
 
 class RecurringBillsPage extends HookWidget {
@@ -34,6 +36,35 @@ class RecurringBillsPage extends HookWidget {
       DateFilterType.monthly,
     ),
   ];
+
+  showPaywall(BuildContext context) async {
+    try {
+      final offerings = await Purchases.getOfferings();
+      if (context.mounted && offerings.current != null) {
+        await showModalBottomSheet(
+          isDismissible: true,
+          isScrollControlled: true,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+          ),
+          context: context,
+          builder: (BuildContext context) {
+            return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setModalState) {
+              return PaywallView(
+                offering: offerings.current!,
+              );
+            });
+          },
+        );
+      }
+    } on PlatformException {
+      await showDialog(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(title: Text("Error")));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -188,29 +219,39 @@ class RecurringBillsPage extends HookWidget {
                 },
               ),
               Divider(),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(
-                            context, RouteStrings.addRecurringBill);
-                      },
-                      child: Row(
-                        children: [
-                          Icon(
-                            Iconsax.add,
-                            size: 20.0,
+              BlocBuilder<RecurringBillBloc, RecurringBillState>(
+                builder: (context, state) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            if (state is RecurringBillsLoaded &&
+                                state.recurringBills.isNotEmpty &&
+                                state.recurringBills.length == 5) {
+                              showPaywall(context);
+                            } else {
+                              Navigator.pushNamed(
+                                  context, RouteStrings.addRecurringBill);
+                            }
+                          },
+                          child: Row(
+                            children: [
+                              Icon(
+                                Iconsax.add,
+                                size: 20.0,
+                              ),
+                              Text("Add Recurring Bill"),
+                            ],
                           ),
-                          Text("Add Recurring Bill"),
-                        ],
-                      ),
-                      behavior: HitTestBehavior.translucent,
+                          behavior: HitTestBehavior.translucent,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
               SizedBox(
                 height: 10.0,

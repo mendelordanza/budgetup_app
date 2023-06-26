@@ -16,6 +16,7 @@ import 'package:iconsax/iconsax.dart';
 import '../../domain/expense_category.dart';
 import '../../helper/string.dart';
 import '../../injection_container.dart';
+import '../custom/delete_dialog.dart';
 
 class AddExpenseCategoryPage extends HookWidget {
   final ExpenseCategory? expenseCategory;
@@ -60,8 +61,24 @@ class AddExpenseCategoryPage extends HookWidget {
             IconButton(
               icon: Icon(Iconsax.trash),
               onPressed: () {
-                context.read<ModifyExpensesBloc>().add(
-                    RemoveExpenseCategory(expenseCategory: expenseCategory!));
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return DeleteDialog(
+                      title: "Delete Category",
+                      description:
+                          "Are you sure you want to delete this category?",
+                      onPositive: () {
+                        context.read<ModifyExpensesBloc>().add(
+                            RemoveExpenseCategory(
+                                expenseCategory: expenseCategory!));
+                      },
+                      onNegative: () {
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                );
               },
             )
         ],

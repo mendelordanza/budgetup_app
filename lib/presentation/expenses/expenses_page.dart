@@ -9,16 +9,19 @@ import 'package:budgetup_app/presentation/transactions_modify/add_expense_txn_pa
 import 'package:emoji_data/emoji_data.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
 import '../custom/balance.dart';
 import '../custom/date_filter_button.dart';
+import '../paywall/paywall.dart';
 import 'bloc/expense_bloc.dart';
 
 class ExpensesPage extends HookWidget {
@@ -38,6 +41,35 @@ class ExpensesPage extends HookWidget {
       DateFilterType.monthly,
     ),
   ];
+
+  showPaywall(BuildContext context) async {
+    try {
+      final offerings = await Purchases.getOfferings();
+      if (context.mounted && offerings.current != null) {
+        await showModalBottomSheet(
+          isDismissible: true,
+          isScrollControlled: true,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+          ),
+          context: context,
+          builder: (BuildContext context) {
+            return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setModalState) {
+              return PaywallView(
+                offering: offerings.current!,
+              );
+            });
+          },
+        );
+      }
+    } on PlatformException {
+      await showDialog(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(title: Text("Error")));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -199,28 +231,39 @@ class ExpensesPage extends HookWidget {
                 },
               ),
               Divider(),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, RouteStrings.addCategory);
-                      },
-                      child: Row(
-                        children: [
-                          Icon(
-                            Iconsax.add,
-                            size: 20.0,
+              BlocBuilder<ExpenseBloc, ExpenseState>(
+                builder: (context, state) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            if (state is ExpenseCategoryLoaded &&
+                                state.expenseCategories.isNotEmpty &&
+                                state.expenseCategories.length == 5) {
+                              showPaywall(context);
+                            } else {
+                              Navigator.pushNamed(
+                                  context, RouteStrings.addCategory);
+                            }
+                          },
+                          child: Row(
+                            children: [
+                              Icon(
+                                Iconsax.add,
+                                size: 20.0,
+                              ),
+                              Text("Add Category"),
+                            ],
                           ),
-                          Text("Add Category"),
-                        ],
-                      ),
-                      behavior: HitTestBehavior.translucent,
+                          behavior: HitTestBehavior.translucent,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
               Expanded(
                   child: BlocListener<ModifyExpensesBloc, ModifyExpensesState>(
