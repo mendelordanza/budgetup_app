@@ -149,29 +149,6 @@ class ExpenseTxnPage extends HookWidget {
                 },
               ),
               SizedBox(
-                height: 16.0,
-              ),
-              Column(
-                children: [
-                  Text(
-                    "Monthly Budget",
-                  ),
-                  BlocBuilder<SingleCategoryCubit, SingleCategoryState>(
-                    builder: (context, state) {
-                      if (state is SingleCategoryLoaded) {
-                        return Text(
-                          decimalFormatterWithSymbol(
-                              state.expenseCategory.budget ?? 0.00),
-                        );
-                      }
-                      return Text(
-                        decimalFormatterWithSymbol(0.00),
-                      );
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(
                 height: 24.0,
               ),
               Expanded(
@@ -209,8 +186,9 @@ class ExpenseTxnPage extends HookWidget {
                             return item2.compareTo(item1);
                           },
                           groupSeparatorBuilder: (value) {
-                            final totalByMonth = expenseCategory.getTotalByDate(
-                                DateFilterType.monthly, value);
+                            final totalByMonth = expenseCategory
+                                .copy(expenseTransactions: state.expenseTxns)
+                                .getTotalByDate(DateFilterType.monthly, value);
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 8.0),

@@ -80,7 +80,7 @@ class TransactionsPage extends HookWidget {
                             width: 5,
                           ),
                           Text(
-                            "Recurring",
+                            "Recurring Bills",
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.white,

@@ -33,7 +33,7 @@ class CustomEmojiPicker extends HookWidget {
                     icon: Text(
                       e.emojiIcons[0],
                       style: TextStyle(
-                        fontSize: 20.0,
+                        fontSize: 30.0,
                       ),
                     ),
                   ),
@@ -68,7 +68,7 @@ class CustomEmojiPicker extends HookWidget {
                             child: Text(
                           e.emojiIcons[index],
                           style: TextStyle(
-                            fontSize: 20.0,
+                            fontSize: 30.0,
                           ),
                         )),
                       ),
@@ -79,9 +79,11 @@ class CustomEmojiPicker extends HookWidget {
             ),
           ),
           if (_selectedEmoji.value.isNotEmpty)
-            CustomButton(onPressed: () {
-              Navigator.pop(context, _selectedEmoji.value);
-            }, child: Text("Select"))
+            CustomButton(
+                onPressed: () {
+                  Navigator.pop(context, _selectedEmoji.value);
+                },
+                child: Text("Select"))
         ],
       ),
     );

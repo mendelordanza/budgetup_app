@@ -4,7 +4,7 @@ import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/domain/recurring_bill.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/presentation/dashboard/dashboard_page.dart';
-import 'package:budgetup_app/presentation/home_page.dart';
+import 'package:budgetup_app/presentation/landing/landing_page.dart';
 import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
 import 'package:budgetup_app/presentation/settings/appearance/appearance_page.dart';
 import 'package:budgetup_app/presentation/settings/settings_page.dart';
@@ -23,15 +23,17 @@ class RouteGenerator {
     switch (settings.name) {
       case RouteStrings.landing:
         return _navigate(
-          builder: (_) => HomePage(),
+          builder: (_) => LandingPage(),
         );
       case RouteStrings.settings:
-        return _navigate(
-          builder: (_) => SettingsPage(),
+        return CustomPageRoute(
+          page: SettingsPage(),
+          offset: Offset(-1.0, 0.0),
         );
       case RouteStrings.summary:
-        return _navigate(
-          builder: (_) => SummaryPage(),
+        return CustomPageRoute(
+          page: SummaryPage(),
+          offset: Offset(1.0, 0.0),
         );
       case RouteStrings.summaryDetail:
         if (args is DateTime) {
@@ -110,4 +112,37 @@ class RouteGenerator {
       ),
     );
   }
+}
+
+class CustomPageRoute extends PageRouteBuilder {
+  final Widget page;
+  final Offset offset;
+
+  CustomPageRoute({
+    required this.page,
+    required this.offset,
+  }) : super(
+          pageBuilder: (BuildContext context, Animation<double> animation,
+              Animation<double> secondaryAnimation) {
+            return page;
+          },
+          transitionsBuilder: (BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child) {
+            return SlideTransition(
+              position: Tween(
+                begin: offset,
+                // Start position of the slide (from left)
+                end: Offset.zero, // End position of the slide (to center)
+              ).animate(
+                CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeInOut, // Replace with your desired curve
+                ),
+              ),
+              child: child,
+            );
+          },
+        );
 }

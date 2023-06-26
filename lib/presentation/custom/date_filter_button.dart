@@ -29,7 +29,7 @@ class DateFilterButton extends StatelessWidget {
                 padding: const EdgeInsets.only(right: 8.0),
                 child: SvgPicture.asset(
                   "assets/icons/ic_calendar.svg",
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               Text(
@@ -37,7 +37,6 @@ class DateFilterButton extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.w500,
-                  color: Theme.of(context).primaryColor,
                 ),
               ),
             ],

@@ -250,19 +250,9 @@ class RecurringBillsPage extends HookWidget {
                     }
                     return Center(
                       child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text("No recurring bills"),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              "ex. Things you pay monthly or yearly – Internet, Phone Bill, Netflix etc.",
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                        child: Text(
+                          "No recurring bills yet\nTap to + to add",
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     );

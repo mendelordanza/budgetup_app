@@ -8,6 +8,7 @@ import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_b
 import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
 import 'package:budgetup_app/presentation/expenses/bloc/single_category_cubit.dart';
 import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
+import 'package:budgetup_app/presentation/landing/bloc/onboarding_cubit.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
@@ -116,6 +117,9 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => getIt<AppearanceCubit>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<OnboardingCubit>(),
           ),
         ],
         child: BlocBuilder<AppearanceCubit, AppearanceState>(
