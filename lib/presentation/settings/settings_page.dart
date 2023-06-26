@@ -6,9 +6,17 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:in_app_review/in_app_review.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
+
+  _launchUrl(String url) async {
+    if (!await launchUrl(Uri.parse(url))) {
+      throw Exception('Could not launch $url');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +68,7 @@ class SettingsPage extends StatelessWidget {
                         ],
                       ),
                       SettingsContainer(
+                        label: "App",
                         settingItems: [
                           SettingItem(
                             onTap: () {
@@ -105,7 +114,17 @@ class SettingsPage extends StatelessWidget {
                             onTap: () {},
                             icon: "assets/icons/ic_import_export.svg",
                             iconBackgroundColor: Color(0xFFC26900),
-                            label: "Import / Export Data",
+                            label: "Import / Export Data - Coming Soon!",
+                            suffix: SvgPicture.asset(
+                              "assets/icons/ic_arrow_right.svg",
+                            ),
+                          ),
+                          Divider(),
+                          SettingItem(
+                            onTap: () {},
+                            icon: "assets/icons/ic_widget.svg",
+                            iconBackgroundColor: Color(0xFF00b2c2),
+                            label: "Home Screen Widget - Coming Soon!",
                             suffix: SvgPicture.asset(
                               "assets/icons/ic_arrow_right.svg",
                             ),
@@ -113,9 +132,16 @@ class SettingsPage extends StatelessWidget {
                         ],
                       ),
                       SettingsContainer(
+                        label: "General",
                         settingItems: [
                           SettingItem(
-                            onTap: () {},
+                            onTap: () async {
+                              final InAppReview inAppReview =
+                                  InAppReview.instance;
+                              if (await inAppReview.isAvailable()) {
+                                inAppReview.requestReview();
+                              }
+                            },
                             icon: "assets/icons/ic_star.svg",
                             iconBackgroundColor: Color(0xFFFFC700),
                             label: "Rate the app",
@@ -135,7 +161,9 @@ class SettingsPage extends StatelessWidget {
                           ),
                           Divider(),
                           SettingItem(
-                            onTap: () {},
+                            onTap: () {
+                              _launchUrl("https://forms.gle/M5qmLiT2FSLXAz8Y7");
+                            },
                             icon: "assets/icons/ic_send.svg",
                             iconBackgroundColor: Color(0xFF0069B6),
                             label: "Send feedback",

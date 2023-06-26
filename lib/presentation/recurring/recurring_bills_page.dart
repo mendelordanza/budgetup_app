@@ -38,7 +38,6 @@ class RecurringBillsPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
-    final notificationService = getIt<NotificationService>();
 
     final selectedFilterType = useState<DateFilterType>(
         dateFilterTypeFromString(
@@ -252,7 +251,7 @@ class RecurringBillsPage extends HookWidget {
                     return Center(
                       child: SingleChildScrollView(
                         child: Text(
-                          "No recurring bills yet\nTap to + to add",
+                          "No recurring bills yet\nTap + to add",
                           textAlign: TextAlign.center,
                         ),
                       ),

@@ -14,17 +14,21 @@ class SummaryPage extends HookWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Summary Reports"),
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SvgPicture.asset(
-              "assets/icons/ic_arrow_left.svg",
+        actions: [
+          InkWell(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SvgPicture.asset(
+                "assets/icons/ic_arrow_right.svg",
+                height: 20.0,
+              ),
             ),
           ),
-        ),
+        ],
+        automaticallyImplyLeading: false,
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),

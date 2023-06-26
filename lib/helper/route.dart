@@ -28,12 +28,12 @@ class RouteGenerator {
       case RouteStrings.settings:
         return CustomPageRoute(
           page: SettingsPage(),
-          offset: Offset(-1.0, 0.0),
+          offset: Offset(1.0, 0.0),
         );
       case RouteStrings.summary:
         return CustomPageRoute(
           page: SummaryPage(),
-          offset: Offset(1.0, 0.0),
+          offset: Offset(-1.0, 0.0),
         );
       case RouteStrings.summaryDetail:
         if (args is DateTime) {

@@ -58,7 +58,10 @@ class AddExpenseTxnPage extends HookWidget {
       controller: pageController,
       scrollDirection: Axis.vertical,
       children: [
-        AddTransaction(args: args),
+        AddTransaction(
+          args: args,
+          pageController: pageController,
+        ),
         ExpenseTxnPage(expenseCategory: args.expenseCategory),
       ],
     );
@@ -67,14 +70,17 @@ class AddExpenseTxnPage extends HookWidget {
 
 class AddTransaction extends HookWidget {
   final ExpenseTxnArgs args;
+  final PageController? pageController;
   final _formKey = GlobalKey<FormState>();
 
-  AddTransaction({required this.args, super.key});
+  AddTransaction({required this.args, this.pageController, super.key});
 
   @override
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
-    final focusNode = useFocusNode();
+    final dateFocusNode = useFocusNode();
+    final amountFocusNode = useFocusNode();
+    final notesFocusNode = useFocusNode();
     final notesTextController = useTextEditingController(
         text: args.expenseTxn != null ? args.expenseTxn!.notes : "");
     final amountTextController = useTextEditingController(
@@ -92,6 +98,16 @@ class AddTransaction extends HookWidget {
           formatDate(currentTransactionDate.value, "MMM dd, yyyy");
       return null;
     }, [currentTransactionDate.value]);
+
+    useEffect(() {
+      pageController?.addListener(() {
+        if (pageController?.page == 1) {
+          amountFocusNode.unfocus();
+          notesFocusNode.unfocus();
+        }
+      });
+      return null;
+    }, []);
 
     return Scaffold(
       appBar: AppBar(
@@ -172,6 +188,7 @@ class AddTransaction extends HookWidget {
                                     height: 5.0,
                                   ),
                                   TextFormField(
+                                    focusNode: amountFocusNode,
                                     controller: amountTextController,
                                     decoration: InputDecoration(
                                       fillColor: Colors.transparent,
@@ -214,7 +231,7 @@ class AddTransaction extends HookWidget {
                               ),
                             ),
                             CustomTextField(
-                              focusNode: focusNode,
+                              focusNode: dateFocusNode,
                               controller: dateTextController,
                               textInputType: TextInputType.datetime,
                               label: "Transaction Date",
@@ -223,7 +240,7 @@ class AddTransaction extends HookWidget {
                                 size: 16,
                               ),
                               onTap: () async {
-                                focusNode.unfocus();
+                                dateFocusNode.unfocus();
                                 await showDatePicker(
                                   context: context,
                                   initialDate: currentTransactionDate.value,
@@ -237,6 +254,7 @@ class AddTransaction extends HookWidget {
                               },
                             ),
                             CustomTextField(
+                              focusNode: notesFocusNode,
                               controller: notesTextController,
                               label: "Notes (optional)",
                               maxLines: null,

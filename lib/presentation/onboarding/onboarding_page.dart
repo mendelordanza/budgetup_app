@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import '../landing/bloc/onboarding_cubit.dart';
 import '../settings/currency/bloc/convert_currency_cubit.dart';
 
@@ -90,7 +89,11 @@ class OnboardingPage extends HookWidget {
             fontWeight: FontWeight.w800,
           ),
         ),
-        SvgPicture.asset("assets/icons/ic_onboarding${index}.svg"),
+        Image.asset(
+          "assets/ic_onboarding$index.png",
+          height: 500.0,
+          fit: BoxFit.fitWidth,
+        ),
         Text(
           caption,
           style: TextStyle(
@@ -150,6 +153,7 @@ class OnboardingPage extends HookWidget {
           )
         ],
       ),
+      behavior: HitTestBehavior.translucent,
     );
   }
 }

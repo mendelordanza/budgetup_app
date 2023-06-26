@@ -253,7 +253,7 @@ class ExpensesPage extends HookWidget {
                     return Center(
                       child: SingleChildScrollView(
                         child: Text(
-                          "No categories yet\nTap to + to add",
+                          "No categories yet\nTap + to add",
                           textAlign: TextAlign.center,
                         ),
                       ),

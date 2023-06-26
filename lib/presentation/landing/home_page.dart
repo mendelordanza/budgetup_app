@@ -1,8 +1,6 @@
 import 'package:budgetup_app/helper/route_strings.dart';
-import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currency_cubit.dart';
 import 'package:budgetup_app/presentation/transactions_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -19,11 +17,6 @@ class HomePage extends HookWidget {
   Widget build(BuildContext context) {
     final _selectedIndex = useState<int>(0);
 
-    useEffect(() {
-      context.read<ConvertCurrencyCubit>().loadCurrencies();
-      return null;
-    });
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -34,10 +27,10 @@ class HomePage extends HookWidget {
         backgroundColor: Colors.transparent,
         leading: IconButton(
           onPressed: () {
-            Navigator.pushNamed(context, RouteStrings.settings);
+            Navigator.pushNamed(context, RouteStrings.summary);
           },
           icon: SvgPicture.asset(
-            "assets/icons/ic_setting.svg",
+            "assets/icons/ic_summary_thin.svg",
             height: 24.0,
             color: Theme.of(context).colorScheme.onSurface,
           ),
@@ -45,10 +38,10 @@ class HomePage extends HookWidget {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.pushNamed(context, RouteStrings.summary);
+              Navigator.pushNamed(context, RouteStrings.settings);
             },
             icon: SvgPicture.asset(
-              "assets/icons/ic_summary_thin.svg",
+              "assets/icons/ic_setting.svg",
               height: 24.0,
               color: Theme.of(context).colorScheme.onSurface,
             ),
