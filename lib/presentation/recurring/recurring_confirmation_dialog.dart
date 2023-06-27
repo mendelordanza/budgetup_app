@@ -42,7 +42,7 @@ class RecurringConfirmationDialog extends HookWidget {
         children: [
           CustomTextField(
             focusNode: focusNode,
-            autofocus: false,
+            readOnly: true,
             controller: dateTextController,
             textInputType: TextInputType.datetime,
             label: "Date Paid",

@@ -148,7 +148,6 @@ class AddRecurringBillPage extends HookWidget {
                                         fontSize: 24.0,
                                         fontWeight: FontWeight.w600,
                                       ),
-                                      autofocus: true,
                                       textAlign: TextAlign.center,
                                       textInputAction: TextInputAction.next,
                                       keyboardType: TextInputType.number,

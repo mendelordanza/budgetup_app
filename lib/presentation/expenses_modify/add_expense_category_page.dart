@@ -149,7 +149,6 @@ class AddExpenseCategoryPage extends HookWidget {
                           label: "Title",
                           hintText: "eg. Transporation",
                           maxLines: 1,
-                          autofocus: true,
                           textInputAction: TextInputAction.next,
                           validator: (value) {
                             if (value == null || value.isEmpty) {

@@ -206,7 +206,6 @@ class AddTransaction extends HookWidget {
                                           border: InputBorder.none,
                                           contentPadding: EdgeInsets.zero,
                                         ),
-                                        autofocus: true,
                                         style: TextStyle(
                                           fontSize: 24.0,
                                           fontWeight: FontWeight.w600,
