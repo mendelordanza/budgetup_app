@@ -1,10 +1,13 @@
 import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../helper/route_strings.dart';
+import '../paywall/paywall.dart';
 
 class SummaryPage extends HookWidget {
   @override
@@ -14,6 +17,7 @@ class SummaryPage extends HookWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Summary Reports"),
+        centerTitle: true,
         actions: [
           InkWell(
             onTap: () {
@@ -83,6 +87,33 @@ class SummaryPage extends HookWidget {
     );
   }
 
+  showPaywall(BuildContext context) async {
+    try {
+      final offerings = await Purchases.getOfferings();
+      if (context.mounted && offerings.current != null) {
+        await showModalBottomSheet(
+          isDismissible: true,
+          isScrollControlled: true,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+          ),
+          context: context,
+          builder: (BuildContext context) {
+            return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setModalState) {
+              return PaywallView(
+                offering: offerings.current!,
+              );
+            });
+          },
+        );
+      }
+    } on PlatformException catch (e) {
+      print(e.message);
+    }
+  }
+
   Widget _summaryItem(
     BuildContext context, {
     required DateTime date,
@@ -91,11 +122,15 @@ class SummaryPage extends HookWidget {
       padding: const EdgeInsets.only(bottom: 12.0),
       child: GestureDetector(
         onTap: () {
-          Navigator.pushNamed(
-            context,
-            RouteStrings.summaryDetail,
-            arguments: date,
-          );
+          if (getMonthFromDate(date) != getMonthFromDate(DateTime.now())) {
+            showPaywall(context);
+          } else {
+            Navigator.pushNamed(
+              context,
+              RouteStrings.summaryDetail,
+              arguments: date,
+            );
+          }
         },
         child: Material(
           shape: SmoothRectangleBorder(

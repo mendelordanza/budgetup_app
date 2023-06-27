@@ -29,6 +29,7 @@ class OnboardingPage extends HookWidget {
             return StatefulBuilder(
                 builder: (BuildContext context, StateSetter setModalState) {
               return PaywallView(
+                isFromOnboarding: true,
                 offering: offerings.current!,
               );
             });

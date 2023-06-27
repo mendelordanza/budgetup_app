@@ -61,6 +61,7 @@ class ExpenseTxnPage extends HookWidget {
         //     ),
         //   ),
         // ),
+        centerTitle: true,
         automaticallyImplyLeading: false,
         elevation: 0,
         backgroundColor: Colors.transparent,

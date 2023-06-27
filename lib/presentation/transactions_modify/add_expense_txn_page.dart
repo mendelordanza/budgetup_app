@@ -114,6 +114,7 @@ class AddTransaction extends HookWidget {
         title: Text(
           args.expenseTxn != null ? "Edit Transaction" : "Add Transaction",
         ),
+        centerTitle: true,
         leading: InkWell(
           onTap: () {
             Navigator.pop(context);

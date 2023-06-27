@@ -18,7 +18,7 @@ class CustomTextField extends StatelessWidget {
   final bool autofocus;
 
   CustomTextField({
-    this.autofocus = true,
+    this.autofocus = false,
     this.focusNode,
     required this.controller,
     this.label,

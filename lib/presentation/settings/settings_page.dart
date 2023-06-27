@@ -58,10 +58,14 @@ class SettingsPage extends StatelessWidget {
       final customerInfo = await Purchases.restorePurchases();
       print(customerInfo.entitlements.active);
       if (customerInfo.entitlements.active["pro"] != null) {
-        print("TRUE!");
+        //TODO set entitlement
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("No previous purchase")));
       }
     } on PlatformException catch (e) {
-      print(e.message);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.message ?? "Error")));
     }
   }
 
@@ -70,6 +74,7 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Settings"),
+        centerTitle: true,
         leading: InkWell(
           onTap: () {
             Navigator.pop(context);

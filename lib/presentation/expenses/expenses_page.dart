@@ -73,11 +73,8 @@ class ExpensesPage extends HookWidget {
 
   getEntitlements() async {
     final customerInfo = await Purchases.getCustomerInfo();
-    if (customerInfo.entitlements.active["pro"] != null) {
-      isSubscribed.value = true;
-    } else {
-      isSubscribed.value = false;
-    }
+    final entitlement = customerInfo.entitlements.active["pro"];
+    isSubscribed.value = entitlement != null;
   }
 
   @override
@@ -100,6 +97,12 @@ class ExpensesPage extends HookWidget {
       context
           .read<ExpenseBloc>()
           .add(LoadExpenseCategories(selectedDate: currentSelectedDate));
+
+      Purchases.addCustomerInfoUpdateListener((customerInfo) {
+        final entitlement = customerInfo.entitlements.active["pro"];
+        isSubscribed.value = entitlement != null;
+      });
+
       return null;
     }, []);
 
@@ -250,10 +253,10 @@ class ExpensesPage extends HookWidget {
                         GestureDetector(
                           onTap: () {
                             getEntitlements();
+
                             if (isSubscribed.value ||
-                                state is ExpenseCategoryLoaded &&
-                                    state.expenseCategories.isNotEmpty &&
-                                    state.expenseCategories.length < 5) {
+                                (state is ExpenseCategoryLoaded &&
+                                    state.expenseCategories.length < 5)) {
                               Navigator.pushNamed(
                                   context, RouteStrings.addCategory);
                             } else {

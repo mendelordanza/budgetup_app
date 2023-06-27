@@ -29,6 +29,7 @@ class ApperancePage extends HookWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Appearance"),
+        centerTitle: true,
         leading: InkWell(
           onTap: () {
             Navigator.pop(context);

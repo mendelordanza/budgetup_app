@@ -8,11 +8,13 @@ import 'package:purchases_flutter/models/package_wrapper.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import '../../helper/colors.dart';
 import '../custom/custom_button.dart';
+import '../custom/platform_progress_indicator.dart';
 
 class PaywallView extends HookWidget {
+  final bool isFromOnboarding;
   final Offering offering;
 
-  PaywallView({required this.offering});
+  PaywallView({this.isFromOnboarding = false, required this.offering});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class PaywallView extends HookWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
           24.0,
-          24.0,
+          16.0,
           24.0,
           0.0,
         ),
@@ -62,6 +64,7 @@ class PaywallView extends HookWidget {
                     ),
                     SvgPicture.asset(
                       "assets/icons/ic_icon_pro.svg",
+                      height: 50.0,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -92,9 +95,12 @@ class PaywallView extends HookWidget {
                               "unlimited expense categories and recurring bills",
                         ),
                         featureItem(
-                          icon: Icon(Iconsax.calendar),
-                          title: "Summary Report",
-                          desc: "summary report every month",
+                          icon: SvgPicture.asset(
+                            "assets/icons/ic_calendar.svg",
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          title: "Previous Summary Reports",
+                          desc: "view previous summary reports",
                         ),
                         featureItem(
                           icon: Icon(Iconsax.back_square),
@@ -113,39 +119,41 @@ class PaywallView extends HookWidget {
                 ),
               ),
             ),
-            CustomButton(
-              onPressed: () async {
-                isLoading.value = true;
-                if (selectedProduct.value != null) {
-                  await Purchases.purchaseStoreProduct(selectedProduct.value!)
-                      .then((value) {
+            Padding(
+              padding: EdgeInsets.only(bottom: isFromOnboarding ? 0.0 : 24.0),
+              child: CustomButton(
+                onPressed: () async {
+                  isLoading.value = true;
+                  if (selectedProduct.value != null) {
+                    await Purchases.purchaseStoreProduct(selectedProduct.value!)
+                        .then((value) {
+                      isLoading.value = false;
+                      Navigator.pop(context);
+                    }).onError((error, stackTrace) {
+                      isLoading.value = false;
+                    });
+                  } else {
                     isLoading.value = false;
-                    Navigator.pop(context);
-                  }).onError((error, stackTrace) {
-                    isLoading.value = false;
-                  });
-                } else {
-                  isLoading.value = false;
-                }
-              },
-              color: selectedProduct.value == null
-                  ? Colors.grey.shade400
-                  : primaryColor,
-              child: isLoading.value
-                  ? CircularProgressIndicator(
-                      color: Colors.white,
-                    )
-                  : Text(
-                      "Buy ${selectedProduct.value?.title.replaceAll(RegExp('\\(.*?\\)'), '') ?? ""}",
-                      textAlign: TextAlign.center,
-                    ),
+                  }
+                },
+                color: selectedProduct.value == null
+                    ? Colors.grey.shade400
+                    : primaryColor,
+                child: isLoading.value
+                    ? PlatformProgressIndicator()
+                    : Text(
+                        "Buy ${selectedProduct.value?.title.replaceAll(RegExp('\\(.*?\\)'), '') ?? ""}",
+                        textAlign: TextAlign.center,
+                      ),
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text("I'll do it later"),
-            )
+            if (isFromOnboarding)
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("I'll do it later"),
+              )
           ],
         ),
       ),

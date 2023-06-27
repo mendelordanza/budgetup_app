@@ -4,7 +4,6 @@ import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/custom/balance.dart';
-import 'package:budgetup_app/presentation/custom/custom_button.dart';
 import 'package:budgetup_app/presentation/dashboard/bloc/dashboard_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,43 +12,14 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:collection/collection.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../helper/colors.dart';
 import '../../helper/shared_prefs.dart';
-import '../paywall/paywall.dart';
 
 class DashboardPage extends HookWidget {
   final DateTime date;
 
   DashboardPage({required this.date, super.key});
-
-  showPaywall(BuildContext context) async {
-    try {
-      final offerings = await Purchases.getOfferings();
-      if (context.mounted && offerings.current != null) {
-        await showModalBottomSheet(
-          isDismissible: true,
-          isScrollControlled: true,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
-          ),
-          context: context,
-          builder: (BuildContext context) {
-            return StatefulBuilder(
-                builder: (BuildContext context, StateSetter setModalState) {
-              return PaywallView(
-                offering: offerings.current!,
-              );
-            });
-          },
-        );
-      }
-    } on PlatformException catch (e) {
-      print(e.message);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +33,7 @@ class DashboardPage extends HookWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("$currentMonth Summary Report"),
+        centerTitle: true,
         actions: [
           InkWell(
             onTap: () {
@@ -81,43 +52,16 @@ class DashboardPage extends HookWidget {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
       ),
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  BlocBuilder<DashboardCubit, DashboardState>(
-                    builder: (context, state) {
-                      if (state is DashboardLoaded) {
-                        return Balance(
-                            headerLabel: Tooltip(
-                              message:
-                                  'Total Spent + Total Paid Recurring Bills for the month of $currentMonth',
-                              textAlign: TextAlign.center,
-                              triggerMode: TooltipTriggerMode.tap,
-                              showDuration: Duration(seconds: 3),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text("Total"),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Icon(
-                                    Iconsax.info_circle,
-                                    size: 16,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            total: state.overallTotal);
-                      }
-                      return Balance(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              BlocBuilder<DashboardCubit, DashboardState>(
+                builder: (context, state) {
+                  if (state is DashboardLoaded) {
+                    return Balance(
                         headerLabel: Tooltip(
                           message:
                               'Total Spent + Total Paid Recurring Bills for the month of $currentMonth',
@@ -126,6 +70,7 @@ class DashboardPage extends HookWidget {
                           showDuration: Duration(seconds: 3),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text("Total"),
                               SizedBox(
@@ -138,93 +83,85 @@ class DashboardPage extends HookWidget {
                             ],
                           ),
                         ),
-                        total: 0.00,
-                      );
-                    },
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24.0),
-                        child: Column(
-                          children: [
-                            Stack(
-                              clipBehavior: Clip.none,
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20.0),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(16.0),
-                                    color: Theme.of(context).cardColor,
-                                    child: Column(
-                                      children: [
-                                        _yourExpenses(currentMonth),
-                                        SizedBox(
-                                          height: 20,
-                                        ),
-                                        _billsPaid(currentMonth),
-                                      ],
+                        total: state.overallTotal);
+                  }
+                  return Balance(
+                    headerLabel: Tooltip(
+                      message:
+                          'Total Spent + Total Paid Recurring Bills for the month of $currentMonth',
+                      textAlign: TextAlign.center,
+                      triggerMode: TooltipTriggerMode.tap,
+                      showDuration: Duration(seconds: 3),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text("Total"),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Icon(
+                            Iconsax.info_circle,
+                            size: 16,
+                          ),
+                        ],
+                      ),
+                    ),
+                    total: 0.00,
+                  );
+                },
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24.0),
+                    child: Column(
+                      children: [
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20.0),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                color: Theme.of(context).cardColor,
+                                child: Column(
+                                  children: [
+                                    _yourExpenses(currentMonth),
+                                    SizedBox(
+                                      height: 20,
                                     ),
-                                  ),
+                                    _billsPaid(currentMonth),
+                                  ],
                                 ),
-                                Positioned(
-                                  top: -20,
-                                  left: 0,
-                                  right: 0,
-                                  child: SvgPicture.asset(
-                                    "assets/icons/ic_receipt_up.svg",
-                                    width: MediaQuery.of(context).size.width,
-                                    color: Theme.of(context).cardColor,
-                                    fit: BoxFit.fill,
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                            SvgPicture.asset(
-                              "assets/icons/ic_receipt_down.svg",
-                              width: MediaQuery.of(context).size.width,
-                              color: Theme.of(context).cardColor,
-                              fit: BoxFit.fill,
+                            Positioned(
+                              top: -20,
+                              left: 0,
+                              right: 0,
+                              child: SvgPicture.asset(
+                                "assets/icons/ic_receipt_up.svg",
+                                width: MediaQuery.of(context).size.width,
+                                color: Theme.of(context).cardColor,
+                                fit: BoxFit.fill,
+                              ),
                             ),
                           ],
                         ),
-                      ),
+                        SvgPicture.asset(
+                          "assets/icons/ic_receipt_down.svg",
+                          width: MediaQuery.of(context).size.width,
+                          color: Theme.of(context).cardColor,
+                          fit: BoxFit.fill,
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-          BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: 7,
-              sigmaY: 7,
-            ),
-            child: Container(),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                "Unlock BudgetUp Pro\nto view summary report",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.w600,
                 ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              CustomButton(
-                onPressed: () {
-                  showPaywall(context);
-                },
-                child: Text("Unlock"),
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

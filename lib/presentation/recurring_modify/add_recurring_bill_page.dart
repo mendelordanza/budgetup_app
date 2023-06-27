@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:budgetup_app/domain/recurring_bill.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
@@ -38,7 +37,6 @@ class AddRecurringBillPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final notificationService = getIt<NotificationService>();
     final sharedPrefs = getIt<SharedPrefs>();
 
     final titleTextController = useTextEditingController(
@@ -84,6 +82,7 @@ class AddRecurringBillPage extends HookWidget {
         title: Text(
           recurringBill != null ? "Edit Recurring Bill" : "Add Recurring Bill",
         ),
+        centerTitle: true,
         leading: InkWell(
           onTap: () {
             Navigator.pop(context);
