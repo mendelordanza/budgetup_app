@@ -19,6 +19,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../domain/recurring_bill_txn.dart';
+import '../../helper/constant.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
@@ -76,16 +77,22 @@ class RecurringBillsPage extends HookWidget {
           ? DateTime.parse(sharedPrefs.getRecurringSelectedDate())
           : DateTime.now(),
     );
-
     final currentSelectedDate =
         DateTime.parse(sharedPrefs.getRecurringSelectedDate());
     final currentDateFilterType =
         sharedPrefs.getRecurringSelectedDateFilterType();
 
+    final isSubscribed = useState(false);
     useEffect(() {
       context
           .read<RecurringBillBloc>()
           .add(LoadRecurringBills(currentSelectedDate));
+
+      Purchases.addCustomerInfoUpdateListener((customerInfo) {
+        final entitlement = customerInfo.entitlements.active[entitlementId];
+        isSubscribed.value = entitlement != null;
+      });
+
       return null;
     }, []);
 
@@ -225,14 +232,22 @@ class RecurringBillsPage extends HookWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         GestureDetector(
-                          onTap: () {
-                            if (state is RecurringBillsLoaded &&
-                                state.recurringBills.isNotEmpty &&
-                                state.recurringBills.length == 5) {
-                              showPaywall(context);
-                            } else {
-                              Navigator.pushNamed(
-                                  context, RouteStrings.addRecurringBill);
+                          onTap: () async {
+                            final customerInfo =
+                                await Purchases.getCustomerInfo();
+                            final hasData = customerInfo
+                                    .entitlements.active[entitlementId] !=
+                                null;
+
+                            if (context.mounted) {
+                              if (hasData ||
+                                  (state is RecurringBillsLoaded &&
+                                      state.recurringBills.length < 5)) {
+                                Navigator.pushNamed(
+                                    context, RouteStrings.addRecurringBill);
+                              } else {
+                                showPaywall(context);
+                              }
                             }
                           },
                           child: Row(

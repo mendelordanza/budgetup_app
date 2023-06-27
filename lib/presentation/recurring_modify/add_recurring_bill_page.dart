@@ -1,4 +1,3 @@
-
 import 'package:budgetup_app/domain/recurring_bill.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/helper/string.dart';
@@ -11,10 +10,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
 
-import '../../data/notification_service.dart';
 import '../../helper/colors.dart';
 import '../../helper/date_helper.dart';
+import '../../helper/keyboard_helper.dart';
 import 'bloc/recurring_modify_bloc.dart';
 
 enum RecurringBillInterval {
@@ -45,7 +45,9 @@ class AddRecurringBillPage extends HookWidget {
         text: recurringBill != null
             ? decimalFormatterWithSymbol(recurringBill!.amount ?? 0.00)
             : "0.00");
-    final focusNode = FocusNode();
+    final amountFocusNode = FocusNode();
+    final dateFocusNode = FocusNode();
+    final timeFocusNode = FocusNode();
 
     final dateTextController = useTextEditingController();
     final currentSelectedDate = useState<DateTime>(
@@ -78,6 +80,7 @@ class AddRecurringBillPage extends HookWidget {
     }, [currentSelectedTime.value]);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
           recurringBill != null ? "Edit Recurring Bill" : "Add Recurring Bill",
@@ -116,147 +119,165 @@ class AddRecurringBillPage extends HookWidget {
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
-                          child: Column(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: Column(
+                              children: [
+                                Text("${sharedPrefs.getCurrencyCode()}"),
+                                SizedBox(
+                                  height: 60.0,
+                                  child: KeyboardActions(
+                                    config:
+                                        buildConfig(amountFocusNode, context),
+                                    child: TextFormField(
+                                      focusNode: amountFocusNode,
+                                      controller: amountTextController,
+                                      decoration: InputDecoration(
+                                        fillColor: Colors.transparent,
+                                        filled: true,
+                                        border: InputBorder.none,
+                                        contentPadding: EdgeInsets.zero,
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 24.0,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      autofocus: true,
+                                      textAlign: TextAlign.center,
+                                      textInputAction: TextInputAction.next,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.digitsOnly,
+                                        NumberInputFormatter(),
+                                      ],
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Amount is required';
+                                        } else if (removeFormatting(value) ==
+                                            "0.0") {
+                                          return 'Please enter a valid number';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          CustomTextField(
+                            label: "Title",
+                            controller: titleTextController,
+                            textInputAction: TextInputAction.done,
+                            hintText: "eg. Internet",
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Title is required';
+                              }
+                              return null;
+                            },
+                          ),
+                          Row(
                             children: [
-                              Text("${sharedPrefs.getCurrencyCode()}"),
-                              TextFormField(
-                                controller: amountTextController,
-                                decoration: InputDecoration(
-                                  fillColor: Colors.transparent,
-                                  filled: true,
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.zero,
+                              Expanded(
+                                child: CustomTextField(
+                                  focusNode: dateFocusNode,
+                                  readOnly: true,
+                                  label: "Remind me starting on...",
+                                  controller: dateTextController,
+                                  prefixIcon: Icon(
+                                    Iconsax.notification,
+                                    size: 18,
+                                  ),
+                                  onTap: () async {
+                                    dateFocusNode.unfocus();
+                                    await showDatePicker(
+                                      context: context,
+                                      initialDate: currentSelectedDate.value,
+                                      firstDate: DateTime(2015, 8),
+                                      lastDate: DateTime(2101),
+                                    ).then((date) {
+                                      if (date != null) {
+                                        currentSelectedDate.value = date;
+                                      }
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter some text';
+                                    }
+                                    return null;
+                                  },
                                 ),
-                                style: TextStyle(
-                                  fontSize: 24.0,
-                                  fontWeight: FontWeight.w600,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                child: CustomTextField(
+                                  focusNode: timeFocusNode,
+                                  readOnly: true,
+                                  label: "at...",
+                                  controller: timeTextController,
+                                  prefixIcon: Icon(
+                                    Iconsax.clock,
+                                    size: 18,
+                                  ),
+                                  onTap: () async {
+                                    timeFocusNode.unfocus();
+                                    await showTimePicker(
+                                            context: context,
+                                            initialTime:
+                                                currentSelectedTime.value)
+                                        .then((time) {
+                                      if (time != null) {
+                                        currentSelectedTime.value = time;
+                                      }
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter some text';
+                                    }
+                                    return null;
+                                  },
                                 ),
-                                autofocus: true,
-                                textAlign: TextAlign.center,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  NumberInputFormatter(),
-                                ],
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Amount is required';
-                                  } else if (removeFormatting(value) == "0.0") {
-                                    return 'Please enter a valid number';
-                                  }
-                                  return null;
-                                },
                               ),
                             ],
                           ),
-                        ),
-                        CustomTextField(
-                          label: "Title",
-                          controller: titleTextController,
-                          hintText: "eg. Internet",
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Title is required';
-                            }
-                            return null;
-                          },
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomTextField(
-                                focusNode: focusNode,
-                                label: "Remind me starting on...",
-                                controller: dateTextController,
-                                prefixIcon: Icon(
-                                  Iconsax.notification,
-                                  size: 18,
-                                ),
-                                onTap: () async {
-                                  focusNode.unfocus();
-                                  await showDatePicker(
-                                    context: context,
-                                    initialDate: currentSelectedDate.value,
-                                    firstDate: DateTime(2015, 8),
-                                    lastDate: DateTime(2101),
-                                  ).then((date) {
-                                    if (date != null) {
-                                      currentSelectedDate.value = date;
-                                    }
-                                  });
-                                },
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter some text';
-                                  }
-                                  return null;
-                                },
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 8.0),
+                                child: Text("Every..."),
                               ),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                              child: CustomTextField(
-                                focusNode: focusNode,
-                                label: "at...",
-                                controller: timeTextController,
-                                prefixIcon: Icon(
-                                  Iconsax.clock,
-                                  size: 18,
-                                ),
-                                onTap: () async {
-                                  focusNode.unfocus();
-                                  await showTimePicker(
-                                          context: context,
-                                          initialTime:
-                                              currentSelectedTime.value)
-                                      .then((time) {
-                                    if (time != null) {
-                                      currentSelectedTime.value = time;
-                                    }
-                                  });
-                                },
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter some text';
-                                  }
-                                  return null;
-                                },
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: intervals.map((element) {
+                                  return _tab(
+                                    context,
+                                    label:
+                                        "${element.name[0].toUpperCase()}${element.name.substring(1)}",
+                                    isSelected:
+                                        selectedInterval.value == element,
+                                    onSelect: () {
+                                      selectedInterval.value = element;
+                                    },
+                                  );
+                                }).toList(),
                               ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const Padding(
-                              padding: EdgeInsets.only(bottom: 8.0),
-                              child: Text("Every..."),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: intervals.map((element) {
-                                return _tab(
-                                  context,
-                                  label:
-                                      "${element.name[0].toUpperCase()}${element.name.substring(1)}",
-                                  isSelected: selectedInterval.value == element,
-                                  onSelect: () {
-                                    selectedInterval.value = element;
-                                  },
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        )
-                      ],
+                            ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),

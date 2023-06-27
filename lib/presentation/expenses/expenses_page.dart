@@ -16,6 +16,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
+import '../../helper/constant.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
@@ -69,14 +70,6 @@ class ExpensesPage extends HookWidget {
     }
   }
 
-  final isSubscribed = useState(false);
-
-  getEntitlements() async {
-    final customerInfo = await Purchases.getCustomerInfo();
-    final entitlement = customerInfo.entitlements.active["pro"];
-    isSubscribed.value = entitlement != null;
-  }
-
   @override
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
@@ -88,21 +81,21 @@ class ExpensesPage extends HookWidget {
           ? DateTime.parse(sharedPrefs.getExpenseSelectedDate())
           : DateTime.now(),
     );
-
     final currentSelectedDate =
         DateTime.parse(sharedPrefs.getExpenseSelectedDate());
     final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
+
+    //Validate if subscribed
+    final isSubscribed = useState(false);
 
     useEffect(() {
       context
           .read<ExpenseBloc>()
           .add(LoadExpenseCategories(selectedDate: currentSelectedDate));
-
       Purchases.addCustomerInfoUpdateListener((customerInfo) {
-        final entitlement = customerInfo.entitlements.active["pro"];
+        final entitlement = customerInfo.entitlements.active[entitlementId];
         isSubscribed.value = entitlement != null;
       });
-
       return null;
     }, []);
 
@@ -251,16 +244,23 @@ class ExpensesPage extends HookWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         GestureDetector(
-                          onTap: () {
-                            getEntitlements();
+                          onTap: () async {
+                            final customerInfo =
+                                await Purchases.getCustomerInfo();
+                            final hasData = customerInfo
+                                    .entitlements.active[entitlementId] !=
+                                null;
 
-                            if (isSubscribed.value ||
-                                (state is ExpenseCategoryLoaded &&
-                                    state.expenseCategories.length < 5)) {
-                              Navigator.pushNamed(
-                                  context, RouteStrings.addCategory);
-                            } else {
-                              showPaywall(context);
+                            if (context.mounted) {
+                              if (hasData ||
+                                  (state is ExpenseCategoryLoaded &&
+                                      state.expenseCategories.length < 5)) {
+                                isSubscribed.value = true;
+                                Navigator.pushNamed(
+                                    context, RouteStrings.addCategory);
+                              } else {
+                                showPaywall(context);
+                              }
                             }
                           },
                           behavior: HitTestBehavior.translucent,

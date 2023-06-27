@@ -12,8 +12,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
 
 import '../../domain/expense_category.dart';
+import '../../helper/keyboard_helper.dart';
 import '../../helper/string.dart';
 import '../../injection_container.dart';
 import '../custom/delete_dialog.dart';
@@ -21,6 +23,7 @@ import '../custom/delete_dialog.dart';
 class AddExpenseCategoryPage extends HookWidget {
   final ExpenseCategory? expenseCategory;
   final _formKey = GlobalKey<FormState>();
+  final FocusNode _numberNode = FocusNode();
 
   AddExpenseCategoryPage({this.expenseCategory, Key? key}) : super(key: key);
 
@@ -40,6 +43,7 @@ class AddExpenseCategoryPage extends HookWidget {
             : Emoji.travelPlaces[0]);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
           expenseCategory != null ? "Edit Category" : "Add Category",
@@ -144,6 +148,9 @@ class AddExpenseCategoryPage extends HookWidget {
                           controller: titleTextController,
                           label: "Title",
                           hintText: "eg. Transporation",
+                          maxLines: 1,
+                          autofocus: true,
+                          textInputAction: TextInputAction.next,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter some text';
@@ -151,24 +158,30 @@ class AddExpenseCategoryPage extends HookWidget {
                             return null;
                           },
                         ),
-                        CustomTextField(
-                          controller: budgetTextController,
-                          label: "Monthly Budget",
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            NumberInputFormatter(),
-                          ],
-                          textInputType: TextInputType.numberWithOptions(
-                            decimal: true,
+                        SizedBox(
+                          height: 100.0,
+                          child: KeyboardActions(
+                            config: buildConfig(_numberNode, context),
+                            child: CustomTextField(
+                              focusNode: _numberNode,
+                              controller: budgetTextController,
+                              label: "Monthly Budget",
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                NumberInputFormatter(),
+                              ],
+                              textInputType: TextInputType.number,
+                              textInputAction: TextInputAction.done,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter some text';
+                                } else if (removeFormatting(value) == "0.0") {
+                                  return 'Please enter a valid number';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter some text';
-                            } else if (removeFormatting(value) == "0.0") {
-                              return 'Please enter a valid number';
-                            }
-                            return null;
-                          },
                         ),
                       ],
                     ),

@@ -6,16 +6,22 @@ import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+import '../../helper/constant.dart';
+
+class SettingsPage extends HookWidget {
+  SettingsPage({super.key});
 
   _launchUrl(String url) async {
-    if (!await launchUrl(Uri.parse(url))) {
+    if (!await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    )) {
       throw Exception('Could not launch $url');
     }
   }
@@ -57,7 +63,7 @@ class SettingsPage extends StatelessWidget {
     try {
       final customerInfo = await Purchases.restorePurchases();
       print(customerInfo.entitlements.active);
-      if (customerInfo.entitlements.active["pro"] != null) {
+      if (customerInfo.entitlements.active[entitlementId] != null) {
         //TODO set entitlement
       } else {
         ScaffoldMessenger.of(context)
@@ -71,6 +77,28 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isSubscribed = useState(false);
+    // final future = useMemoized(() => Purchases.getCustomerInfo());
+    // final customerInfo = useFuture(future, initialData: null);
+    // useEffect(() {
+    //   if (customerInfo.data != null) {
+    //     final entitlement =
+    //         customerInfo.data!.entitlements.active[entitlementId];
+    //     isSubscribed.value = entitlement != null;
+    //   } else {
+    //     isSubscribed.value = false;
+    //   }
+    //   return null;
+    // }, [customerInfo.data]);
+
+    useEffect(() {
+      Purchases.addCustomerInfoUpdateListener((customerInfo) {
+        final entitlement = customerInfo.entitlements.active[entitlementId];
+        isSubscribed.value = entitlement != null;
+      });
+      return null;
+    }, []);
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Settings"),
@@ -103,13 +131,25 @@ class SettingsPage extends StatelessWidget {
                         padding: EdgeInsets.zero,
                         settingItems: [
                           SettingItem(
-                            onTap: () {
-                              showPaywall(context);
+                            onTap: () async {
+                              final customerInfo =
+                                  await Purchases.getCustomerInfo();
+                              if (customerInfo
+                                      .entitlements.active[entitlementId] !=
+                                  null) {
+                                isSubscribed.value = true;
+                              } else if (context.mounted) {
+                                showPaywall(context);
+                              }
                             },
                             icon: "assets/icons/ic_app_icon.svg",
                             iconBackgroundColor: Color(0xFF666666),
-                            label: "Unlock BudgetUp Pro",
-                            subtitle: "Enjoy all features!",
+                            label: isSubscribed.value
+                                ? "You are subscribed to BudegetUp Pro!"
+                                : "Unlock BudgetUp Pro",
+                            subtitle: isSubscribed.value
+                                ? null
+                                : "Enjoy all features!",
                             suffix: SvgPicture.asset(
                               "assets/icons/ic_arrow_right.svg",
                             ),

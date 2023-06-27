@@ -6,6 +6,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
+import '../../helper/constant.dart';
 import '../../helper/route_strings.dart';
 import '../paywall/paywall.dart';
 
@@ -13,6 +14,29 @@ class SummaryPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final _currentYear = useState(DateTime.now().year);
+
+    //Verify if subscribed
+    final isSubscribed = useState(false);
+    // final future = useMemoized(() => Purchases.getCustomerInfo());
+    // final customerInfo = useFuture(future, initialData: null);
+    // useEffect(() {
+    //   if (customerInfo.data != null) {
+    //     final entitlement =
+    //         customerInfo.data!.entitlements.active[entitlementId];
+    //     isSubscribed.value = entitlement != null;
+    //   } else {
+    //     isSubscribed.value = false;
+    //   }
+    //   return null;
+    // }, [customerInfo.data]);
+
+    useEffect(() {
+      Purchases.addCustomerInfoUpdateListener((customerInfo) {
+        final entitlement = customerInfo.entitlements.active[entitlementId];
+        isSubscribed.value = entitlement != null;
+      });
+      return null;
+    }, []);
 
     return Scaffold(
       appBar: AppBar(
@@ -75,6 +99,7 @@ class SummaryPage extends HookWidget {
                     final date = getPrevMonths(_currentYear.value)[index];
                     return _summaryItem(
                       context,
+                      isSubscribed: isSubscribed.value,
                       date: date,
                     );
                   },
@@ -116,20 +141,29 @@ class SummaryPage extends HookWidget {
 
   Widget _summaryItem(
     BuildContext context, {
+    required bool isSubscribed,
     required DateTime date,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: GestureDetector(
-        onTap: () {
-          if (getMonthFromDate(date) != getMonthFromDate(DateTime.now())) {
-            showPaywall(context);
-          } else {
-            Navigator.pushNamed(
-              context,
-              RouteStrings.summaryDetail,
-              arguments: date,
-            );
+        onTap: () async {
+          final customerInfo = await Purchases.getCustomerInfo();
+          final hasData =
+              customerInfo.entitlements.active[entitlementId] != null;
+
+          if (context.mounted) {
+            if (hasData ||
+                (getMonthFromDate(date) == getMonthFromDate(DateTime.now()))) {
+              Navigator.pushNamed(
+                context,
+                RouteStrings.summaryDetail,
+                arguments: date,
+              );
+            } else if (getMonthFromDate(date) !=
+                getMonthFromDate(DateTime.now())) {
+              showPaywall(context);
+            }
           }
         },
         child: Material(

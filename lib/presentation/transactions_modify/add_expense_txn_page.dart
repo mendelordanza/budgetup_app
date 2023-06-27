@@ -1,6 +1,7 @@
 import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/domain/expense_txn.dart';
 import 'package:budgetup_app/helper/date_helper.dart';
+import 'package:budgetup_app/helper/keyboard_helper.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/custom/custom_button.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
 
 import '../../helper/route_strings.dart';
 import '../../helper/string.dart';
@@ -110,6 +112,7 @@ class AddTransaction extends HookWidget {
     }, []);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
           args.expenseTxn != null ? "Edit Transaction" : "Add Transaction",
@@ -138,6 +141,7 @@ class AddTransaction extends HookWidget {
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Form(
                         key: _formKey,
@@ -188,35 +192,44 @@ class AddTransaction extends HookWidget {
                                   SizedBox(
                                     height: 5.0,
                                   ),
-                                  TextFormField(
-                                    focusNode: amountFocusNode,
-                                    controller: amountTextController,
-                                    decoration: InputDecoration(
-                                      fillColor: Colors.transparent,
-                                      filled: true,
-                                      border: InputBorder.none,
-                                      contentPadding: EdgeInsets.zero,
+                                  SizedBox(
+                                    height: 60.0,
+                                    child: KeyboardActions(
+                                      config:
+                                          buildConfig(amountFocusNode, context),
+                                      child: TextFormField(
+                                        focusNode: amountFocusNode,
+                                        controller: amountTextController,
+                                        decoration: InputDecoration(
+                                          fillColor: Colors.transparent,
+                                          filled: true,
+                                          border: InputBorder.none,
+                                          contentPadding: EdgeInsets.zero,
+                                        ),
+                                        autofocus: true,
+                                        style: TextStyle(
+                                          fontSize: 24.0,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                        textInputAction: TextInputAction.next,
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter
+                                              .digitsOnly,
+                                          NumberInputFormatter(),
+                                        ],
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Amount is required';
+                                          } else if (removeFormatting(value) ==
+                                              "0.0") {
+                                            return 'Please enter a valid number';
+                                          }
+                                          return null;
+                                        },
+                                      ),
                                     ),
-                                    style: TextStyle(
-                                      fontSize: 24.0,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    autofocus: true,
-                                    textAlign: TextAlign.center,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly,
-                                      NumberInputFormatter(),
-                                    ],
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Amount is required';
-                                      } else if (removeFormatting(value) ==
-                                          "0.0") {
-                                        return 'Please enter a valid number';
-                                      }
-                                      return null;
-                                    },
                                   ),
                                   // Padding(
                                   //   padding:
@@ -233,6 +246,7 @@ class AddTransaction extends HookWidget {
                             ),
                             CustomTextField(
                               focusNode: dateFocusNode,
+                              readOnly: true,
                               controller: dateTextController,
                               textInputType: TextInputType.datetime,
                               label: "Transaction Date",
@@ -257,6 +271,7 @@ class AddTransaction extends HookWidget {
                             CustomTextField(
                               focusNode: notesFocusNode,
                               controller: notesTextController,
+                              textInputAction: TextInputAction.done,
                               label: "Notes (optional)",
                               maxLines: null,
                               prefixIcon: Icon(

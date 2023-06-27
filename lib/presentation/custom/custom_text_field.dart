@@ -16,9 +16,11 @@ class CustomTextField extends StatelessWidget {
   final int? maxLines;
   final List<TextInputFormatter>? inputFormatters;
   final bool autofocus;
+  final bool readOnly;
 
   CustomTextField({
     this.autofocus = false,
+    this.readOnly = false,
     this.focusNode,
     required this.controller,
     this.label,
@@ -47,6 +49,7 @@ class CustomTextField extends StatelessWidget {
               ),
             ),
           TextFormField(
+            readOnly: readOnly,
             focusNode: focusNode,
             textAlignVertical: TextAlignVertical.center,
             inputFormatters: inputFormatters,
