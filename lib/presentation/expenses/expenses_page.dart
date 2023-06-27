@@ -64,10 +64,19 @@ class ExpensesPage extends HookWidget {
           },
         );
       }
-    } on PlatformException {
-      await showDialog(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(title: Text("Error")));
+    } on PlatformException catch (e) {
+      print(e.message);
+    }
+  }
+
+  final isSubscribed = useState(false);
+
+  getEntitlements() async {
+    final customerInfo = await Purchases.getCustomerInfo();
+    if (customerInfo.entitlements.active["pro"] != null) {
+      isSubscribed.value = true;
+    } else {
+      isSubscribed.value = false;
     }
   }
 
@@ -240,15 +249,18 @@ class ExpensesPage extends HookWidget {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            if (state is ExpenseCategoryLoaded &&
-                                state.expenseCategories.isNotEmpty &&
-                                state.expenseCategories.length == 5) {
-                              showPaywall(context);
-                            } else {
+                            getEntitlements();
+                            if (isSubscribed.value ||
+                                state is ExpenseCategoryLoaded &&
+                                    state.expenseCategories.isNotEmpty &&
+                                    state.expenseCategories.length < 5) {
                               Navigator.pushNamed(
                                   context, RouteStrings.addCategory);
+                            } else {
+                              showPaywall(context);
                             }
                           },
+                          behavior: HitTestBehavior.translucent,
                           child: Row(
                             children: [
                               Icon(
@@ -258,7 +270,6 @@ class ExpensesPage extends HookWidget {
                               Text("Add Category"),
                             ],
                           ),
-                          behavior: HitTestBehavior.translucent,
                         ),
                       ],
                     ),

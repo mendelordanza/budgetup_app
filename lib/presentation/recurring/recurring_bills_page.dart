@@ -59,10 +59,8 @@ class RecurringBillsPage extends HookWidget {
           },
         );
       }
-    } on PlatformException {
-      await showDialog(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(title: Text("Error")));
+    } on PlatformException catch (e) {
+      print(e.message);
     }
   }
 

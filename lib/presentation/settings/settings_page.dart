@@ -20,6 +20,12 @@ class SettingsPage extends StatelessWidget {
     }
   }
 
+  _launchEmail(String email) async {
+    if (!await launchUrl(Uri.parse("mailto:$email"))) {
+      throw Exception('Could not launch mailto:$email');
+    }
+  }
+
   showPaywall(BuildContext context) async {
     try {
       final offerings = await Purchases.getOfferings();
@@ -42,10 +48,20 @@ class SettingsPage extends StatelessWidget {
           },
         );
       }
-    } on PlatformException {
-      await showDialog(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(title: Text("Error")));
+    } on PlatformException catch (e) {
+      print(e.message);
+    }
+  }
+
+  restorePurchase(BuildContext context) async {
+    try {
+      final customerInfo = await Purchases.restorePurchases();
+      print(customerInfo.entitlements.active);
+      if (customerInfo.entitlements.active["pro"] != null) {
+        print("TRUE!");
+      }
+    } on PlatformException catch (e) {
+      print(e.message);
     }
   }
 
@@ -79,6 +95,7 @@ class SettingsPage extends StatelessWidget {
                   child: Column(
                     children: [
                       SettingsContainer(
+                        padding: EdgeInsets.zero,
                         settingItems: [
                           SettingItem(
                             onTap: () {
@@ -86,13 +103,19 @@ class SettingsPage extends StatelessWidget {
                             },
                             icon: "assets/icons/ic_app_icon.svg",
                             iconBackgroundColor: Color(0xFF666666),
-                            label: "Subscribe to BudgetUp Pro",
-                            subtitle: "Unlock all features!",
+                            label: "Unlock BudgetUp Pro",
+                            subtitle: "Enjoy all features!",
                             suffix: SvgPicture.asset(
                               "assets/icons/ic_arrow_right.svg",
                             ),
                           ),
                         ],
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          restorePurchase(context);
+                        },
+                        child: Text("Restore Purchase"),
                       ),
                       SettingsContainer(
                         label: "App",
@@ -198,6 +221,30 @@ class SettingsPage extends StatelessWidget {
                               "assets/icons/ic_arrow_right.svg",
                             ),
                           ),
+                          Divider(),
+                          SettingItem(
+                            onTap: () {
+                              _launchEmail("mendelordanza@gmail.com");
+                            },
+                            icon: "assets/icons/ic_contact.svg",
+                            iconBackgroundColor: Color(0xFFff9cf5),
+                            label: "Contact",
+                            suffix: SvgPicture.asset(
+                              "assets/icons/ic_arrow_right.svg",
+                            ),
+                          ),
+                          Divider(),
+                          SettingItem(
+                            onTap: () {
+                              Navigator.pushNamed(context, RouteStrings.debug);
+                            },
+                            icon: "assets/icons/ic_code.svg",
+                            iconBackgroundColor: Color(0xFF03adfc),
+                            label: "Debug",
+                            suffix: SvgPicture.asset(
+                              "assets/icons/ic_arrow_right.svg",
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -223,18 +270,20 @@ class SettingsPage extends StatelessWidget {
 class SettingsContainer extends StatelessWidget {
   final String? label;
   final List<Widget> settingItems;
+  final EdgeInsetsGeometry padding;
 
   SettingsContainer({
     this.label,
     required this.settingItems,
+    this.padding = const EdgeInsets.only(
+      bottom: 16.0,
+    ),
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-        bottom: 16.0,
-      ),
+      padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

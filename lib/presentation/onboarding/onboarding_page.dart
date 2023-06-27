@@ -1,14 +1,48 @@
 import 'package:budgetup_app/presentation/custom/custom_button.dart';
 import 'package:currency_picker/currency_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import '../landing/bloc/onboarding_cubit.dart';
+import '../paywall/paywall.dart';
 import '../settings/currency/bloc/convert_currency_cubit.dart';
 
 class OnboardingPage extends HookWidget {
   OnboardingPage({super.key});
+
+  showPaywall(BuildContext context) async {
+    try {
+      final offerings = await Purchases.getOfferings();
+      if (context.mounted && offerings.current != null) {
+        await showModalBottomSheet(
+          isDismissible: true,
+          isScrollControlled: true,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+          ),
+          context: context,
+          builder: (BuildContext context) {
+            return StatefulBuilder(
+                builder: (BuildContext context, StateSetter setModalState) {
+              return PaywallView(
+                offering: offerings.current!,
+              );
+            });
+          },
+        ).then((value) {
+          context.read<OnboardingCubit>().finishOnboarding();
+        }).onError((error, stackTrace) {
+          context.read<OnboardingCubit>().finishOnboarding();
+        });
+      }
+    } on PlatformException catch (e) {
+      print(e.message);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +90,7 @@ class OnboardingPage extends HookWidget {
               CustomButton(
                 onPressed: () {
                   if (currentIndex.value == pages.length - 1) {
-                    context.read<OnboardingCubit>().finishOnboarding();
+                    showPaywall(context);
                   } else {
                     pageController.nextPage(
                         duration: Duration(milliseconds: 300),
@@ -119,6 +153,7 @@ class OnboardingPage extends HookWidget {
           },
         );
       },
+      behavior: HitTestBehavior.translucent,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -153,7 +188,6 @@ class OnboardingPage extends HookWidget {
           )
         ],
       ),
-      behavior: HitTestBehavior.translucent,
     );
   }
 }

@@ -22,7 +22,12 @@ class PaywallView extends HookWidget {
     return Container(
       height: MediaQuery.of(context).size.height * 0.95,
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.fromLTRB(
+          24.0,
+          24.0,
+          24.0,
+          0.0,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -59,50 +64,50 @@ class PaywallView extends HookWidget {
                       "assets/icons/ic_icon_pro.svg",
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          featureItem(
-                            icon: Icon(Iconsax.document_text),
-                            title: "Unlimited Lists",
-                            desc:
-                                "unlimited expense categories and recurring bills",
-                          ),
-                          featureItem(
-                            icon: Icon(Iconsax.calendar),
-                            title: "Summary Report",
-                            desc: "summary report every month",
-                          ),
-                          featureItem(
-                            icon: Icon(Iconsax.back_square),
-                            title: "Data Backup - coming soon!",
-                            desc:
-                                "import and export data to continue using on other device",
-                          ),
-                          featureItem(
-                            icon: Icon(Iconsax.home_hashtag),
-                            title: "Home Screen Widget - coming soon!",
-                            desc: "overview of balance in your home screen",
-                          ),
-                        ],
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: offering.availablePackages.length,
+                        itemBuilder: (context, index) {
+                          final item = offering.availablePackages[index];
+                          return priceItem(
+                            item: item,
+                            isSelected: item.storeProduct.identifier ==
+                                selectedProduct.value?.identifier,
+                            onTap: () {
+                              selectedProduct.value = item.storeProduct;
+                            },
+                          );
+                        },
                       ),
                     ),
-                    ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: offering.availablePackages.length,
-                      itemBuilder: (context, index) {
-                        final item = offering.availablePackages[index];
-                        return priceItem(
-                          item: item,
-                          isSelected: item.storeProduct.identifier ==
-                              selectedProduct.value?.identifier,
-                          onTap: () {
-                            selectedProduct.value = item.storeProduct;
-                          },
-                        );
-                      },
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        featureItem(
+                          icon: Icon(Iconsax.document_text),
+                          title: "Unlimited Lists",
+                          desc:
+                              "unlimited expense categories and recurring bills",
+                        ),
+                        featureItem(
+                          icon: Icon(Iconsax.calendar),
+                          title: "Summary Report",
+                          desc: "summary report every month",
+                        ),
+                        featureItem(
+                          icon: Icon(Iconsax.back_square),
+                          title: "Data Backup - coming soon!",
+                          desc:
+                              "import and export data to continue using on other device",
+                        ),
+                        featureItem(
+                          icon: Icon(Iconsax.home_hashtag),
+                          title: "Home Screen Widget - coming soon!",
+                          desc: "overview of balance in your home screen",
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -131,10 +136,16 @@ class PaywallView extends HookWidget {
                       color: Colors.white,
                     )
                   : Text(
-                      "Buy ${selectedProduct.value?.title ?? ""}",
+                      "Buy ${selectedProduct.value?.title.replaceAll(RegExp('\\(.*?\\)'), '') ?? ""}",
                       textAlign: TextAlign.center,
                     ),
             ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("I'll do it later"),
+            )
           ],
         ),
       ),
@@ -224,7 +235,8 @@ class PaywallView extends HookWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            item.storeProduct.title,
+                            item.storeProduct.title
+                                .replaceAll(RegExp('\\(.*?\\)'), ''),
                             style: TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.w700,

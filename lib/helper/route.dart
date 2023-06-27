@@ -7,8 +7,9 @@ import 'package:budgetup_app/presentation/dashboard/dashboard_page.dart';
 import 'package:budgetup_app/presentation/landing/landing_page.dart';
 import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
 import 'package:budgetup_app/presentation/settings/appearance/appearance_page.dart';
+import 'package:budgetup_app/presentation/settings/debug/debug_page.dart';
 import 'package:budgetup_app/presentation/settings/settings_page.dart';
-import 'package:budgetup_app/presentation/settings/summary/summary_page.dart';
+import 'package:budgetup_app/presentation/summary/summary_page.dart';
 import 'package:budgetup_app/presentation/transactions_modify/add_expense_txn_page.dart';
 import 'package:budgetup_app/presentation/transactions/expense_txn_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -88,6 +89,10 @@ class RouteGenerator {
         } else {
           return _errorRoute();
         }
+      case RouteStrings.debug:
+        return _navigate(
+          builder: (_) => DebugPage(),
+        );
       default:
         return _errorRoute();
     }
