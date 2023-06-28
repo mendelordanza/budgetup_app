@@ -1,5 +1,6 @@
 import 'package:figma_squircle/figma_squircle.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
@@ -7,6 +8,7 @@ import 'package:purchases_flutter/models/offering_wrapper.dart';
 import 'package:purchases_flutter/models/package_wrapper.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import '../../helper/colors.dart';
+import '../../helper/constant.dart';
 import '../custom/custom_button.dart';
 import '../custom/platform_progress_indicator.dart';
 
@@ -15,6 +17,22 @@ class PaywallView extends HookWidget {
   final Offering offering;
 
   PaywallView({this.isFromOnboarding = false, required this.offering});
+
+  restorePurchase(BuildContext context) async {
+    try {
+      final customerInfo = await Purchases.restorePurchases();
+      print(customerInfo.entitlements.active);
+      if (customerInfo.entitlements.active[entitlementId] != null) {
+        //TODO set entitlement
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("No previous purchase")));
+      }
+    } on PlatformException catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.message ?? "Error")));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,56 +82,71 @@ class PaywallView extends HookWidget {
                     ),
                     SvgPicture.asset(
                       "assets/icons/ic_icon_pro.svg",
-                      height: 50.0,
+                      height: 80.0,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: offering.availablePackages.length,
-                        itemBuilder: (context, index) {
-                          final item = offering.availablePackages[index];
-                          return priceItem(
-                            item: item,
-                            isSelected: item.storeProduct.identifier ==
-                                selectedProduct.value?.identifier,
+                      child: Column(
+                        children: [
+                          Column(
+                            children: offering.availablePackages.map((item) {
+                              return priceItem(
+                                item: item,
+                                isSelected: item.storeProduct.identifier ==
+                                    selectedProduct.value?.identifier,
+                                onTap: () {
+                                  selectedProduct.value = item.storeProduct;
+                                },
+                              );
+                            }).toList(),
+                          ),
+                          GestureDetector(
                             onTap: () {
-                              selectedProduct.value = item.storeProduct;
+                              restorePurchase(context);
                             },
-                          );
-                        },
+                            child: Text(
+                              "Already Subscribed? Restore Purchase",
+                              style: TextStyle(
+                                fontSize: 12.0,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        featureItem(
-                          icon: Icon(Iconsax.document_text),
-                          title: "Unlimited Lists",
-                          desc:
-                              "unlimited expense categories and recurring bills",
-                        ),
-                        featureItem(
-                          icon: SvgPicture.asset(
-                            "assets/icons/ic_calendar.svg",
-                            color: Theme.of(context).colorScheme.onSurface,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          featureItem(
+                            icon: Icon(Iconsax.document_text),
+                            title: "Unlimited Lists",
+                            desc:
+                                "unlimited expense categories and recurring bills",
                           ),
-                          title: "Previous Summary Reports",
-                          desc: "view previous summary reports",
-                        ),
-                        featureItem(
-                          icon: Icon(Iconsax.back_square),
-                          title: "Data Backup - coming soon!",
-                          desc:
-                              "import and export data to continue using on other device",
-                        ),
-                        featureItem(
-                          icon: Icon(Iconsax.home_hashtag),
-                          title: "Home Screen Widget - coming soon!",
-                          desc: "overview of balance in your home screen",
-                        ),
-                      ],
+                          featureItem(
+                            icon: SvgPicture.asset(
+                              "assets/icons/ic_calendar.svg",
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            title: "Previous Summary Reports",
+                            desc: "view previous summary reports",
+                          ),
+                          featureItem(
+                            icon: Icon(Iconsax.back_square),
+                            title: "Data Backup - coming soon!",
+                            desc:
+                                "import and export data to continue using on other device",
+                          ),
+                          featureItem(
+                            icon: Icon(Iconsax.home_hashtag),
+                            title: "Home Screen Widget - coming soon!",
+                            desc: "overview of balance in your home screen",
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

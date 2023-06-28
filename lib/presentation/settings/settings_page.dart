@@ -59,22 +59,6 @@ class SettingsPage extends HookWidget {
     }
   }
 
-  restorePurchase(BuildContext context) async {
-    try {
-      final customerInfo = await Purchases.restorePurchases();
-      print(customerInfo.entitlements.active);
-      if (customerInfo.entitlements.active[entitlementId] != null) {
-        //TODO set entitlement
-      } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("No previous purchase")));
-      }
-    } on PlatformException catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message ?? "Error")));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isSubscribed = useState(false);
@@ -155,12 +139,6 @@ class SettingsPage extends HookWidget {
                             ),
                           ),
                         ],
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          restorePurchase(context);
-                        },
-                        child: Text("Restore Purchase"),
                       ),
                       SettingsContainer(
                         label: "App",
