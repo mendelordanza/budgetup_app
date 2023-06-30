@@ -112,9 +112,6 @@ class ExpensesPage extends HookWidget {
     final isSubscribed = useState(false);
 
     useEffect(() {
-      _setWidget();
-      _updateWidget();
-
       context
           .read<ExpenseBloc>()
           .add(LoadExpenseCategories(selectedDate: currentSelectedDate));

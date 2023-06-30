@@ -20,10 +20,6 @@ import workmanager
           GeneratedPluginRegistrant.register(with: registry)
         }
       
-      WorkmanagerPlugin.setPluginRegistrantCallback { registry in
-          GeneratedPluginRegistrant.register(with: registry)
-      }
-      
       UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(60*15))
       
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)

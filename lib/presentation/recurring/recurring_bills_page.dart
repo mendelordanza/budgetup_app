@@ -107,8 +107,6 @@ class RecurringBillsPage extends HookWidget {
 
     final isSubscribed = useState(false);
     useEffect(() {
-      _setWidget();
-      _updateWidget();
       context
           .read<RecurringBillBloc>()
           .add(LoadRecurringBills(currentSelectedDate));

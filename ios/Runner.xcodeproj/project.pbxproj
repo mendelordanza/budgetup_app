@@ -10,6 +10,7 @@
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		4F188F432A4EC168008A8E6E /* BillsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F188F412A4EB552008A8E6E /* BillsWidget.swift */; };
+		4F97C52A2A4F28E60043C563 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F97C5292A4F28E60043C563 /* StoreKit.framework */; };
 		4FB69DC22A4E748500CC7756 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F4F439E2A4C1992001829A4 /* WidgetKit.framework */; };
 		4FB69DC32A4E748500CC7756 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F4F43A02A4C1992001829A4 /* SwiftUI.framework */; };
 		4FB69DC62A4E748500CC7756 /* BudgetUpWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB69DC52A4E748500CC7756 /* BudgetUpWidgetBundle.swift */; };
@@ -68,6 +69,7 @@
 		4F188F412A4EB552008A8E6E /* BillsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillsWidget.swift; sourceTree = "<group>"; };
 		4F4F439E2A4C1992001829A4 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		4F4F43A02A4C1992001829A4 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		4F97C5292A4F28E60043C563 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4FB69DC12A4E748500CC7756 /* BudgetUpWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BudgetUpWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FB69DC52A4E748500CC7756 /* BudgetUpWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetUpWidgetBundle.swift; sourceTree = "<group>"; };
 		4FB69DC72A4E748500CC7756 /* BudgetUpWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetUpWidget.swift; sourceTree = "<group>"; };
@@ -105,6 +107,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9F211ED284CC71D6C4E6B2FB /* Pods_Runner.framework in Frameworks */,
+				4F97C52A2A4F28E60043C563 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,6 +147,7 @@
 		864BEA5FB339BDA8DB5567C5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4F97C5292A4F28E60043C563 /* StoreKit.framework */,
 				72D18EE7995720E5723DCA1A /* Pods_Runner.framework */,
 				4F4F439E2A4C1992001829A4 /* WidgetKit.framework */,
 				4F4F43A02A4C1992001829A4 /* SwiftUI.framework */,

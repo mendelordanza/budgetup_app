@@ -52,7 +52,6 @@ class _MyAppState extends State<MyApp> {
 
   initPlatformState() async {
     await Purchases.setLogLevel(LogLevel.debug);
-
     if (Platform.isAndroid) {
       final configuration = PurchasesConfiguration(googleApiKey);
       await Purchases.configure(configuration);
@@ -85,9 +84,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    initPlatformState();
-    notificationPermission();
-    notificationService.initNotification();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      initPlatformState();
+      notificationPermission();
+      notificationService.initNotification();
+    });
     //ensureScheduledNotifications();
     super.initState();
   }
