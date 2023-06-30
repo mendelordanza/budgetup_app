@@ -780,10 +780,10 @@ packages:
     dependency: "direct main"
     description:
       name: purchases_flutter
-      sha256: "51432bbf61d012cd9b855f4181d49a87b151e1b27952e3fd2dd7c5885ed34842"
+      sha256: c7e94b04babd44f28be96be205ec5f75ec3ec11b7ce7c2e5252ef6b47e42115a
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.0"
+    version: "5.2.3"
   share_plus:
     dependency: "direct main"
     description:

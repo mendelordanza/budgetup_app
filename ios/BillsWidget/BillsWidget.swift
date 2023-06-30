@@ -103,6 +103,7 @@ struct BillsWidget: Widget {
         }
         .configurationDisplayName("Upcoming Bills")
         .description("View 2 of your upcoming bills")
+        .supportedFamilies([.systemSmall])
     }
 }
 

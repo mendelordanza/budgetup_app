@@ -79,15 +79,7 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
           .sort((a, b) => a.reminderDate!.compareTo(b.reminderDate!));
 
       //GET UPCOMING BILLS
-      final upcomingBills = convertedRecurringBills
-          .where((element) {
-            return element.reminderDate!.isAfter(DateTime.now());
-          })
-          .toList()
-          .take(3);
-      final jsonData = upcomingBills.map((e) => e.toJson()).toList();
-      final encodedJson = jsonEncode(jsonData);
-      _setupWidget(upcomingBills: encodedJson);
+      _setupWidget(recurringBills: convertedRecurringBills);
 
       emit(RecurringBillsLoaded(
         total: getPaidRecurringBillTotal(convertedPaidRecurringBills),
@@ -120,15 +112,7 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
             .sort((a, b) => a.reminderDate!.compareTo(b.reminderDate!));
 
         //GET UPCOMING BILLS
-        final upcomingBills = convertedRecurringBills
-            .where((element) {
-              return element.reminderDate!.isAfter(DateTime.now());
-            })
-            .take(3)
-            .toList();
-        final jsonData = upcomingBills.map((e) => e.toJson()).toList();
-        final encodedJson = jsonEncode(jsonData);
-        _setupWidget(upcomingBills: encodedJson);
+        _setupWidget(recurringBills: convertedRecurringBills);
 
         emit(RecurringBillsLoaded(
           total: getPaidRecurringBillTotal(convertedPaidRecurringBills),
@@ -154,9 +138,18 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
   }
 
   _setupWidget({
-    required String upcomingBills,
+    required List<RecurringBill> recurringBills,
   }) async {
     try {
+      final data = recurringBills
+          .where((element) {
+            return element.reminderDate!.isAfter(DateTime.now());
+          })
+          .toList()
+          .take(2);
+      final jsonData = data.map((e) => e.toJson()).toList();
+      final upcomingBills = jsonEncode(jsonData);
+
       final customerInfo = await Purchases.getCustomerInfo();
       final isSubscribed =
           customerInfo.entitlements.active[entitlementId] != null;

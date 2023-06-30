@@ -52,7 +52,7 @@ class RecurringBill extends Equatable {
         "title": title,
         "amount": decimalFormatterWithSymbol(amount ?? 0.00),
         "interval": interval,
-        "recurringBillTxns": recurringBillTxns,
+        "recurringBillTxns": recurringBillTxns?.map((e) => e.toJson()).toList(),
         "reminderDate": reminderDate?.toIso8601String(),
         "createdAt": createdAt?.toIso8601String(),
         "updatedAt": updatedAt?.toIso8601String(),
