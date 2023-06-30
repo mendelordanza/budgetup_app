@@ -93,7 +93,7 @@ dependencies:
   timezone: ^0.9.2
 
   #Purchases
-  purchases_flutter: ^5.1.0
+  purchases_flutter: ^5.2.3
 
   #In-App Review
   in_app_review: ^2.0.6

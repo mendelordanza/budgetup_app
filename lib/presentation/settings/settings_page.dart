@@ -112,7 +112,9 @@ class SettingsPage extends HookWidget {
                   child: Column(
                     children: [
                       SettingsContainer(
-                        padding: EdgeInsets.zero,
+                        padding: EdgeInsets.only(
+                          bottom: 16.0,
+                        ),
                         settingItems: [
                           SettingItem(
                             onTap: () async {
