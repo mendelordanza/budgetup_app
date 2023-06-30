@@ -42,6 +42,7 @@ class OnboardingPage extends HookWidget {
       }
     } on PlatformException catch (e) {
       print(e.message);
+      context.read<OnboardingCubit>().finishOnboarding();
     }
   }
 

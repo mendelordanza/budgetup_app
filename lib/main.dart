@@ -20,7 +20,9 @@ import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'helper/constant.dart';
 import 'helper/my_themes.dart';
@@ -30,8 +32,45 @@ import 'injection_container.dart' as di;
 import 'injection_container.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
+@pragma("vm:entry-point")
+void callbackDispatcher() {
+  Workmanager().executeTask((taskName, inputData) {
+    final now = DateTime.now();
+    return Future.wait<bool?>([
+      HomeWidget.saveWidgetData(
+        'title',
+        'Updated from Background',
+      ),
+      HomeWidget.saveWidgetData(
+        'message',
+        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
+      ),
+      HomeWidget.updateWidget(
+        name: 'HomeWidgetExampleProvider',
+        iOSName: 'HomeWidgetExample',
+      ),
+    ]).then((value) {
+      return !value.contains(false);
+    });
+  });
+}
+
+/// Called when Doing Background Work initiated from Widget
+@pragma("vm:entry-point")
+void backgroundCallback(Uri? data) async {
+  print(data);
+
+  await HomeWidget.saveWidgetData<String>('_date', "Sample");
+  await HomeWidget.saveWidgetData<String>('_title', "Sample");
+  await HomeWidget.saveWidgetData<String>('_balance', "Sample");
+  await HomeWidget.updateWidget(
+      name: 'HomeWidgetExampleProvider', iOSName: 'HomeWidgetExample');
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
 
   tz.initializeTimeZones();
   await di.setup();

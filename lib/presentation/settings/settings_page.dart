@@ -194,7 +194,9 @@ class SettingsPage extends HookWidget {
                           ),
                           Divider(),
                           SettingItem(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.pushNamed(context, RouteStrings.widget);
+                            },
                             icon: "assets/icons/ic_widget.svg",
                             iconBackgroundColor: Color(0xFF00b2c2),
                             label: "Home Screen Widget - Coming Soon!",
@@ -247,7 +249,7 @@ class SettingsPage extends HookWidget {
                           Divider(),
                           SettingItem(
                             onTap: () {
-                              _launchEmail("mendelordanza@gmail.com");
+                              _launchEmail("ralph@trybudgetup.com");
                             },
                             icon: "assets/icons/ic_contact.svg",
                             iconBackgroundColor: Color(0xFFff9cf5),

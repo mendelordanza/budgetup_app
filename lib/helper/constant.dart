@@ -1,5 +1,3 @@
-const entitlementID = 'Pro';
-
 const appleApiKey = 'appl_IHKfiFatylginJUUbmhsFHoTmOI';
 
 const googleApiKey = 'goog_jniLvRuFmpzaKuyjobDfrHVlcdF';

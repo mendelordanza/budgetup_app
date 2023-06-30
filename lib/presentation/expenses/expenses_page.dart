@@ -13,8 +13,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:workmanager/workmanager.dart';
 
 import '../../helper/constant.dart';
 import '../../helper/date_helper.dart';
@@ -24,6 +26,38 @@ import '../custom/balance.dart';
 import '../custom/date_filter_button.dart';
 import '../paywall/paywall.dart';
 import 'bloc/expense_bloc.dart';
+
+@pragma("vm:entry-point")
+void callbackDispatcher() {
+  Workmanager().executeTask((taskName, inputData) {
+    return Future.wait<bool?>([
+      HomeWidget.saveWidgetData(
+        'total',
+        '\$100.50',
+      ),
+      HomeWidget.updateWidget(
+        name: 'HomeWidgetExampleProvider',
+        iOSName: 'BudgetUpWidgetExtension',
+      ),
+    ]).then((value) {
+      return !value.contains(false);
+    });
+  });
+}
+
+@pragma("vm:entry-point")
+Future<void> backgroundCallback(Uri? uri) async {
+  print("URI: $uri");
+
+  final customerInfo = await Purchases.getCustomerInfo();
+  final isSubscribed = customerInfo.entitlements.active[entitlementId] != null;
+  HomeWidget.saveWidgetData<String>('total', "\$100.50");
+  HomeWidget.saveWidgetData<bool>('isSubscribed', isSubscribed);
+  await HomeWidget.updateWidget(
+      //this must the class name used in .Kt
+      name: 'HomeWidgetExampleProvider',
+      iOSName: 'BudgetUpWidgetExtension');
+}
 
 class ExpensesPage extends HookWidget {
   ExpensesPage({Key? key}) : super(key: key);
@@ -42,6 +76,81 @@ class ExpensesPage extends HookWidget {
       DateFilterType.monthly,
     ),
   ];
+
+  void _checkForWidgetLaunch() {
+    HomeWidget.initiallyLaunchedFromHomeWidget()
+        .then((uri) => _launchedFromWidget);
+  }
+
+  void _launchedFromWidget(Uri? uri) {
+    if (uri != null) {
+      print("URI: $uri");
+    }
+  }
+
+  Future _loadData(
+    Function(String) dateCallback,
+    Function(bool) isSubscribed,
+  ) async {
+    try {
+      return Future.wait([
+        HomeWidget.getWidgetData<String>('filter', defaultValue: "")
+            .then((value) => print(value)),
+        HomeWidget.getWidgetData<String>('total', defaultValue: 'Default Title')
+            .then((value) => dateCallback(value ?? "")),
+        HomeWidget.getWidgetData<bool>('isSubscribed', defaultValue: false)
+            .then((value) => isSubscribed(value ?? false)),
+      ]);
+    } on PlatformException catch (exception) {
+      debugPrint('Error Getting Data. $exception');
+    }
+  }
+
+  Future _sendDataFilter({
+    required String filter,
+  }) async {
+    try {
+      return Future.wait([
+        HomeWidget.saveWidgetData<String>('filter', filter),
+      ]);
+    } on PlatformException catch (exception) {
+      debugPrint('Error Sending Data. $exception');
+    }
+  }
+
+  Future _sendData({
+    required String total,
+  }) async {
+    try {
+      final customerInfo = await Purchases.getCustomerInfo();
+      final isSubscribed =
+          customerInfo.entitlements.active[entitlementId] != null;
+      print("SEND!");
+      return Future.wait([
+        HomeWidget.saveWidgetData<String>('total', total),
+        HomeWidget.saveWidgetData<bool>('isSubscribed', isSubscribed),
+      ]);
+    } on PlatformException catch (exception) {
+      debugPrint('Error Sending Data. $exception');
+    }
+  }
+
+  Future _updateWidget() async {
+    try {
+      return HomeWidget.updateWidget(
+          name: 'HomeWidgetExampleProvider',
+          iOSName: 'BudgetUpWidgetExtension');
+    } on PlatformException catch (exception) {
+      debugPrint('Error Updating Widget. $exception');
+    }
+  }
+
+  Future<void> _sendAndUpdate({
+    required String total,
+  }) async {
+    await _sendData(total: total);
+    await _updateWidget();
+  }
 
   showPaywall(BuildContext context) async {
     try {
@@ -89,14 +198,32 @@ class ExpensesPage extends HookWidget {
     final isSubscribed = useState(false);
 
     useEffect(() {
+      Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+      HomeWidget.setAppGroupId('group.G53UVF44L3.com.ralphordanza.budgetupapp');
+      HomeWidget.registerBackgroundCallback(backgroundCallback);
+      _loadData((p0) {
+        print("DATE: $p0");
+      }, (p1) {
+        print("IS SUBSCRIBED: $p1");
+      });
+      //_sendAndUpdate();
+
       context
           .read<ExpenseBloc>()
           .add(LoadExpenseCategories(selectedDate: currentSelectedDate));
+
       Purchases.addCustomerInfoUpdateListener((customerInfo) {
         final entitlement = customerInfo.entitlements.active[entitlementId];
         isSubscribed.value = entitlement != null;
+        //_sendAndUpdate();
       });
       return null;
+    }, []);
+
+    useEffect(() {
+      _checkForWidgetLaunch();
+      HomeWidget.widgetClicked.listen(_launchedFromWidget);
+      return () {};
     }, []);
 
     return Scaffold(
@@ -202,6 +329,8 @@ class ExpensesPage extends HookWidget {
               BlocBuilder<ExpenseBloc, ExpenseState>(
                 builder: (context, state) {
                   if (state is ExpenseCategoryLoaded) {
+                    _sendAndUpdate(
+                        total: decimalFormatterWithSymbol(state.total));
                     return Balance(
                       headerLabel: Tooltip(
                         message:
