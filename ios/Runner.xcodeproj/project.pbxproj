@@ -9,14 +9,14 @@
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
-		4F4F43D52A4C4C9F001829A4 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F4F439E2A4C1992001829A4 /* WidgetKit.framework */; };
-		4F4F43D62A4C4C9F001829A4 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F4F43A02A4C1992001829A4 /* SwiftUI.framework */; };
-		4F4F43D92A4C4C9F001829A4 /* BudgetUpWidgetExtensionBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F4F43D82A4C4C9F001829A4 /* BudgetUpWidgetExtensionBundle.swift */; };
-		4F4F43DB2A4C4C9F001829A4 /* BudgetUpWidgetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F4F43DA2A4C4C9F001829A4 /* BudgetUpWidgetExtension.swift */; };
-		4F4F43DE2A4C4CA1001829A4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4F4F43DD2A4C4CA1001829A4 /* Assets.xcassets */; };
-		4F4F43E02A4C4CA1001829A4 /* BudgetUpWidgetExtension.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 4F4F43DC2A4C4C9F001829A4 /* BudgetUpWidgetExtension.intentdefinition */; };
-		4F4F43E12A4C4CA1001829A4 /* BudgetUpWidgetExtension.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 4F4F43DC2A4C4C9F001829A4 /* BudgetUpWidgetExtension.intentdefinition */; };
-		4F4F43E42A4C4CA1001829A4 /* BudgetUpWidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4F4F43D42A4C4C9F001829A4 /* BudgetUpWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4FB69DC22A4E748500CC7756 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F4F439E2A4C1992001829A4 /* WidgetKit.framework */; };
+		4FB69DC32A4E748500CC7756 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F4F43A02A4C1992001829A4 /* SwiftUI.framework */; };
+		4FB69DC62A4E748500CC7756 /* BudgetUpWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB69DC52A4E748500CC7756 /* BudgetUpWidgetBundle.swift */; };
+		4FB69DC82A4E748500CC7756 /* BudgetUpWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB69DC72A4E748500CC7756 /* BudgetUpWidget.swift */; };
+		4FB69DCB2A4E748600CC7756 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4FB69DCA2A4E748600CC7756 /* Assets.xcassets */; };
+		4FB69DCD2A4E748600CC7756 /* BudgetUpWidget.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 4FB69DC92A4E748500CC7756 /* BudgetUpWidget.intentdefinition */; };
+		4FB69DCE2A4E748600CC7756 /* BudgetUpWidget.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 4FB69DC92A4E748500CC7756 /* BudgetUpWidget.intentdefinition */; };
+		4FB69DD12A4E748600CC7756 /* BudgetUpWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4FB69DC12A4E748500CC7756 /* BudgetUpWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
@@ -25,12 +25,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		4F4F43E22A4C4CA1001829A4 /* PBXContainerItemProxy */ = {
+		4FB69DCF2A4E748600CC7756 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4F4F43D32A4C4C9F001829A4;
-			remoteInfo = BudgetUpWidgetExtensionExtension;
+			remoteGlobalIDString = 4FB69DC02A4E748500CC7756;
+			remoteInfo = BudgetUpWidgetExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -41,7 +41,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				4F4F43E42A4C4CA1001829A4 /* BudgetUpWidgetExtensionExtension.appex in Embed Foundation Extensions */,
+				4FB69DD12A4E748600CC7756 /* BudgetUpWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -66,13 +66,13 @@
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		4F4F439E2A4C1992001829A4 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		4F4F43A02A4C1992001829A4 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		4F4F43D42A4C4C9F001829A4 /* BudgetUpWidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BudgetUpWidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		4F4F43D82A4C4C9F001829A4 /* BudgetUpWidgetExtensionBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetUpWidgetExtensionBundle.swift; sourceTree = "<group>"; };
-		4F4F43DA2A4C4C9F001829A4 /* BudgetUpWidgetExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetUpWidgetExtension.swift; sourceTree = "<group>"; };
-		4F4F43DC2A4C4C9F001829A4 /* BudgetUpWidgetExtension.intentdefinition */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; path = BudgetUpWidgetExtension.intentdefinition; sourceTree = "<group>"; };
-		4F4F43DD2A4C4CA1001829A4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		4F4F43DF2A4C4CA1001829A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		4F4F43E92A4C4CAC001829A4 /* BudgetUpWidgetExtensionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BudgetUpWidgetExtensionExtension.entitlements; sourceTree = "<group>"; };
+		4FB69DC12A4E748500CC7756 /* BudgetUpWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BudgetUpWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		4FB69DC52A4E748500CC7756 /* BudgetUpWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetUpWidgetBundle.swift; sourceTree = "<group>"; };
+		4FB69DC72A4E748500CC7756 /* BudgetUpWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetUpWidget.swift; sourceTree = "<group>"; };
+		4FB69DC92A4E748500CC7756 /* BudgetUpWidget.intentdefinition */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; path = BudgetUpWidget.intentdefinition; sourceTree = "<group>"; };
+		4FB69DCA2A4E748600CC7756 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4FB69DCC2A4E748600CC7756 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4FB69DD62A4E817900CC7756 /* BudgetUpWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = BudgetUpWidgetExtension.entitlements; path = BudgetUpWidgetExtension/BudgetUpWidgetExtension.entitlements; sourceTree = "<group>"; };
 		4FBE8C2A2A42F6E700B288F0 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		72D18EE7995720E5723DCA1A /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -89,12 +89,12 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		4F4F43D12A4C4C9F001829A4 /* Frameworks */ = {
+		4FB69DBE2A4E748500CC7756 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4F4F43D62A4C4C9F001829A4 /* SwiftUI.framework in Frameworks */,
-				4F4F43D52A4C4C9F001829A4 /* WidgetKit.framework in Frameworks */,
+				4FB69DC32A4E748500CC7756 /* SwiftUI.framework in Frameworks */,
+				4FB69DC22A4E748500CC7756 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,16 +119,16 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		4F4F43D72A4C4C9F001829A4 /* BudgetUpWidgetExtension */ = {
+		4FB69DC42A4E748500CC7756 /* BudgetUpWidget */ = {
 			isa = PBXGroup;
 			children = (
-				4F4F43D82A4C4C9F001829A4 /* BudgetUpWidgetExtensionBundle.swift */,
-				4F4F43DA2A4C4C9F001829A4 /* BudgetUpWidgetExtension.swift */,
-				4F4F43DC2A4C4C9F001829A4 /* BudgetUpWidgetExtension.intentdefinition */,
-				4F4F43DD2A4C4CA1001829A4 /* Assets.xcassets */,
-				4F4F43DF2A4C4CA1001829A4 /* Info.plist */,
+				4FB69DC52A4E748500CC7756 /* BudgetUpWidgetBundle.swift */,
+				4FB69DC72A4E748500CC7756 /* BudgetUpWidget.swift */,
+				4FB69DC92A4E748500CC7756 /* BudgetUpWidget.intentdefinition */,
+				4FB69DCA2A4E748600CC7756 /* Assets.xcassets */,
+				4FB69DCC2A4E748600CC7756 /* Info.plist */,
 			);
-			path = BudgetUpWidgetExtension;
+			path = BudgetUpWidget;
 			sourceTree = "<group>";
 		};
 		864BEA5FB339BDA8DB5567C5 /* Frameworks */ = {
@@ -155,10 +155,10 @@
 		97C146E51CF9000F007C117D = {
 			isa = PBXGroup;
 			children = (
-				4F4F43E92A4C4CAC001829A4 /* BudgetUpWidgetExtensionExtension.entitlements */,
+				4FB69DD62A4E817900CC7756 /* BudgetUpWidgetExtension.entitlements */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
-				4F4F43D72A4C4C9F001829A4 /* BudgetUpWidgetExtension */,
+				4FB69DC42A4E748500CC7756 /* BudgetUpWidget */,
 				97C146EF1CF9000F007C117D /* Products */,
 				05208B8BBB23404AAE6729A9 /* Pods */,
 				864BEA5FB339BDA8DB5567C5 /* Frameworks */,
@@ -169,7 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
-				4F4F43D42A4C4C9F001829A4 /* BudgetUpWidgetExtensionExtension.appex */,
+				4FB69DC12A4E748500CC7756 /* BudgetUpWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -193,21 +193,21 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4F4F43D32A4C4C9F001829A4 /* BudgetUpWidgetExtensionExtension */ = {
+		4FB69DC02A4E748500CC7756 /* BudgetUpWidgetExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4F4F43E52A4C4CA1001829A4 /* Build configuration list for PBXNativeTarget "BudgetUpWidgetExtensionExtension" */;
+			buildConfigurationList = 4FB69DD22A4E748600CC7756 /* Build configuration list for PBXNativeTarget "BudgetUpWidgetExtension" */;
 			buildPhases = (
-				4F4F43D02A4C4C9F001829A4 /* Sources */,
-				4F4F43D12A4C4C9F001829A4 /* Frameworks */,
-				4F4F43D22A4C4C9F001829A4 /* Resources */,
+				4FB69DBD2A4E748500CC7756 /* Sources */,
+				4FB69DBE2A4E748500CC7756 /* Frameworks */,
+				4FB69DBF2A4E748500CC7756 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = BudgetUpWidgetExtensionExtension;
-			productName = BudgetUpWidgetExtensionExtension;
-			productReference = 4F4F43D42A4C4C9F001829A4 /* BudgetUpWidgetExtensionExtension.appex */;
+			name = BudgetUpWidgetExtension;
+			productName = BudgetUpWidgetExtension;
+			productReference = 4FB69DC12A4E748500CC7756 /* BudgetUpWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 		97C146ED1CF9000F007C117D /* Runner */ = {
@@ -227,7 +227,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				4F4F43E32A4C4CA1001829A4 /* PBXTargetDependency */,
+				4FB69DD02A4E748600CC7756 /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
@@ -244,7 +244,7 @@
 				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
-					4F4F43D32A4C4C9F001829A4 = {
+					4FB69DC02A4E748500CC7756 = {
 						CreatedOnToolsVersion = 14.2;
 					};
 					97C146ED1CF9000F007C117D = {
@@ -267,17 +267,17 @@
 			projectRoot = "";
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
-				4F4F43D32A4C4C9F001829A4 /* BudgetUpWidgetExtensionExtension */,
+				4FB69DC02A4E748500CC7756 /* BudgetUpWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		4F4F43D22A4C4C9F001829A4 /* Resources */ = {
+		4FB69DBF2A4E748500CC7756 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4F4F43DE2A4C4CA1001829A4 /* Assets.xcassets in Resources */,
+				4FB69DCB2A4E748600CC7756 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -368,13 +368,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		4F4F43D02A4C4C9F001829A4 /* Sources */ = {
+		4FB69DBD2A4E748500CC7756 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4F4F43D92A4C4C9F001829A4 /* BudgetUpWidgetExtensionBundle.swift in Sources */,
-				4F4F43DB2A4C4C9F001829A4 /* BudgetUpWidgetExtension.swift in Sources */,
-				4F4F43E02A4C4CA1001829A4 /* BudgetUpWidgetExtension.intentdefinition in Sources */,
+				4FB69DCD2A4E748600CC7756 /* BudgetUpWidget.intentdefinition in Sources */,
+				4FB69DC62A4E748500CC7756 /* BudgetUpWidgetBundle.swift in Sources */,
+				4FB69DC82A4E748500CC7756 /* BudgetUpWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -382,19 +382,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FB69DCE2A4E748600CC7756 /* BudgetUpWidget.intentdefinition in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
-				4F4F43E12A4C4CA1001829A4 /* BudgetUpWidgetExtension.intentdefinition in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		4F4F43E32A4C4CA1001829A4 /* PBXTargetDependency */ = {
+		4FB69DD02A4E748600CC7756 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4F4F43D32A4C4C9F001829A4 /* BudgetUpWidgetExtensionExtension */;
-			targetProxy = 4F4F43E22A4C4CA1001829A4 /* PBXContainerItemProxy */;
+			target = 4FB69DC02A4E748500CC7756 /* BudgetUpWidgetExtension */;
+			targetProxy = 4FB69DCF2A4E748600CC7756 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -495,7 +495,7 @@
 			};
 			name = Profile;
 		};
-		4F4F43E62A4C4CA1001829A4 /* Debug */ = {
+		4FB69DD32A4E748600CC7756 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -506,14 +506,14 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BudgetUpWidgetExtensionExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = BudgetUpWidgetExtension/BudgetUpWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = G53UVF44L3;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = BudgetUpWidgetExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = BudgetUpWidgetExtension;
+				INFOPLIST_FILE = BudgetUpWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BudgetUpWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -524,7 +524,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ralphordanza.budgetupapp.BudgetUpWidgetExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ralphordanza.budgetupapp.BudgetUpWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -535,7 +535,7 @@
 			};
 			name = Debug;
 		};
-		4F4F43E72A4C4CA1001829A4 /* Release */ = {
+		4FB69DD42A4E748600CC7756 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -546,14 +546,14 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BudgetUpWidgetExtensionExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = BudgetUpWidgetExtension/BudgetUpWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = G53UVF44L3;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = BudgetUpWidgetExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = BudgetUpWidgetExtension;
+				INFOPLIST_FILE = BudgetUpWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BudgetUpWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -563,7 +563,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ralphordanza.budgetupapp.BudgetUpWidgetExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ralphordanza.budgetupapp.BudgetUpWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -572,7 +572,7 @@
 			};
 			name = Release;
 		};
-		4F4F43E82A4C4CA1001829A4 /* Profile */ = {
+		4FB69DD52A4E748600CC7756 /* Profile */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -583,14 +583,14 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = BudgetUpWidgetExtensionExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = BudgetUpWidgetExtension/BudgetUpWidgetExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = G53UVF44L3;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = BudgetUpWidgetExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = BudgetUpWidgetExtension;
+				INFOPLIST_FILE = BudgetUpWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BudgetUpWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -600,7 +600,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ralphordanza.budgetupapp.BudgetUpWidgetExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ralphordanza.budgetupapp.BudgetUpWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -774,12 +774,12 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4F4F43E52A4C4CA1001829A4 /* Build configuration list for PBXNativeTarget "BudgetUpWidgetExtensionExtension" */ = {
+		4FB69DD22A4E748600CC7756 /* Build configuration list for PBXNativeTarget "BudgetUpWidgetExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4F4F43E62A4C4CA1001829A4 /* Debug */,
-				4F4F43E72A4C4CA1001829A4 /* Release */,
-				4F4F43E82A4C4CA1001829A4 /* Profile */,
+				4FB69DD32A4E748600CC7756 /* Debug */,
+				4FB69DD42A4E748600CC7756 /* Release */,
+				4FB69DD52A4E748600CC7756 /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

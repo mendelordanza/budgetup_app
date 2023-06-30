@@ -6,9 +6,9 @@
 	<array>
 		<dict>
 			<key>INEnumDisplayName</key>
-			<string>DateFilter</string>
+			<string>Date Filter</string>
 			<key>INEnumDisplayNameID</key>
-			<string>vgtmWV</string>
+			<string>8XC7ei</string>
 			<key>INEnumGeneratesHeader</key>
 			<true/>
 			<key>INEnumName</key>
@@ -21,7 +21,7 @@
 					<key>INEnumValueDisplayName</key>
 					<string>unknown</string>
 					<key>INEnumValueDisplayNameID</key>
-					<string>KtiCdC</string>
+					<string>sCepZh</string>
 					<key>INEnumValueName</key>
 					<string>unknown</string>
 				</dict>
@@ -29,7 +29,7 @@
 					<key>INEnumValueDisplayName</key>
 					<string>This Month</string>
 					<key>INEnumValueDisplayNameID</key>
-					<string>UD2ZCQ</string>
+					<string>Ck3xNW</string>
 					<key>INEnumValueIndex</key>
 					<integer>1</integer>
 					<key>INEnumValueName</key>
@@ -39,7 +39,7 @@
 					<key>INEnumValueDisplayName</key>
 					<string>This Week</string>
 					<key>INEnumValueDisplayNameID</key>
-					<string>WTEdgA</string>
+					<string>jOVLEU</string>
 					<key>INEnumValueIndex</key>
 					<integer>2</integer>
 					<key>INEnumValueName</key>
@@ -49,7 +49,7 @@
 					<key>INEnumValueDisplayName</key>
 					<string>Today</string>
 					<key>INEnumValueDisplayNameID</key>
-					<string>ZQMXxo</string>
+					<string>Is497Y</string>
 					<key>INEnumValueIndex</key>
 					<integer>3</integer>
 					<key>INEnumValueName</key>
@@ -61,7 +61,7 @@
 	<key>INIntentDefinitionModelVersion</key>
 	<string>1.2</string>
 	<key>INIntentDefinitionNamespace</key>
-	<string>voKbO3</string>
+	<string>88xZPY</string>
 	<key>INIntentDefinitionSystemVersion</key>
 	<string>22F82</string>
 	<key>INIntentDefinitionToolsBuildVersion</key>
@@ -74,7 +74,7 @@
 			<key>INIntentCategory</key>
 			<string>information</string>
 			<key>INIntentDescriptionID</key>
-			<string>3eU37u</string>
+			<string>tVvJ9c</string>
 			<key>INIntentEligibleForWidgets</key>
 			<true/>
 			<key>INIntentIneligibleForSuggestions</key>
@@ -91,13 +91,13 @@
 					<key>INIntentParameterDisplayName</key>
 					<string>Date Filter</string>
 					<key>INIntentParameterDisplayNameID</key>
-					<string>ZPUarK</string>
+					<string>6SHpI6</string>
 					<key>INIntentParameterDisplayPriority</key>
 					<integer>1</integer>
 					<key>INIntentParameterEnumType</key>
 					<string>DateFilter</string>
 					<key>INIntentParameterEnumTypeNamespace</key>
-					<string>voKbO3</string>
+					<string>88xZPY</string>
 					<key>INIntentParameterMetadata</key>
 					<dict>
 						<key>INIntentParameterMetadataDefaultValue</key>
@@ -125,7 +125,7 @@
 							<key>INIntentParameterPromptDialogFormatString</key>
 							<string>There are ${count} options matching ‘${dateFilter}’.</string>
 							<key>INIntentParameterPromptDialogFormatStringID</key>
-							<string>xRg8Tm</string>
+							<string>ufyN3v</string>
 							<key>INIntentParameterPromptDialogType</key>
 							<string>DisambiguationIntroduction</string>
 						</dict>
@@ -135,7 +135,7 @@
 							<key>INIntentParameterPromptDialogFormatString</key>
 							<string>Just to confirm, you wanted ‘${dateFilter}’?</string>
 							<key>INIntentParameterPromptDialogFormatStringID</key>
-							<string>3zyFuA</string>
+							<string>6mpjiK</string>
 							<key>INIntentParameterPromptDialogType</key>
 							<string>Confirmation</string>
 						</dict>
@@ -165,7 +165,7 @@
 			<key>INIntentTitle</key>
 			<string>Budget Up Configuration</string>
 			<key>INIntentTitleID</key>
-			<string>paxN6s</string>
+			<string>gpCwrM</string>
 			<key>INIntentType</key>
 			<string>Custom</string>
 			<key>INIntentVerb</key>
