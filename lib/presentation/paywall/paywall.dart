@@ -105,7 +105,9 @@ class PaywallView extends HookWidget {
                           ),
                           GestureDetector(
                             onTap: () {
+                              isLoading.value = true;
                               restorePurchase(context);
+                              isLoading.value = false;
                             },
                             child: Text(
                               "Already Subscribed? Restore Purchase",
