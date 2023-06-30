@@ -15,6 +15,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
@@ -37,6 +38,28 @@ class RecurringBillsPage extends HookWidget {
       DateFilterType.monthly,
     ),
   ];
+
+  Future _setWidget() async {
+    try {
+      final customerInfo = await Purchases.getCustomerInfo();
+      final isSubscribed =
+          customerInfo.entitlements.active[entitlementId] != null;
+      return Future.wait([
+        HomeWidget.saveWidgetData<bool>('isSubscribed', isSubscribed),
+      ]);
+    } on PlatformException catch (exception) {
+      debugPrint('Error Sending Data. $exception');
+    }
+  }
+
+  Future _updateWidget() async {
+    try {
+      HomeWidget.updateWidget(
+          name: 'HomeWidgetExampleProvider', iOSName: 'BillsWidget');
+    } on PlatformException catch (exception) {
+      debugPrint('Error Updating Widget. $exception');
+    }
+  }
 
   showPaywall(BuildContext context) async {
     try {
@@ -84,13 +107,16 @@ class RecurringBillsPage extends HookWidget {
 
     final isSubscribed = useState(false);
     useEffect(() {
+      _setWidget();
+      _updateWidget();
       context
           .read<RecurringBillBloc>()
           .add(LoadRecurringBills(currentSelectedDate));
-
       Purchases.addCustomerInfoUpdateListener((customerInfo) {
         final entitlement = customerInfo.entitlements.active[entitlementId];
         isSubscribed.value = entitlement != null;
+        _setWidget();
+        _updateWidget();
       });
 
       return null;

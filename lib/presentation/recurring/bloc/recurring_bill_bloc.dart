@@ -1,10 +1,16 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:budgetup_app/domain/recurring_bill.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:meta/meta.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import '../../../data/recurring_bills_repository.dart';
+import '../../../helper/constant.dart';
 import '../../../helper/shared_prefs.dart';
 import '../../recurring_modify/bloc/recurring_modify_bloc.dart';
 import '../../settings/currency/bloc/convert_currency_cubit.dart';
@@ -60,6 +66,8 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
             : (bill.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
         return bill.copy(amount: convertedAmount);
       }).toList();
+      convertedRecurringBills
+          .sort((a, b) => a.reminderDate!.compareTo(b.reminderDate!));
 
       final convertedPaidRecurringBills = paidRecurringBills.map((bill) {
         final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
@@ -67,6 +75,19 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
             : (bill.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
         return bill.copy(amount: convertedAmount);
       }).toList();
+      convertedPaidRecurringBills
+          .sort((a, b) => a.reminderDate!.compareTo(b.reminderDate!));
+
+      //GET UPCOMING BILLS
+      final upcomingBills = convertedRecurringBills
+          .where((element) {
+            return element.reminderDate!.isAfter(DateTime.now());
+          })
+          .toList()
+          .take(3);
+      final jsonData = upcomingBills.map((e) => e.toJson()).toList();
+      final encodedJson = jsonEncode(jsonData);
+      _setupWidget(upcomingBills: encodedJson);
 
       emit(RecurringBillsLoaded(
         total: getPaidRecurringBillTotal(convertedPaidRecurringBills),
@@ -86,6 +107,8 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
               : (bill.amount ?? 0.00) * event.currencyRate;
           return bill.copy(amount: convertedAmount);
         }).toList();
+        convertedRecurringBills
+            .sort((a, b) => a.reminderDate!.compareTo(b.reminderDate!));
 
         final convertedPaidRecurringBills = paidRecurringBills.map((bill) {
           final convertedAmount = event.currencyCode == "USD"
@@ -93,6 +116,19 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
               : (bill.amount ?? 0.00) * event.currencyRate;
           return bill.copy(amount: convertedAmount);
         }).toList();
+        convertedPaidRecurringBills
+            .sort((a, b) => a.reminderDate!.compareTo(b.reminderDate!));
+
+        //GET UPCOMING BILLS
+        final upcomingBills = convertedRecurringBills
+            .where((element) {
+              return element.reminderDate!.isAfter(DateTime.now());
+            })
+            .take(3)
+            .toList();
+        final jsonData = upcomingBills.map((e) => e.toJson()).toList();
+        final encodedJson = jsonEncode(jsonData);
+        _setupWidget(upcomingBills: encodedJson);
 
         emit(RecurringBillsLoaded(
           total: getPaidRecurringBillTotal(convertedPaidRecurringBills),
@@ -115,5 +151,31 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
     _recurringSubscription?.cancel();
     _currencySubscription?.cancel();
     return super.close();
+  }
+
+  _setupWidget({
+    required String upcomingBills,
+  }) async {
+    try {
+      final customerInfo = await Purchases.getCustomerInfo();
+      final isSubscribed =
+          customerInfo.entitlements.active[entitlementId] != null;
+      print("BILLS SEND!: $upcomingBills");
+      Future.wait([
+        HomeWidget.saveWidgetData<String>('upcomingBills', upcomingBills),
+        HomeWidget.saveWidgetData<bool>('isSubscribed', isSubscribed),
+        HomeWidget.saveWidgetData<String>('title', "Taytol"),
+        HomeWidget.saveWidgetData<String>('message', "Miseyg"),
+      ]);
+    } on PlatformException catch (exception) {
+      debugPrint('Error Sending Data. $exception');
+    }
+
+    try {
+      HomeWidget.updateWidget(
+          name: 'HomeWidgetExampleProvider', iOSName: 'BillsWidget');
+    } on PlatformException catch (exception) {
+      debugPrint('Error Updating Widget. $exception');
+    }
   }
 }

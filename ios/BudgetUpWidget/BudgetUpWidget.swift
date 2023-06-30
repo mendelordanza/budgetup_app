@@ -57,17 +57,17 @@ struct BudgetUpWidgetEntryView : View {
                 VStack (alignment: .leading) {
                     Text("Total Spent")
                         .font(.system(size: 14)).multilineTextAlignment(.leading)
-                    Text(entry.total).font(.system(size: 28, weight: .bold)).multilineTextAlignment(.leading)
+                    Text(entry.total).font(.system(size: 28, weight: .bold)).multilineTextAlignment(.leading).lineLimit(1)
                 }
-            }).padding(16)
+            }).padding(16).frame(maxWidth: .infinity, alignment: .leading)
         }
         else {
-            VStack.init(alignment: .leading, spacing: /*@START_MENU_TOKEN@*/nil/*@END_MENU_TOKEN@*/, content: {
-                Image(systemName: "lock.fill")
-                Text("Get BudgetUp Pro to view this widget")
-                    .font(.body)
-            }).padding(16)
-            
+            VStack.init(alignment: .center, spacing: /*@START_MENU_TOKEN@*/nil/*@END_MENU_TOKEN@*/, content: {
+                            Image(systemName: "lock.fill")
+                            Text("Get BudgetUp Pro to view this widget")
+                                .font(.body)
+                                .multilineTextAlignment(.center)
+                        }).padding(16).unredacted()
         }
     }
     
@@ -88,6 +88,7 @@ struct BudgetUpWidget: Widget {
         }
         .configurationDisplayName("Total Spent")
         .description("Shows total spent based on date")
+        .supportedFamilies([.systemSmall])
     }
 }
 

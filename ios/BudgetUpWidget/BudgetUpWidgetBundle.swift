@@ -10,7 +10,10 @@ import SwiftUI
 
 @main
 struct BudgetUpWidgetBundle: WidgetBundle {
+    
+    @WidgetBundleBuilder
     var body: some Widget {
         BudgetUpWidget()
+        BillsWidget()
     }
 }

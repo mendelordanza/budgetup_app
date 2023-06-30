@@ -26,20 +26,6 @@ import '../custom/date_filter_button.dart';
 import '../paywall/paywall.dart';
 import 'bloc/expense_bloc.dart';
 
-@pragma("vm:entry-point")
-Future<void> backgroundCallback(Uri? uri) async {
-  print("URI: $uri");
-
-  final customerInfo = await Purchases.getCustomerInfo();
-  final isSubscribed = customerInfo.entitlements.active[entitlementId] != null;
-  HomeWidget.saveWidgetData<String>('total', "\$100.50");
-  HomeWidget.saveWidgetData<bool>('isSubscribed', isSubscribed);
-  await HomeWidget.updateWidget(
-      //this must the class name used in .Kt
-      name: 'HomeWidgetExampleProvider',
-      iOSName: 'BudgetUpWidget');
-}
-
 class ExpensesPage extends HookWidget {
   ExpensesPage({Key? key}) : super(key: key);
 
@@ -71,28 +57,6 @@ class ExpensesPage extends HookWidget {
     }
   }
 
-  Future _sendData({
-    required String todayTotal,
-    required String thisMonthTotal,
-    required String thisWeekTotal,
-  }) async {
-    try {
-      final customerInfo = await Purchases.getCustomerInfo();
-      final isSubscribed =
-          customerInfo.entitlements.active[entitlementId] != null;
-      print("SEND!");
-      print("THIS MONTH: ${thisMonthTotal}");
-      return Future.wait([
-        HomeWidget.saveWidgetData<String>('todayTotal', todayTotal),
-        HomeWidget.saveWidgetData<String>('thisMonthTotal', thisMonthTotal),
-        HomeWidget.saveWidgetData<String>('thisWeekTotal', thisWeekTotal),
-        HomeWidget.saveWidgetData<bool>('isSubscribed', isSubscribed),
-      ]);
-    } on PlatformException catch (exception) {
-      debugPrint('Error Sending Data. $exception');
-    }
-  }
-
   Future _updateWidget() async {
     try {
       return HomeWidget.updateWidget(
@@ -100,31 +64,6 @@ class ExpensesPage extends HookWidget {
     } on PlatformException catch (exception) {
       debugPrint('Error Updating Widget. $exception');
     }
-  }
-
-  Future<void> _sendAndUpdate(
-      {required List<ExpenseCategory> convertedCategories}) async {
-    //Fetch total for today, this week, and this month
-    var todayTotal = 0.00;
-    var thisMonthTotal = 0.00;
-    var thisWeekTotal = 0.00;
-    convertedCategories.forEach((element) {
-      thisMonthTotal +=
-          element.getTotalByDate(DateFilterType.monthly, DateTime.now());
-
-      thisWeekTotal +=
-          element.getTotalByDate(DateFilterType.weekly, DateTime.now());
-
-      todayTotal +=
-          element.getTotalByDate(DateFilterType.daily, DateTime.now());
-    });
-
-    await _sendData(
-      todayTotal: decimalFormatterWithSymbol(todayTotal),
-      thisMonthTotal: decimalFormatterWithSymbol(thisMonthTotal),
-      thisWeekTotal: decimalFormatterWithSymbol(thisWeekTotal),
-    );
-    await _updateWidget();
   }
 
   showPaywall(BuildContext context) async {
@@ -173,8 +112,8 @@ class ExpensesPage extends HookWidget {
     final isSubscribed = useState(false);
 
     useEffect(() {
-      HomeWidget.setAppGroupId('group.G53UVF44L3.com.ralphordanza.budgetupapp');
-      HomeWidget.registerBackgroundCallback(backgroundCallback);
+      _setWidget();
+      _updateWidget();
 
       context
           .read<ExpenseBloc>()
@@ -382,10 +321,6 @@ class ExpensesPage extends HookWidget {
                   builder: (context, state) {
                     if (state is ExpenseCategoryLoaded &&
                         state.expenseCategories.isNotEmpty) {
-                      //UPDATE WIDGET
-                      _sendAndUpdate(
-                          convertedCategories: state.expenseCategories);
-
                       return GridView.builder(
                         shrinkWrap: true,
                         itemCount: state.expenseCategories.length,

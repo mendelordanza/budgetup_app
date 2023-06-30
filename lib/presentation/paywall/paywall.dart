@@ -100,6 +100,9 @@ class PaywallView extends HookWidget {
                               );
                             }).toList(),
                           ),
+                          SizedBox(
+                            height: 10,
+                          ),
                           GestureDetector(
                             onTap: () {
                               restorePurchase(context);

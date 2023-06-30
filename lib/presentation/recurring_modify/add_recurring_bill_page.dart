@@ -131,7 +131,7 @@ class AddRecurringBillPage extends HookWidget {
                               children: [
                                 Text("${sharedPrefs.getCurrencyCode()}"),
                                 SizedBox(
-                                  height: 60.0,
+                                  height: 70.0,
                                   child: KeyboardActions(
                                     config:
                                         buildConfig(amountFocusNode, context),
