@@ -19,7 +19,10 @@ import workmanager
         FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
           GeneratedPluginRegistrant.register(with: registry)
         }
-      WorkmanagerPlugin.registerTask(withIdentifier: "recurring-bill-task-identifier")
+      
+      WorkmanagerPlugin.setPluginRegistrantCallback { registry in
+          GeneratedPluginRegistrant.register(with: registry)
+      }
       
       UIApplication.shared.setMinimumBackgroundFetchInterval(TimeInterval(60*15))
       

@@ -1,9 +1,16 @@
 import 'package:budgetup_app/presentation/expenses/expenses_page.dart';
+import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/recurring_bills_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:iconsax/iconsax.dart';
+
+import '../helper/shared_prefs.dart';
+import '../injection_container.dart';
+import 'expenses/bloc/expense_bloc.dart';
 
 class TransactionsPage extends HookWidget {
   TransactionsPage({Key? key}) : super(key: key);
@@ -14,7 +21,21 @@ class TransactionsPage extends HookWidget {
     final tabPadding = useState(EdgeInsets.zero);
     final _currentIndex = useState<int>(0);
 
+    final sharedPrefs = getIt<SharedPrefs>();
+    final expensesCurrentSelectedDate =
+        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
+    final recurringCurrentSelectedDate =
+        DateTime.parse(sharedPrefs.getRecurringSelectedDate());
+
     useEffect(() {
+      context.read<ExpenseBloc>().add(
+          LoadExpenseCategories(selectedDate: expensesCurrentSelectedDate));
+      context
+          .read<RecurringBillBloc>()
+          .add(LoadRecurringBills(recurringCurrentSelectedDate));
+
+      HomeWidget.setAppGroupId('group.G53UVF44L3.com.ralphordanza.budgetupapp');
+
       tabController.addListener(() {
         if (tabController.indexIsChanging) {
           tabPadding.value = EdgeInsets.only(right: 8.0);

@@ -11,6 +11,7 @@ import '../../helper/colors.dart';
 import '../../helper/constant.dart';
 import '../custom/custom_button.dart';
 import '../custom/platform_progress_indicator.dart';
+import 'package:collection/collection.dart';
 
 class PaywallView extends HookWidget {
   final bool isFromOnboarding;
@@ -36,7 +37,8 @@ class PaywallView extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedProduct = useState<StoreProduct?>(null);
+    //final selectedProduct = useState<StoreProduct?>(null);
+    final selectedIndex = useState(0);
     final isLoading = useState(false);
 
     return Container(
@@ -80,25 +82,26 @@ class PaywallView extends HookWidget {
                         ),
                       ],
                     ),
-                    SvgPicture.asset(
-                      "assets/icons/ic_icon_pro.svg",
-                      height: 80.0,
-                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                       child: Column(
                         children: [
                           Column(
-                            children: offering.availablePackages.map((item) {
+                            children: offering.availablePackages
+                                .mapIndexed((index, item) {
                               return priceItem(
+                                context,
                                 item: item,
-                                isSelected: item.storeProduct.identifier ==
-                                    selectedProduct.value?.identifier,
+                                isSelected: index == selectedIndex.value,
                                 onTap: () {
-                                  selectedProduct.value = item.storeProduct;
+                                  selectedIndex.value = index;
+                                  //selectedProduct.value = item.storeProduct;
                                 },
                               );
                             }).toList(),
+                          ),
+                          SizedBox(
+                            height: 10,
                           ),
                           GestureDetector(
                             onTap: () {
@@ -121,10 +124,17 @@ class PaywallView extends HookWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           featureItem(
-                            icon: Icon(Iconsax.document_text),
-                            title: "Unlimited Lists",
-                            desc:
-                                "unlimited expense categories and recurring bills",
+                            icon: Icon(Iconsax.money_send),
+                            title: "Unlimited Expense Categories",
+                            desc: "track your expenses without limits",
+                          ),
+                          featureItem(
+                            icon: SvgPicture.asset(
+                              "assets/icons/ic_recurring.svg",
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            title: "Unlimited Recurring Bills",
+                            desc: "track your recurring bills without limits",
                           ),
                           featureItem(
                             icon: SvgPicture.asset(
@@ -135,15 +145,16 @@ class PaywallView extends HookWidget {
                             desc: "view previous summary reports",
                           ),
                           featureItem(
+                            icon: Icon(Iconsax.home_hashtag),
+                            title: "Home Screen Widget",
+                            desc:
+                                "get a glance of your budget in your home screen",
+                          ),
+                          featureItem(
                             icon: Icon(Iconsax.back_square),
                             title: "Data Backup - coming soon!",
                             desc:
                                 "import and export data to continue using on other device",
-                          ),
-                          featureItem(
-                            icon: Icon(Iconsax.home_hashtag),
-                            title: "Home Screen Widget - coming soon!",
-                            desc: "overview of balance in your home screen",
                           ),
                         ],
                       ),
@@ -157,9 +168,10 @@ class PaywallView extends HookWidget {
               child: CustomButton(
                 onPressed: () async {
                   isLoading.value = true;
-                  if (selectedProduct.value != null) {
-                    await Purchases.purchaseStoreProduct(selectedProduct.value!)
-                        .then((value) {
+                  if (selectedIndex.value != -1) {
+                    final item = offering
+                        .availablePackages[selectedIndex.value].storeProduct;
+                    await Purchases.purchaseStoreProduct(item).then((value) {
                       isLoading.value = false;
                       Navigator.pop(context);
                     }).onError((error, stackTrace) {
@@ -169,13 +181,15 @@ class PaywallView extends HookWidget {
                     isLoading.value = false;
                   }
                 },
-                color: selectedProduct.value == null
+                color: selectedIndex.value == -1
                     ? Colors.grey.shade400
                     : primaryColor,
                 child: isLoading.value
                     ? PlatformProgressIndicator()
                     : Text(
-                        "Buy ${selectedProduct.value?.title.replaceAll(RegExp('\\(.*?\\)'), '') ?? ""}",
+                        selectedIndex.value == -1
+                            ? "Buy"
+                            : "Buy ${offering.availablePackages[selectedIndex.value].storeProduct.title.replaceAll(RegExp('\\(.*?\\)'), '')}",
                         textAlign: TextAlign.center,
                       ),
               ),
@@ -231,7 +245,8 @@ class PaywallView extends HookWidget {
     );
   }
 
-  Widget priceItem({
+  Widget priceItem(
+    BuildContext context, {
     required Package item,
     required bool isSelected,
     required Function() onTap,
@@ -246,31 +261,32 @@ class PaywallView extends HookWidget {
               cornerRadius: 16,
               cornerSmoothing: 1.0,
             ),
+            side: isSelected
+                ? BorderSide(
+                    color: Theme.of(context).primaryColor,
+                    width: 2.0,
+                  )
+                : BorderSide.none,
           ),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              0.0,
-              16.0,
-              16.0,
-              16.0,
-            ),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
                   children: [
-                    Checkbox(
-                      activeColor: secondaryColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          3.0,
-                        ),
-                      ),
-                      value: isSelected,
-                      onChanged: (checked) {
-                        onTap();
-                      },
-                    ),
+                    // Checkbox(
+                    //   activeColor: secondaryColor,
+                    //   shape: RoundedRectangleBorder(
+                    //     borderRadius: BorderRadius.circular(
+                    //       3.0,
+                    //     ),
+                    //   ),
+                    //   value: isSelected,
+                    //   onChanged: (checked) {
+                    //     onTap();
+                    //   },
+                    // ),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,

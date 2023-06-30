@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
@@ -42,6 +43,28 @@ class ExpensesPage extends HookWidget {
       DateFilterType.monthly,
     ),
   ];
+
+  Future _setWidget() async {
+    try {
+      final customerInfo = await Purchases.getCustomerInfo();
+      final isSubscribed =
+          customerInfo.entitlements.active[entitlementId] != null;
+      return Future.wait([
+        HomeWidget.saveWidgetData<bool>('isSubscribed', isSubscribed),
+      ]);
+    } on PlatformException catch (exception) {
+      debugPrint('Error Sending Data. $exception');
+    }
+  }
+
+  Future _updateWidget() async {
+    try {
+      return HomeWidget.updateWidget(
+          name: 'HomeWidgetExampleProvider', iOSName: 'BudgetUpWidget');
+    } on PlatformException catch (exception) {
+      debugPrint('Error Updating Widget. $exception');
+    }
+  }
 
   showPaywall(BuildContext context) async {
     try {
@@ -89,12 +112,18 @@ class ExpensesPage extends HookWidget {
     final isSubscribed = useState(false);
 
     useEffect(() {
+      _setWidget();
+      _updateWidget();
+
       context
           .read<ExpenseBloc>()
           .add(LoadExpenseCategories(selectedDate: currentSelectedDate));
+
       Purchases.addCustomerInfoUpdateListener((customerInfo) {
         final entitlement = customerInfo.entitlements.active[entitlementId];
         isSubscribed.value = entitlement != null;
+        _setWidget();
+        _updateWidget();
       });
       return null;
     }, []);

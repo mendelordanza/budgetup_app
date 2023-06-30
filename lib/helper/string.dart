@@ -8,7 +8,7 @@ String decimalFormatterWithSymbol(double number) {
   final sharedPrefs = getIt<SharedPrefs>();
   double roundedNumber = double.parse(number.toStringAsFixed(2));
   final formatter = NumberFormat("#,##0.00");
-  return "${sharedPrefs.getCurrencySymbol()} ${formatter.format(roundedNumber)}";
+  return "${sharedPrefs.getCurrencySymbol()}${formatter.format(roundedNumber)}";
 }
 
 String decimalFormatter(double number) {

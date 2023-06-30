@@ -1,5 +1,6 @@
 import 'package:budgetup_app/domain/recurring_bill_txn.dart';
 import 'package:budgetup_app/helper/date_helper.dart';
+import 'package:budgetup_app/helper/string.dart';
 import 'package:equatable/equatable.dart';
 import 'package:isar/isar.dart';
 
@@ -49,11 +50,12 @@ class RecurringBill extends Equatable {
   Map<String, Object?> toJson() => {
         "id": id,
         "title": title,
-        "amount": amount,
+        "amount": decimalFormatterWithSymbol(amount ?? 0.00),
         "interval": interval,
         "recurringBillTxns": recurringBillTxns,
-        "createdAt": createdAt,
-        "updatedAt": updatedAt,
+        "reminderDate": reminderDate?.toIso8601String(),
+        "createdAt": createdAt?.toIso8601String(),
+        "updatedAt": updatedAt?.toIso8601String(),
       };
 
   RecurringBillEntity toIsarObject() {

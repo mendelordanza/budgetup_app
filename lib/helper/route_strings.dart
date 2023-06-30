@@ -9,5 +9,6 @@ class RouteStrings {
   static const String summary = '/summary';
   static const String summaryDetail = '/summaryDetail';
   static const String appearance = '/appearance';
+  static const String widget = '/widget';
   static const String debug = '/debug';
 }

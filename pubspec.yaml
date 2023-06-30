@@ -110,6 +110,9 @@ dependencies:
   #KeyboardActions
   keyboard_actions: ^4.2.0
 
+  #HomeWidget
+  home_widget: ^0.2.1
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
