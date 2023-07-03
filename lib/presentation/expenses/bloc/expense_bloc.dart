@@ -214,7 +214,7 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
 
     try {
       HomeWidget.updateWidget(
-          name: 'HomeWidgetExampleProvider', iOSName: 'BudgetUpWidget');
+          name: 'TotalSpentWidgetProvider', iOSName: 'BudgetUpWidget');
     } on PlatformException catch (exception) {
       debugPrint('Error Updating Widget. $exception');
     }

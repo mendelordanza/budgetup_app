@@ -44,8 +44,13 @@ class ExpenseCategory extends Equatable {
         break;
       case DateFilterType.weekly:
         filteredList = expenseTransactions?.where((element) {
-          return element.updatedAt!.isAfter(getStartDate(selectedDate)) &&
-              element.updatedAt!.isBefore(getEndDate(selectedDate));
+          final txnDate = element.updatedAt!;
+          final startDate = getStartDate(removeTimeFromDate(selectedDate));
+          final endDate = getEndDate(removeTimeFromDate(selectedDate));
+
+          return txnDate == startDate ||
+              txnDate == endDate ||
+              (txnDate.isAfter(startDate) && txnDate.isBefore(endDate));
         }).toList();
         break;
       case DateFilterType.monthly:

@@ -62,7 +62,7 @@ class OnboardingPage extends HookWidget {
         index: 2,
       ),
       _pageItem(
-        title: "View Monthly Reports",
+        title: "View Monthly Statements",
         caption: "Get a sense of your finances",
         index: 3,
       ),

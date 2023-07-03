@@ -55,7 +55,7 @@ class RecurringBillsPage extends HookWidget {
   Future _updateWidget() async {
     try {
       HomeWidget.updateWidget(
-          name: 'HomeWidgetExampleProvider', iOSName: 'BillsWidget');
+          name: 'UpcomingBillsWidgetProvider', iOSName: 'BillsWidget');
     } on PlatformException catch (exception) {
       debugPrint('Error Updating Widget. $exception');
     }
@@ -328,9 +328,40 @@ class RecurringBillsPage extends HookWidget {
                     }
                     return Center(
                       child: SingleChildScrollView(
-                        child: Text(
-                          "No recurring bills yet\nTap + to add",
-                          textAlign: TextAlign.center,
+                        child: Column(
+                          children: [
+                            Text(
+                              "No recurring bills yet",
+                              textAlign: TextAlign.center,
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                final customerInfo =
+                                    await Purchases.getCustomerInfo();
+                                final hasData = customerInfo
+                                        .entitlements.active[entitlementId] !=
+                                    null;
+
+                                if (context.mounted) {
+                                  if (hasData ||
+                                      (state is RecurringBillsLoaded &&
+                                          state.recurringBills.length < 5)) {
+                                    Navigator.pushNamed(
+                                        context, RouteStrings.addRecurringBill);
+                                  } else {
+                                    showPaywall(context);
+                                  }
+                                }
+                              },
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Iconsax.add),
+                                  Text("Add your first recurring bill"),
+                                ],
+                              ),
+                            )
+                          ],
                         ),
                       ),
                     );

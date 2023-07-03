@@ -193,7 +193,7 @@ class AddTransaction extends HookWidget {
                                     height: 5.0,
                                   ),
                                   SizedBox(
-                                    height: 60.0,
+                                    height: 70.0,
                                     child: KeyboardActions(
                                       config:
                                           buildConfig(amountFocusNode, context),

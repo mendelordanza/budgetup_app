@@ -40,7 +40,7 @@ class SummaryPage extends HookWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Summary Reports"),
+        title: Text("Monthly Statements"),
         centerTitle: true,
         actions: [
           InkWell(

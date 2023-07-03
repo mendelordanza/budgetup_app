@@ -59,7 +59,7 @@ struct BudgetUpWidgetEntryView : View {
                         .font(.system(size: 14)).multilineTextAlignment(.leading)
                     Text(entry.total).font(.system(size: 28, weight: .bold)).multilineTextAlignment(.leading).lineLimit(1)
                 }
-            }).padding(8).frame(maxWidth: .infinity, alignment: .leading)
+            }).padding(10).frame(maxWidth: .infinity, alignment: .leading)
         }
         else {
             VStack.init(alignment: .center, spacing: /*@START_MENU_TOKEN@*/nil/*@END_MENU_TOKEN@*/, content: {
