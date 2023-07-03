@@ -22,7 +22,7 @@ class RecurringBillTxn extends Equatable {
   Map<String, Object?> toJson() => {
         "id": id,
         "isPaid": isPaid,
-        "datePaid": datePaid,
+        "datePaid": datePaid?.toIso8601String(),
       };
 
   RecurringBillTxn copy({
