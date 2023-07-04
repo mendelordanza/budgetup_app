@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -128,7 +129,8 @@ class SettingsPage extends HookWidget {
                                 showPaywall(context);
                               }
                             },
-                            icon: "assets/icons/ic_app_icon.svg",
+                            icon: SvgPicture.asset(
+                                "assets/icons/ic_app_icon.svg"),
                             iconBackgroundColor: Color(0xFF666666),
                             label: isSubscribed.value
                                 ? "You are subscribed to BudegetUp Pro!"
@@ -150,7 +152,7 @@ class SettingsPage extends HookWidget {
                               Navigator.pushNamed(
                                   context, RouteStrings.appearance);
                             },
-                            icon: "assets/icons/ic_moon.svg",
+                            icon: SvgPicture.asset("assets/icons/ic_moon.svg"),
                             iconBackgroundColor: Color(0xFF9300ED),
                             label: "Appearance",
                             suffix: SvgPicture.asset(
@@ -177,7 +179,8 @@ class SettingsPage extends HookWidget {
                                 },
                               );
                             },
-                            icon: "assets/icons/ic_currency.svg",
+                            icon: SvgPicture.asset(
+                                "assets/icons/ic_currency.svg"),
                             iconBackgroundColor: Color(0xFF00A61B),
                             label: "Currency",
                             suffix: SvgPicture.asset(
@@ -189,7 +192,8 @@ class SettingsPage extends HookWidget {
                             onTap: () {
                               Navigator.pushNamed(context, RouteStrings.widget);
                             },
-                            icon: "assets/icons/ic_widget.svg",
+                            icon:
+                                SvgPicture.asset("assets/icons/ic_widget.svg"),
                             iconBackgroundColor: Color(0xFF00b2c2),
                             label: "Home Screen Widget",
                             suffix: SvgPicture.asset(
@@ -199,7 +203,8 @@ class SettingsPage extends HookWidget {
                           Divider(),
                           SettingItem(
                             onTap: () {},
-                            icon: "assets/icons/ic_import_export.svg",
+                            icon: SvgPicture.asset(
+                                "assets/icons/ic_import_export.svg"),
                             iconBackgroundColor: Color(0xFFC26900),
                             label: "Import / Export Data - Coming Soon!",
                             suffix: SvgPicture.asset(
@@ -219,29 +224,29 @@ class SettingsPage extends HookWidget {
                                 inAppReview.requestReview();
                               }
                             },
-                            icon: "assets/icons/ic_star.svg",
+                            icon: SvgPicture.asset("assets/icons/ic_star.svg"),
                             iconBackgroundColor: Color(0xFFFFC700),
                             label: "Rate the app",
                             suffix: SvgPicture.asset(
                               "assets/icons/ic_arrow_right.svg",
                             ),
                           ),
-                          Divider(),
-                          SettingItem(
-                            onTap: () {},
-                            icon: "assets/icons/ic_share.svg",
-                            iconBackgroundColor: Color(0xFFB43D3D),
-                            label: "Share the app",
-                            suffix: SvgPicture.asset(
-                              "assets/icons/ic_arrow_right.svg",
-                            ),
-                          ),
+                          // Divider(),
+                          // SettingItem(
+                          //   onTap: () {},
+                          //   icon: "assets/icons/ic_share.svg",
+                          //   iconBackgroundColor: Color(0xFFB43D3D),
+                          //   label: "Share the app",
+                          //   suffix: SvgPicture.asset(
+                          //     "assets/icons/ic_arrow_right.svg",
+                          //   ),
+                          // ),
                           Divider(),
                           SettingItem(
                             onTap: () {
                               _launchUrl("https://forms.gle/M5qmLiT2FSLXAz8Y7");
                             },
-                            icon: "assets/icons/ic_send.svg",
+                            icon: SvgPicture.asset("assets/icons/ic_send.svg"),
                             iconBackgroundColor: Color(0xFF0069B6),
                             label: "Send feedback",
                             suffix: SvgPicture.asset(
@@ -253,9 +258,46 @@ class SettingsPage extends HookWidget {
                             onTap: () {
                               _launchEmail("ralph@trybudgetup.com");
                             },
-                            icon: "assets/icons/ic_contact.svg",
+                            icon:
+                                SvgPicture.asset("assets/icons/ic_contact.svg"),
                             iconBackgroundColor: Color(0xFFff9cf5),
-                            label: "Contact",
+                            label: "Contact Us",
+                            suffix: SvgPicture.asset(
+                              "assets/icons/ic_arrow_right.svg",
+                            ),
+                          ),
+                          Divider(),
+                          SettingItem(
+                            onTap: () {
+                              _launchUrl(
+                                  "https://budgetup.notion.site/BudgetUp-Terms-of-Service-0f0bf474649646eb94f39d562cf9d366?pvs=4");
+                            },
+                            icon: const Center(
+                              child: Icon(
+                                Iconsax.book,
+                                size: 15,
+                              ),
+                            ),
+                            iconBackgroundColor: Color(0xFF668042),
+                            label: "Terms of Service",
+                            suffix: SvgPicture.asset(
+                              "assets/icons/ic_arrow_right.svg",
+                            ),
+                          ),
+                          Divider(),
+                          SettingItem(
+                            onTap: () {
+                              _launchUrl(
+                                  "https://budgetup.notion.site/BudgetUp-Privacy-Policy-e3cf48a7d2ba4661be89963696363918?pvs=4");
+                            },
+                            icon: const Center(
+                              child: Icon(
+                                Iconsax.security,
+                                size: 15,
+                              ),
+                            ),
+                            iconBackgroundColor: Color(0xFF4f1d5e),
+                            label: "Privacy Policy",
                             suffix: SvgPicture.asset(
                               "assets/icons/ic_arrow_right.svg",
                             ),
@@ -265,7 +307,7 @@ class SettingsPage extends HookWidget {
                             onTap: () {
                               Navigator.pushNamed(context, RouteStrings.debug);
                             },
-                            icon: "assets/icons/ic_code.svg",
+                            icon: SvgPicture.asset("assets/icons/ic_code.svg"),
                             iconBackgroundColor: Color(0xFF03adfc),
                             label: "Debug",
                             suffix: SvgPicture.asset(
@@ -282,7 +324,7 @@ class SettingsPage extends HookWidget {
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
               child: Text(
-                "BudgetUp v1.0",
+                "BudgetUp v1.0.1s",
                 style: TextStyle(fontSize: 12.0),
                 textAlign: TextAlign.center,
               ),
@@ -349,7 +391,7 @@ class SettingsContainer extends StatelessWidget {
 
 class SettingItem extends StatelessWidget {
   final Function() onTap;
-  final String? icon;
+  final Widget? icon;
   final String? iconSize;
   final Color? iconBackgroundColor;
   final String label;
@@ -379,9 +421,7 @@ class SettingItem extends StatelessWidget {
                 height: 30.0,
                 width: 30.0,
                 padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                child: SvgPicture.asset(
-                  icon!,
-                ),
+                child: icon,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4.0),
                   color: iconBackgroundColor,
