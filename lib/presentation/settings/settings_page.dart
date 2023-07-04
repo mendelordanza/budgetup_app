@@ -186,22 +186,22 @@ class SettingsPage extends HookWidget {
                           ),
                           Divider(),
                           SettingItem(
-                            onTap: () {},
-                            icon: "assets/icons/ic_import_export.svg",
-                            iconBackgroundColor: Color(0xFFC26900),
-                            label: "Import / Export Data - Coming Soon!",
+                            onTap: () {
+                              Navigator.pushNamed(context, RouteStrings.widget);
+                            },
+                            icon: "assets/icons/ ic_widget.svg",
+                            iconBackgroundColor: Color(0xFF00b2c2),
+                            label: "Home Screen Widget",
                             suffix: SvgPicture.asset(
                               "assets/icons/ic_arrow_right.svg",
                             ),
                           ),
                           Divider(),
                           SettingItem(
-                            onTap: () {
-                              Navigator.pushNamed(context, RouteStrings.widget);
-                            },
-                            icon: "assets/icons/ic_widget.svg",
-                            iconBackgroundColor: Color(0xFF00b2c2),
-                            label: "Home Screen Widget - Coming Soon!",
+                            onTap: () {},
+                            icon: "assets/icons/ic_import_export.svg",
+                            iconBackgroundColor: Color(0xFFC26900),
+                            label: "Import / Export Data - Coming Soon!",
                             suffix: SvgPicture.asset(
                               "assets/icons/ic_arrow_right.svg",
                             ),

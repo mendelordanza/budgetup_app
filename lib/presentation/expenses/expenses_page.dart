@@ -60,7 +60,7 @@ class ExpensesPage extends HookWidget {
   Future _updateWidget() async {
     try {
       return HomeWidget.updateWidget(
-          name: 'HomeWidgetExampleProvider', iOSName: 'BudgetUpWidget');
+          name: 'UpcomingBillsWidgetProvider', iOSName: 'BudgetUpWidget');
     } on PlatformException catch (exception) {
       debugPrint('Error Updating Widget. $exception');
     }
@@ -310,7 +310,13 @@ class ExpensesPage extends HookWidget {
                 listener: (context, state) {
                   if (state is ExpenseEdited) {
                     Navigator.pop(context);
-                  } else if (state is ExpenseAdded || state is ExpenseRemoved) {
+                  } else if (state is ExpenseAdded) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Category added")));
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                  } else if (state is ExpenseRemoved) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Category removed")));
                     Navigator.popUntil(context, (route) => route.isFirst);
                   }
                 },
@@ -335,9 +341,41 @@ class ExpensesPage extends HookWidget {
                     }
                     return Center(
                       child: SingleChildScrollView(
-                        child: Text(
-                          "No categories yet\nTap + to add",
-                          textAlign: TextAlign.center,
+                        child: Column(
+                          children: [
+                            Text(
+                              "No categories yet",
+                              textAlign: TextAlign.center,
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                final customerInfo =
+                                    await Purchases.getCustomerInfo();
+                                final hasData = customerInfo
+                                        .entitlements.active[entitlementId] !=
+                                    null;
+
+                                if (context.mounted) {
+                                  if (hasData ||
+                                      (state is ExpenseCategoryLoaded &&
+                                          state.expenseCategories.length < 5)) {
+                                    isSubscribed.value = true;
+                                    Navigator.pushNamed(
+                                        context, RouteStrings.addCategory);
+                                  } else {
+                                    showPaywall(context);
+                                  }
+                                }
+                              },
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Iconsax.add),
+                                  Text("Add your first category"),
+                                ],
+                              ),
+                            )
+                          ],
                         ),
                       ),
                     );

@@ -29,8 +29,8 @@ class ExpenseTxn extends Equatable {
         "id": id,
         "notes": notes,
         "amount": amount,
-        "createdAt": createdAt,
-        "updatedAt": updatedAt
+        "createdAt": createdAt?.toIso8601String(),
+        "updatedAt": updatedAt?.toIso8601String()
       };
 
   ExpenseTxn copy({

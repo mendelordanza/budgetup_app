@@ -12,20 +12,20 @@ class Item {
 
 class AddAsWidgetPage extends StatelessWidget {
   final list = [
-    Item("assets/images/Widget1.svg",
+    Item("assets/Widget1.svg",
         "Hold down on any app to edit Home Screen"),
-    Item("assets/images/Widget2.svg",
+    Item("assets/Widget2.svg",
         "Tap the add button on the upper left corner"),
-    Item("assets/images/Widget3.svg", "Search or look for Once app"),
-    Item("assets/images/Widget4.svg", "Add Once as a widget"),
+    Item("assets/Widget3.svg", "Search or look for BudgetUp"),
+    Item("assets/Widget4.svg", "Add BudgetUp as a widget"),
   ];
 
   final androidList = [
-    Item("assets/images/AndroidWidget1.svg", "Hold down on the Home Screen"),
-    Item("assets/images/AndroidWidget2.svg",
+    Item("assets/AndroidWidget1.svg", "Hold down on the Home Screen"),
+    Item("assets/AndroidWidget2.svg",
         "Tap the widget button on the lower part"),
-    Item("assets/images/AndroidWidget3.svg", "Search or look for Once app"),
-    Item("assets/images/AndroidWidget4.svg", "Add Once as a widget"),
+    Item("assets/AndroidWidget3.svg", "Search or look for BudgetUp"),
+    Item("assets/AndroidWidget4.svg", "Add Once as a widget"),
   ];
 
   @override

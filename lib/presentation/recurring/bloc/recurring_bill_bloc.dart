@@ -157,8 +157,6 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
       Future.wait([
         HomeWidget.saveWidgetData<String>('upcomingBills', upcomingBills),
         HomeWidget.saveWidgetData<bool>('isSubscribed', isSubscribed),
-        HomeWidget.saveWidgetData<String>('title', "Taytol"),
-        HomeWidget.saveWidgetData<String>('message', "Miseyg"),
       ]);
     } on PlatformException catch (exception) {
       debugPrint('Error Sending Data. $exception');
@@ -166,7 +164,7 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
 
     try {
       HomeWidget.updateWidget(
-          name: 'HomeWidgetExampleProvider', iOSName: 'BillsWidget');
+          name: 'UpcomingBillsWidgetProvider', iOSName: 'BillsWidget');
     } on PlatformException catch (exception) {
       debugPrint('Error Updating Widget. $exception');
     }

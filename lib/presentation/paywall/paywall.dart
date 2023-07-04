@@ -143,8 +143,8 @@ class PaywallView extends HookWidget {
                               "assets/icons/ic_calendar.svg",
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
-                            title: "Previous Summary Reports",
-                            desc: "view previous summary reports",
+                            title: "Previous Monthly Statements",
+                            desc: "see the breakdown of your finances",
                           ),
                           featureItem(
                             icon: Icon(Iconsax.home_hashtag),

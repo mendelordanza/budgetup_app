@@ -75,7 +75,7 @@ class AddRecurringBillPage extends HookWidget {
 
     useEffect(() {
       timeTextController.text =
-          "${currentSelectedTime.value.hour}:${currentSelectedTime.value.minute}";
+          "${currentSelectedTime.value.hour.toString().padLeft(2, "0")}:${currentSelectedTime.value.minute.toString().padLeft(2, "0")}";
       return null;
     }, [currentSelectedTime.value]);
 
