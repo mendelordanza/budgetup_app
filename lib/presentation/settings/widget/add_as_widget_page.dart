@@ -25,7 +25,7 @@ class AddAsWidgetPage extends StatelessWidget {
     Item("assets/AndroidWidget2.svg",
         "Tap the widget button on the lower part"),
     Item("assets/AndroidWidget3.svg", "Search or look for BudgetUp"),
-    Item("assets/AndroidWidget4.svg", "Add Once as a widget"),
+    Item("assets/AndroidWidget4.svg", "Add BudgetUp as a widget"),
   ];
 
   @override
