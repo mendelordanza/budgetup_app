@@ -133,24 +133,30 @@ List<DateTime> getPrevMonths(int year) {
   }
 }
 
-bool isDateInQuarter(DateTime date) {
-  int quarter = ((date.month - 1) / 3).ceil();
-  return quarter == 1 || quarter == 2 || quarter == 3 || quarter == 4;
+bool isWithin30Days(DateTime date) {
+  DateTime currentDate = DateTime.now();
+  DateTime thirtyDaysFromNow = currentDate.add(Duration(days: 30));
+
+  return date.isAfter(currentDate) && date.isBefore(thirtyDaysFromNow);
 }
 
-bool has31Days(int month) {
-  if (month < 1 || month > 12) {
-    throw Exception('Invalid month');
+int getNextMonthDate(DateTime currentDate) {
+  int currentMonth = currentDate.month;
+
+  // Calculate the next month
+  int nextMonth = currentMonth + 1;
+
+  if (nextMonth > 12) {
+    nextMonth = 1;
   }
 
-  return DateTime(DateTime.now().year, month + 1, 0).day == 31;
-}
-
-int getNumberOfDays(int year, int month) {
-  if (month < 1 || month > 12) {
-    throw Exception('Invalid month');
+  // Handle the case where the current date has already passed
+  if (currentDate.day > 1) {
+    nextMonth -= 1;
+    if (nextMonth == 0) {
+      nextMonth = 12;
+    }
   }
 
-  return DateTime(year, month + 1, 0).day;
+  return nextMonth;
 }
-

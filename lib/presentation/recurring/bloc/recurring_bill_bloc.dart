@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:budgetup_app/domain/recurring_bill.dart';
+import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:home_widget/home_widget.dart';
@@ -141,13 +142,38 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
     required List<RecurringBill> recurringBills,
   }) async {
     try {
-      final data = recurringBills
-          .where((element) {
-            return element.reminderDate!.isAfter(DateTime.now());
-          })
-          .toList()
-          .take(2);
-      final jsonData = data.map((e) => e.toJson()).toList();
+      List<RecurringBill> data = [];
+      recurringBills.forEach((bill) {
+        if (bill.interval == RecurringBillInterval.monthly.name) {
+          final billReminderDate = DateTime(DateTime.now().year,
+              DateTime.now().month, bill.reminderDate!.day);
+          if (billReminderDate.isBefore(DateTime.now())) {
+            data.add(bill.copy(
+                reminderDate: DateTime(DateTime.now().year,
+                    DateTime.now().month + 1, bill.reminderDate!.day)));
+          } else {
+            data.add(bill.copy(
+                reminderDate: DateTime(DateTime.now().year,
+                    DateTime.now().month, bill.reminderDate!.day)));
+          }
+        } else if (bill.interval == RecurringBillInterval.yearly.name) {
+          final billReminderDate = DateTime(DateTime.now().year,
+              bill.reminderDate!.month, bill.reminderDate!.day);
+
+          if (billReminderDate.isBefore(DateTime.now())) {
+            data.add(bill.copy(
+                reminderDate: DateTime(DateTime.now().year + 1,
+                    bill.reminderDate!.month, bill.reminderDate!.day)));
+          } else {
+            data.add(bill.copy(
+                reminderDate: DateTime(DateTime.now().year,
+                    bill.reminderDate!.month, bill.reminderDate!.day)));
+          }
+        }
+      });
+      data.sort((a, b) => a.reminderDate!.compareTo(b.reminderDate!));
+
+      final jsonData = data.take(2).map((e) => e.toJson()).toList();
       final upcomingBills = jsonEncode(jsonData);
 
       final customerInfo = await Purchases.getCustomerInfo();
