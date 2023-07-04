@@ -20,14 +20,41 @@
             android:paddingTop="12dp"
             android:paddingEnd="12dp"
             android:text="Upcoming Bills"
-            android:textColor="#3A3A3A"
-            android:textSize="12sp" />
+            android:textColor="#3A3A3A" />
 
         <ListView
             android:id="@+id/bills_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="12dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#F2F2F2"
+        android:visibility="invisible"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:paddingStart="12dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="12dp"
+            android:text="Upcoming Bills"
+            android:textColor="#3A3A3A" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:text="No upcoming bills"
+            android:textColor="#3A3A3A" />
 
     </LinearLayout>
 

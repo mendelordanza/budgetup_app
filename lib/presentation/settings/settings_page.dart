@@ -189,7 +189,7 @@ class SettingsPage extends HookWidget {
                             onTap: () {
                               Navigator.pushNamed(context, RouteStrings.widget);
                             },
-                            icon: "assets/icons/ ic_widget.svg",
+                            icon: "assets/icons/ic_widget.svg",
                             iconBackgroundColor: Color(0xFF00b2c2),
                             label: "Home Screen Widget",
                             suffix: SvgPicture.asset(
