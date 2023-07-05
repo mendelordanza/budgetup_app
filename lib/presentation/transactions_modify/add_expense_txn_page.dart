@@ -361,8 +361,10 @@ class AddTransaction extends HookWidget {
                           const SnackBar(content: Text("Transaction added")));
 
                       if (args.expenseCategory != null) {
+                        //if it's from category transaction
                         Navigator.pop(context);
                       } else {
+                        //if it's from home page
                         Navigator.pushNamedAndRemoveUntil(
                           context,
                           RouteStrings.transactions,
