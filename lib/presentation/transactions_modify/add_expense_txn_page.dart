@@ -357,14 +357,10 @@ class AddTransaction extends HookWidget {
                             );
                       }
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Transaction added")));
-
-                      if (args.expenseCategory != null) {
-                        //if it's from category transaction
-                        Navigator.pop(context);
-                      } else {
-                        //if it's from home page
+                      //If the add transaction is coming from home page
+                      if (selectedCategory.value != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Transaction added")));
                         Navigator.pushNamedAndRemoveUntil(
                           context,
                           RouteStrings.transactions,
