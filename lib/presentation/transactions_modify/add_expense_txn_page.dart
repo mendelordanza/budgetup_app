@@ -356,19 +356,20 @@ class AddTransaction extends HookWidget {
                               ),
                             );
                       }
+
                       ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("Transaction added")));
-                      // Navigator.pushNamed(
-                      //   context,
-                      //   RouteStrings.transactions,
-                      //   arguments: selectedCategory.value,
-                      // );
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        RouteStrings.transactions,
-                        (route) => route.isFirst,
-                        arguments: selectedCategory.value,
-                      );
+
+                      if (args.expenseCategory != null) {
+                        Navigator.pop(context);
+                      } else {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          RouteStrings.transactions,
+                          (route) => route.isFirst,
+                          arguments: selectedCategory.value,
+                        );
+                      }
                     }
 
                     //Clear textfields
