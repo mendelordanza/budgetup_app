@@ -22,6 +22,7 @@ import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
 import '../custom/balance.dart';
+import '../custom/custom_floating_button.dart';
 import '../custom/date_filter_button.dart';
 import '../paywall/paywall.dart';
 import 'bloc/expense_bloc.dart';
@@ -386,14 +387,26 @@ class ExpensesPage extends HookWidget {
           ),
         ),
       ),
-      // floatingActionButton: CustomFloatingButton(
-      //   onPressed: () {
-      //     Navigator.pushNamed(
-      //       context,
-      //       RouteStrings.addTransaction,
-      //     );
-      //   },
-      // ),
+      floatingActionButton: BlocBuilder<ExpenseBloc, ExpenseState>(
+        builder: (context, state) {
+          if (state is ExpenseCategoryLoaded &&
+              state.expenseCategories.isNotEmpty) {
+            return CustomFloatingButton(
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  RouteStrings.addTransaction,
+                  arguments: ExpenseTxnArgs(
+                    expenseCategory: null,
+                  ),
+                );
+              },
+            );
+          }
+          return Container();
+        },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -410,13 +423,17 @@ class ExpensesPage extends HookWidget {
       children: [
         GestureDetector(
           onTap: () {
+            // Navigator.pushNamed(
+            //   context,
+            //   RouteStrings.addTransaction,
+            //   arguments: ExpenseTxnArgs(
+            //     expenseCategory: item
+            //   ),
+            // );
             Navigator.pushNamed(
               context,
-              RouteStrings.addTransaction,
-              arguments: ExpenseTxnArgs(
-                expenseCategory: item,
-                from: From.expensePage,
-              ),
+              RouteStrings.transactions,
+              arguments: item,
             );
           },
           child: Material(

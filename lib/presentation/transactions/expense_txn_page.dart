@@ -15,10 +15,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../helper/date_helper.dart';
+import '../custom/custom_floating_button.dart';
 
 class ExpenseTxnPage extends HookWidget {
   final ExpenseCategory expenseCategory;
@@ -27,6 +29,12 @@ class ExpenseTxnPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<SingleCategoryCubit>().getCategory(expenseCategory);
+      });
+      return null;
+    }, []);
     useEffect(() {
       context
           .read<ExpenseTxnBloc>()
@@ -50,17 +58,17 @@ class ExpenseTxnPage extends HookWidget {
             );
           },
         ),
-        // leading: InkWell(
-        //   onTap: () {
-        //     Navigator.pop(context);
-        //   },
-        //   child: Padding(
-        //     padding: const EdgeInsets.all(16.0),
-        //     child: SvgPicture.asset(
-        //       "assets/icons/ic_arrow_left.svg",
-        //     ),
-        //   ),
-        // ),
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SvgPicture.asset(
+              "assets/icons/ic_arrow_left.svg",
+            ),
+          ),
+        ),
         centerTitle: true,
         automaticallyImplyLeading: false,
         elevation: 0,
@@ -86,8 +94,11 @@ class ExpenseTxnPage extends HookWidget {
                     },
                     onSelected: (value) {
                       if (value == 0) {
-                        Navigator.pushNamed(context, RouteStrings.addCategory,
-                            arguments: state.expenseCategory);
+                        Navigator.pushNamed(
+                          context,
+                          RouteStrings.addCategory,
+                          arguments: state.expenseCategory,
+                        );
                       } else if (value == 1) {
                         showDialog(
                           context: context,
@@ -95,7 +106,7 @@ class ExpenseTxnPage extends HookWidget {
                             return DeleteDialog(
                               title: "Delete Category",
                               description:
-                                  "Are you sure you want to delete this category?",
+                                  "This will also delete transactions under this category. Are you sure you want to delete this category?",
                               onPositive: () {
                                 context.read<ModifyExpensesBloc>().add(
                                     RemoveExpenseCategory(
@@ -172,7 +183,11 @@ class ExpenseTxnPage extends HookWidget {
                 child: BlocListener<TransactionsModifyBloc,
                     TransactionsModifyState>(
                   listener: (contex, state) {
-                    if (state is ExpenseTxnEdited) {
+                    if (state is ExpenseTxnAdded) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Transaction added")));
+                      Navigator.pop(context);
+                    } else if (state is ExpenseTxnEdited) {
                       ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("Transaction edited")));
                       Navigator.pop(context);
@@ -237,7 +252,30 @@ class ExpenseTxnPage extends HookWidget {
                           },
                         );
                       }
-                      return Center(child: Text("No transactions"));
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("No transactions"),
+                          TextButton(
+                            onPressed: () async {
+                              Navigator.pushNamed(
+                                context,
+                                RouteStrings.addTransaction,
+                                arguments: ExpenseTxnArgs(
+                                  expenseCategory: expenseCategory,
+                                ),
+                              );
+                            },
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Iconsax.add),
+                                Text("Add your first transaction"),
+                              ],
+                            ),
+                          )
+                        ],
+                      );
                     },
                   ),
                 ),
@@ -246,18 +284,17 @@ class ExpenseTxnPage extends HookWidget {
           ),
         ),
       ),
-      // floatingActionButton: CustomFloatingButton(
-      //   onPressed: () {
-      //     Navigator.pushNamed(
-      //       context,
-      //       RouteStrings.addTransaction,
-      //       arguments: ExpenseTxnArgs(
-      //         expenseCategory: expenseCategory,
-      //         from: From.txnPage,
-      //       ),
-      //     );
-      //   },
-      // ),
+      floatingActionButton: CustomFloatingButton(
+        onPressed: () {
+          Navigator.pushNamed(
+            context,
+            RouteStrings.addTransaction,
+            arguments: ExpenseTxnArgs(
+              expenseCategory: expenseCategory,
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -319,7 +356,6 @@ class ExpenseTxnPage extends HookWidget {
               arguments: ExpenseTxnArgs(
                 expenseCategory: expenseCategory,
                 expenseTxn: item,
-                from: From.txnPage,
               ),
             );
           },
