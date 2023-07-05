@@ -71,7 +71,7 @@ class AddExpenseCategoryPage extends HookWidget {
                     return DeleteDialog(
                       title: "Delete Category",
                       description:
-                          "Are you sure you want to delete this category?",
+                          "This will also delete transactions under this category. Are you sure you want to delete this category?",
                       onPositive: () {
                         context.read<ModifyExpensesBloc>().add(
                             RemoveExpenseCategory(

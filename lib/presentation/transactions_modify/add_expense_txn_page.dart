@@ -6,8 +6,8 @@ import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/custom/custom_button.dart';
 import 'package:budgetup_app/presentation/custom/custom_text_field.dart';
-import 'package:budgetup_app/presentation/transactions/expense_txn_page.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,25 +16,20 @@ import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 
+import '../../helper/colors.dart';
 import '../../helper/route_strings.dart';
 import '../../helper/string.dart';
+import '../expenses/bloc/expense_bloc.dart';
 import '../expenses/bloc/single_category_cubit.dart';
 
 class ExpenseTxnArgs {
-  final ExpenseCategory expenseCategory;
+  final ExpenseCategory? expenseCategory;
   final ExpenseTxn? expenseTxn;
-  final From from;
 
   ExpenseTxnArgs({
     required this.expenseCategory,
     this.expenseTxn,
-    required this.from,
   });
-}
-
-enum From {
-  expensePage,
-  txnPage,
 }
 
 class AddExpenseTxnPage extends HookWidget {
@@ -44,38 +39,26 @@ class AddExpenseTxnPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pageController = usePageController();
-
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<SingleCategoryCubit>().getCategory(args.expenseCategory);
+        if (args.expenseCategory != null) {
+          context
+              .read<SingleCategoryCubit>()
+              .getCategory(args.expenseCategory!);
+        }
       });
       return null;
     }, []);
 
-    if (args.expenseTxn != null) {
-      return AddTransaction(args: args);
-    }
-    return PageView(
-      controller: pageController,
-      scrollDirection: Axis.vertical,
-      children: [
-        AddTransaction(
-          args: args,
-          pageController: pageController,
-        ),
-        ExpenseTxnPage(expenseCategory: args.expenseCategory),
-      ],
-    );
+    return AddTransaction(args: args);
   }
 }
 
 class AddTransaction extends HookWidget {
   final ExpenseTxnArgs args;
-  final PageController? pageController;
   final _formKey = GlobalKey<FormState>();
 
-  AddTransaction({required this.args, this.pageController, super.key});
+  AddTransaction({required this.args, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +77,7 @@ class AddTransaction extends HookWidget {
         args.expenseTxn != null && args.expenseTxn!.updatedAt != null
             ? args.expenseTxn!.updatedAt!
             : DateTime.now());
+    final selectedCategory = useState<ExpenseCategory?>(null);
 
     useEffect(() {
       dateTextController.text =
@@ -101,15 +85,15 @@ class AddTransaction extends HookWidget {
       return null;
     }, [currentTransactionDate.value]);
 
-    useEffect(() {
-      pageController?.addListener(() {
-        if (pageController?.page == 1) {
-          amountFocusNode.unfocus();
-          notesFocusNode.unfocus();
-        }
-      });
-      return null;
-    }, []);
+    // useEffect(() {
+    //   pageController?.addListener(() {
+    //     if (pageController?.page == 1) {
+    //       amountFocusNode.unfocus();
+    //       notesFocusNode.unfocus();
+    //     }
+    //   });
+    //   return null;
+    // }, []);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -151,44 +135,45 @@ class AddTransaction extends HookWidget {
                               padding: const EdgeInsets.only(bottom: 16.0),
                               child: Column(
                                 children: [
-                                  BlocBuilder<SingleCategoryCubit,
-                                          SingleCategoryState>(
-                                      builder: (context, state) {
-                                    if (state is SingleCategoryLoaded) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          Navigator.pushNamed(
-                                            context,
-                                            RouteStrings.addCategory,
-                                            arguments: state.expenseCategory,
-                                          );
-                                        },
-                                        behavior: HitTestBehavior.translucent,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              "${state.expenseCategory.icon} ${state.expenseCategory.title}",
-                                              style: TextStyle(
-                                                fontSize: 16.0,
+                                  if (args.expenseCategory != null)
+                                    BlocBuilder<SingleCategoryCubit,
+                                            SingleCategoryState>(
+                                        builder: (context, state) {
+                                      if (state is SingleCategoryLoaded) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                              context,
+                                              RouteStrings.addCategory,
+                                              arguments: state.expenseCategory,
+                                            );
+                                          },
+                                          behavior: HitTestBehavior.translucent,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                "${state.expenseCategory.icon} ${state.expenseCategory.title}",
+                                                style: TextStyle(
+                                                  fontSize: 16.0,
+                                                ),
                                               ),
-                                            ),
-                                            SizedBox(
-                                              width: 5.0,
-                                            ),
-                                            Icon(
-                                              Iconsax.edit,
-                                              size: 14,
-                                            )
-                                          ],
-                                        ),
-                                      );
-                                    }
-                                    return Text("No category");
-                                  }),
+                                              SizedBox(
+                                                width: 5.0,
+                                              ),
+                                              Icon(
+                                                Iconsax.edit,
+                                                size: 14,
+                                              )
+                                            ],
+                                          ),
+                                        );
+                                      }
+                                      return Text("No category");
+                                    }),
                                   SizedBox(
                                     height: 5.0,
                                   ),
@@ -278,26 +263,46 @@ class AddTransaction extends HookWidget {
                                 size: 16,
                               ),
                             ),
+                            if (args.expenseCategory == null)
+                              BlocBuilder<ExpenseBloc, ExpenseState>(
+                                builder: (context, state) {
+                                  if (state is ExpenseCategoryLoaded &&
+                                      state.expenseCategories.isNotEmpty) {
+                                    return categoryDropdown(context,
+                                        items: state.expenseCategories,
+                                        onChanged: (categoryId) {
+                                      selectedCategory.value = state
+                                          .expenseCategories
+                                          .singleWhere((element) =>
+                                              element.id == categoryId);
+                                    });
+                                  }
+                                  return categoryDropdown(context, items: [],
+                                      onChanged: (category) {
+                                    selectedCategory.value = null;
+                                  });
+                                },
+                              ),
                           ],
                         ),
                       ),
-                      if (args.expenseTxn == null)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              "assets/icons/ic_double_arrow_up.svg",
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            SizedBox(
-                              width: 5.0,
-                            ),
-                            Text(
-                              "Swipe up to view transactions",
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                      // if (args.expenseTxn == null)
+                      //   Row(
+                      //     mainAxisAlignment: MainAxisAlignment.center,
+                      //     children: [
+                      //       SvgPicture.asset(
+                      //         "assets/icons/ic_double_arrow_up.svg",
+                      //         color: Theme.of(context).colorScheme.onSurface,
+                      //       ),
+                      //       SizedBox(
+                      //         width: 5.0,
+                      //       ),
+                      //       Text(
+                      //         "Swipe up to view transactions",
+                      //         textAlign: TextAlign.center,
+                      //       ),
+                      //     ],
+                      //   ),
                     ],
                   ),
                 ),
@@ -314,9 +319,17 @@ class AddTransaction extends HookWidget {
                         updatedAt:
                             removeTimeFromDate(currentTransactionDate.value),
                       );
-                      context.read<TransactionsModifyBloc>().add(EditExpenseTxn(
-                          expenseCategory: args.expenseCategory,
-                          expenseTxn: editedTxn));
+                      if (args.expenseCategory != null) {
+                        context.read<TransactionsModifyBloc>().add(
+                            EditExpenseTxn(
+                                expenseCategory: args.expenseCategory!,
+                                expenseTxn: editedTxn));
+                      } else if (selectedCategory.value != null) {
+                        context.read<TransactionsModifyBloc>().add(
+                            EditExpenseTxn(
+                                expenseCategory: selectedCategory.value!,
+                                expenseTxn: editedTxn));
+                      }
                     } else {
                       //Add
                       final newTxn = ExpenseTxn(
@@ -328,19 +341,34 @@ class AddTransaction extends HookWidget {
                         updatedAt:
                             removeTimeFromDate(currentTransactionDate.value),
                       );
-                      context.read<TransactionsModifyBloc>().add(
-                            AddExpenseTxn(
-                              expenseTxn: newTxn,
-                              expenseCategory: args.expenseCategory,
-                            ),
-                          );
+                      if (args.expenseCategory != null) {
+                        context.read<TransactionsModifyBloc>().add(
+                              AddExpenseTxn(
+                                expenseTxn: newTxn,
+                                expenseCategory: args.expenseCategory!,
+                              ),
+                            );
+                      } else if (selectedCategory.value != null) {
+                        context.read<TransactionsModifyBloc>().add(
+                              AddExpenseTxn(
+                                expenseTxn: newTxn,
+                                expenseCategory: selectedCategory.value!,
+                              ),
+                            );
+                      }
                       ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("Transaction added")));
                       // Navigator.pushNamed(
                       //   context,
                       //   RouteStrings.transactions,
-                      //   arguments: args.expenseCategory,
+                      //   arguments: selectedCategory.value,
                       // );
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        RouteStrings.transactions,
+                        (route) => route.isFirst,
+                        arguments: selectedCategory.value,
+                      );
                     }
 
                     //Clear textfields
@@ -367,5 +395,90 @@ class AddTransaction extends HookWidget {
         ? double.parse(removeFormatting(amount))
         : double.parse(removeFormatting(amount)) /
             sharedPrefs.getCurrencyRate();
+  }
+
+  Widget categoryDropdown(BuildContext context,
+      {ExpenseCategory? selectedCategory,
+      required List<ExpenseCategory> items,
+      required Function(int) onChanged}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            "Category",
+          ),
+        ),
+        DropdownButtonFormField2(
+          decoration: InputDecoration(
+            hintText: "Select Category",
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: secondaryColor, width: 2.0),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFFC62F3A), width: 2.0),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFFC62F3A), width: 2.0),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            filled: true,
+            fillColor: Theme.of(context).cardColor,
+            contentPadding: EdgeInsets.all(16.0),
+            prefixIcon: Icon(
+              Iconsax.category,
+              size: 15.0,
+            ),
+          ),
+          isExpanded: true,
+          // hint: Text(
+          //   selectedCategory != null
+          //       ? selectedCategory.title!
+          //       : 'Select category',
+          // ),
+          items: items
+              .map(
+                (item) => DropdownMenuItem<int>(
+                  value: item.id,
+                  child: Text(
+                    item.title ?? "",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
+          validator: (value) {
+            if (value == null) {
+              return 'Please select category.';
+            }
+            return null;
+          },
+          onChanged: (value) {
+            if (value != null) {
+              onChanged(value);
+            }
+          },
+          iconStyleData: IconStyleData(
+            icon: SvgPicture.asset(
+              "assets/icons/ic_arrow_down.svg",
+            ),
+          ),
+          dropdownStyleData: DropdownStyleData(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
