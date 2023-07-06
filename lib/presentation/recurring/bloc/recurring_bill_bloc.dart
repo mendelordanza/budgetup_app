@@ -50,18 +50,30 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
       } else if (state is RecurringBillRemoved) {
         add(LoadRecurringBills(state.selectedDate));
       } else if (state is MarkAsPaid) {
-        add(LoadRecurringBills(state.selectedDate));
+        final currentSelectedDate =
+            DateTime.parse(sharedPrefs.getRecurringSelectedDate());
+        add(LoadRecurringBills(currentSelectedDate));
       } else if (state is UnmarkAsPaid) {
-        add(LoadRecurringBills(state.selectedDate));
+        final currentSelectedDate =
+            DateTime.parse(sharedPrefs.getRecurringSelectedDate());
+        add(LoadRecurringBills(currentSelectedDate));
       }
     });
 
     on<LoadRecurringBills>((event, emit) async {
       final recurringBills = await recurringBillsRepo.getRecurringBills();
+
+      //Filter out monthly and yearly
+      final filteredRecurringBills = recurringBills.where((bill) {
+        return bill.interval == RecurringBillInterval.monthly.name ||
+            (bill.interval == RecurringBillInterval.yearly.name &&
+                bill.reminderDate!.month == event.selectedDate.month);
+      }).toList();
+
       final paidRecurringBills =
           await recurringBillsRepo.getPaidRecurringBills(event.selectedDate);
 
-      final convertedRecurringBills = recurringBills.map((bill) {
+      final convertedRecurringBills = filteredRecurringBills.map((bill) {
         final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
             ? (bill.amount ?? 0.00)
             : (bill.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
@@ -90,11 +102,21 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
     on<ConvertRecurringBill>((event, emit) async {
       if (state is RecurringBillsLoaded) {
         final recurringBills = await recurringBillsRepo.getRecurringBills();
+
+        //Filter out monthly and yearly
+        final filteredRecurringBills = recurringBills.where((bill) {
+          return bill.interval == RecurringBillInterval.monthly.name ||
+              (bill.interval == RecurringBillInterval.yearly.name &&
+                  bill.reminderDate!.month ==
+                      DateTime.parse(sharedPrefs.getRecurringSelectedDate())
+                          .month);
+        }).toList();
+
         final paidRecurringBills =
             await recurringBillsRepo.getPaidRecurringBills(
                 DateTime.parse(sharedPrefs.getRecurringSelectedDate()));
 
-        final convertedRecurringBills = recurringBills.map((bill) {
+        final convertedRecurringBills = filteredRecurringBills.map((bill) {
           final convertedAmount = event.currencyCode == "USD"
               ? (bill.amount ?? 0.00)
               : (bill.amount ?? 0.00) * event.currencyRate;
