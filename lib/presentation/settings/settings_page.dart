@@ -125,6 +125,10 @@ class SettingsPage extends HookWidget {
                                       .entitlements.active[entitlementId] !=
                                   null) {
                                 isSubscribed.value = true;
+                                if (context.mounted) {
+                                  Navigator.pushNamed(
+                                      context, RouteStrings.subStatus);
+                                }
                               } else if (context.mounted) {
                                 showPaywall(context);
                               }

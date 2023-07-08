@@ -33,6 +33,18 @@ class RecurringBillsRepository {
     return await _isarService.saveRecurringBill(newRecurringBill);
   }
 
+  Future<void> softDeleteRecurringBill(
+    RecurringBill recurringBill,
+    DateTime selectedDate,
+  ) async {
+    final recurringBillEntity = recurringBill.toIsarObject();
+    await _isarService.softDeleteRecurringBill(
+      recurringBillEntity,
+      selectedDate,
+    );
+  }
+
+  //TODO add identification for delete all
   Future<void> deleteRecurringBill(int recurringBillId) async {
     await _isarService.deleteAllRecurringBillTxns(recurringBillId);
     await _isarService.deleteRecurringBill(recurringBillId);

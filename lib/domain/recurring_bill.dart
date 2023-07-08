@@ -13,6 +13,8 @@ class RecurringBill extends Equatable {
   final String? interval;
   final DateTime? reminderDate;
   final List<RecurringBillTxn>? recurringBillTxns;
+  final bool? archived;
+  final DateTime? archivedDate;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -23,6 +25,8 @@ class RecurringBill extends Equatable {
     this.interval,
     this.reminderDate,
     this.recurringBillTxns,
+    this.archived,
+    this.archivedDate,
     this.createdAt,
     this.updatedAt,
   });
@@ -43,6 +47,8 @@ class RecurringBill extends Equatable {
         reminderDate: json["reminderDate"],
         recurringBillTxns: List<RecurringBillTxn>.from(json["recurringBillTxns"]
             .map((txn) => RecurringBillTxn.fromJson(txn.toJson()))),
+        archived: json["archived"],
+        archivedDate: json["archivedDate"],
         createdAt: json["createdAt"],
         updatedAt: json["updatedAt"],
       );
@@ -54,6 +60,8 @@ class RecurringBill extends Equatable {
         "interval": interval,
         "recurringBillTxns": recurringBillTxns?.map((e) => e.toJson()).toList(),
         "reminderDate": reminderDate?.toIso8601String(),
+        "archived": archived,
+        "archiveDate": archivedDate?.toIso8601String(),
         "createdAt": createdAt?.toIso8601String(),
         "updatedAt": updatedAt?.toIso8601String(),
       };
@@ -65,6 +73,8 @@ class RecurringBill extends Equatable {
       ..amount = amount
       ..interval = interval
       ..reminderDate = reminderDate
+      ..archived = archived
+      ..archivedDate = archivedDate
       ..createdAt = createdAt
       ..updatedAt = updatedAt;
   }
@@ -76,6 +86,8 @@ class RecurringBill extends Equatable {
     String? interval,
     DateTime? reminderDate,
     List<RecurringBillTxn>? recurringBillTxns,
+    bool? archived,
+    DateTime? archivedDate,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) =>
@@ -86,6 +98,8 @@ class RecurringBill extends Equatable {
         interval: interval ?? this.interval,
         reminderDate: reminderDate ?? this.reminderDate,
         recurringBillTxns: recurringBillTxns ?? this.recurringBillTxns,
+        archived: archived ?? this.archived,
+        archivedDate: archivedDate ?? this.archivedDate,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
@@ -99,6 +113,8 @@ class RecurringBill extends Equatable {
         interval,
         reminderDate,
         recurringBillTxns,
+        archived,
+        archivedDate,
         createdAt,
         updatedAt,
       ];

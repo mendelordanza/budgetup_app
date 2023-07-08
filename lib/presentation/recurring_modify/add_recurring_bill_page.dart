@@ -15,6 +15,7 @@ import 'package:keyboard_actions/keyboard_actions.dart';
 import '../../helper/colors.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/keyboard_helper.dart';
+import '../custom/delete_dialog.dart';
 import 'bloc/recurring_modify_bloc.dart';
 
 enum RecurringBillInterval {
@@ -102,9 +103,25 @@ class AddRecurringBillPage extends HookWidget {
             IconButton(
               icon: Icon(Iconsax.trash),
               onPressed: () {
-                context.read<RecurringModifyBloc>().add(RemoveRecurringBill(
-                    selectedDate: currentSelectedDate.value,
-                    recurringBill: recurringBill!));
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return DeleteDialog(
+                      title: "Delete Recurring Bill",
+                      description:
+                          "Are you sure you want to delete this recurring bill?",
+                      onPositive: () {
+                        context.read<RecurringModifyBloc>().add(
+                            RemoveRecurringBill(
+                                selectedDate: currentSelectedDate.value,
+                                recurringBill: recurringBill!));
+                      },
+                      onNegative: () {
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                );
               },
             )
         ],

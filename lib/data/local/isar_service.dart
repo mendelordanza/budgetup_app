@@ -4,8 +4,12 @@ import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
 import 'package:budgetup_app/data/local/entities/recurring_bill_entity.dart';
 import 'package:budgetup_app/data/local/entities/recurring_bill_txn_entity.dart';
 import 'package:budgetup_app/helper/date_helper.dart';
+import 'package:budgetup_app/helper/shared_prefs.dart';
+import 'package:budgetup_app/injection_container.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../../helper/string.dart';
 
 class IsarService {
   late Future<Isar> db;
@@ -161,6 +165,28 @@ class IsarService {
     final isar = await db;
     await isar.writeTxn(() async {
       final success = await isar.recurringBillEntitys.delete(recurringBillId);
+      print('deleted: $success');
+    });
+  }
+
+  Future<void> softDeleteRecurringBill(
+    RecurringBillEntity recurringBillEntity,
+    DateTime selectedDate,
+  ) async {
+    final isar = await db;
+
+    final sharedPrefs = getIt<SharedPrefs>();
+    final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
+        ? (recurringBillEntity.amount ?? 0.00)
+        : (recurringBillEntity.amount ?? 0.00) / sharedPrefs.getCurrencyRate();
+
+    await isar.writeTxn(() async {
+      final success =
+          await isar.recurringBillEntitys.put(recurringBillEntity.copy(
+        amount: convertedAmount,
+        archived: true,
+        archivedDate: removeTimeFromDate(selectedDate),
+      ));
       print('deleted: $success');
     });
   }

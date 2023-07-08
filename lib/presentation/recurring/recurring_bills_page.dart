@@ -3,6 +3,7 @@ import 'package:budgetup_app/helper/colors.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/custom/balance.dart';
+import 'package:budgetup_app/presentation/custom/custom_action_dialog.dart';
 import 'package:budgetup_app/presentation/custom/date_filter_button.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/recurring_confirmation_dialog.dart';
@@ -24,6 +25,7 @@ import '../../helper/constant.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
+import '../custom/custom_button.dart';
 import '../custom/date_filter_bottom_sheet.dart';
 import '../custom/delete_dialog.dart';
 import '../paywall/paywall.dart';
@@ -433,18 +435,101 @@ class RecurringBillsPage extends HookWidget {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return DeleteDialog(
+                  return CustomActionDialog(
                     title: "Delete Recurring Bill",
                     description:
                         "Are you sure you want to delete this recurring bill?",
-                    onPositive: () {
-                      context.read<RecurringModifyBloc>().add(
-                          RemoveRecurringBill(
-                              selectedDate: selectedDate, recurringBill: item));
-                    },
-                    onNegative: () {
-                      Navigator.pop(context);
-                    },
+                    actions: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 14.0),
+                              child: SizedBox(
+                                height: 44.0,
+                                child: OutlinedButton(
+                                  onPressed: () {
+                                    context
+                                        .read<RecurringModifyBloc>()
+                                        .add(ArchiveRecurringBill(
+                                          selectedDate: selectedDate,
+                                          recurringBill: item,
+                                        ));
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(
+                                    "This and following months",
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    side: BorderSide(
+                                      width: 1.0,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 14.0),
+                              child: SizedBox(
+                                height: 44.0,
+                                child: OutlinedButton(
+                                  onPressed: () {
+                                    context
+                                        .read<RecurringModifyBloc>()
+                                        .add(RemoveRecurringBill(
+                                          selectedDate: selectedDate,
+                                          recurringBill: item,
+                                        ));
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(
+                                    "Delete all",
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                    side: BorderSide(
+                                      width: 1.0,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            CustomButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                "Cancel",
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   );
                 },
               );
@@ -526,7 +611,36 @@ class RecurringBillsPage extends HookWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(item.title ?? "hello"),
+                            Row(
+                              children: [
+                                Text(item.title ?? "hello"),
+                                if (item.archived == true)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 4.0),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 4.0,
+                                        vertical: 2.0,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                          4.0,
+                                        ),
+                                        color: secondaryColor,
+                                      ),
+                                      child: Text(
+                                        "Archived",
+                                        style: TextStyle(
+                                          fontSize: 10.0,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onInverseSurface,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
                             if (item.isPaid(selectedDate) && txn != null)
                               Text(
                                 "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",

@@ -1,6 +1,8 @@
+import 'package:budgetup_app/presentation/custom/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -54,7 +56,10 @@ class DateFilterBottomSheet extends HookWidget {
 
     return SingleChildScrollView(
       child: Container(
-        padding: EdgeInsets.all(
+        padding: EdgeInsets.fromLTRB(
+          16.0,
+          4.0,
+          16.0,
           16.0,
         ),
         clipBehavior: Clip.antiAlias,
@@ -65,6 +70,25 @@ class DateFilterBottomSheet extends HookWidget {
         child: Column(
           children: [
             _buildHandle(context),
+            TextButton(
+              onPressed: () {
+                selectedDate.value = removeTimeFromDate(DateTime.now());
+                onSelectDate(selectedDate.value);
+                _currentYear.value = DateTime.now().year;
+                onSelectYear(_currentYear.value);
+              },
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(
+                    Iconsax.refresh,
+                    size: 15.0,
+                  ),
+                  Text(" Today"),
+                ],
+              ),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: types.map((element) {
@@ -192,30 +216,8 @@ class DateFilterBottomSheet extends HookWidget {
                         Text("${_currentYear.value}"),
                         IconButton(
                           onPressed: () {
-                            if (_currentYear.value != DateTime.now().year) {
-                              _currentYear.value = _currentYear.value + 1;
-                              onSelectYear(_currentYear.value);
-                              // context
-                              //     .read<ExpenseDateFilterBloc>()
-                              //     .add(ExpenseSelectDate(
-                              //         _selectedFilterType.value,
-                              //         DateTime(
-                              //           _currentYear.value,
-                              //           _selectedDate.value.month,
-                              //           _selectedDate.value.day,
-                              //         )));
-                              // context.read<ExpenseBloc>().add(
-                              //       LoadExpenseCategories(
-                              //         dateFilterType:
-                              //             _selectedFilterType.value,
-                              //         selectedDate: DateTime(
-                              //           _currentYear.value,
-                              //           _selectedDate.value.month,
-                              //           _selectedDate.value.day,
-                              //         ),
-                              //       ),
-                              //     );
-                            }
+                            _currentYear.value = _currentYear.value + 1;
+                            onSelectYear(_currentYear.value);
                           },
                           icon: SvgPicture.asset(
                             "assets/icons/ic_arrow_right.svg",

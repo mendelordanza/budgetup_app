@@ -236,7 +236,7 @@ class PaywallView extends HookWidget {
                 Text(
                   desc,
                   style: TextStyle(
-                    fontSize: 12.0,
+                    fontSize: 13.0,
                   ),
                 ),
               ],

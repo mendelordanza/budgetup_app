@@ -9,6 +9,7 @@ import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_pa
 import 'package:budgetup_app/presentation/settings/appearance/appearance_page.dart';
 import 'package:budgetup_app/presentation/settings/debug/debug_page.dart';
 import 'package:budgetup_app/presentation/settings/settings_page.dart';
+import 'package:budgetup_app/presentation/settings/subscription/subscribed_page.dart';
 import 'package:budgetup_app/presentation/settings/widget/add_as_widget_page.dart';
 import 'package:budgetup_app/presentation/summary/summary_page.dart';
 import 'package:budgetup_app/presentation/transactions_modify/add_expense_txn_page.dart';
@@ -26,6 +27,10 @@ class RouteGenerator {
       case RouteStrings.landing:
         return _navigate(
           builder: (_) => LandingPage(),
+        );
+      case RouteStrings.subStatus:
+        return _navigate(
+          builder: (_) => SubscribedPage(),
         );
       case RouteStrings.settings:
         return CustomPageRoute(

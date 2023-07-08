@@ -58,6 +58,16 @@ class RecurringModifyBloc
 
       emit(RecurringBillRemoved(event.selectedDate));
     });
+    on<ArchiveRecurringBill>((event, emit) async {
+      await recurringBillsRepo.softDeleteRecurringBill(
+        event.recurringBill,
+        event.selectedDate,
+      );
+
+      notificationService.cancelNotif(event.recurringBill.id!);
+
+      emit(RecurringBillRemoved(event.selectedDate));
+    });
     on<AddRecurringBillTxn>((event, emit) async {
       await recurringBillsRepo.addRecurringBillTxn(
           event.recurringBill, event.recurringBillTxn);
