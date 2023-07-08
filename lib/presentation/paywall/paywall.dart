@@ -38,7 +38,7 @@ class PaywallView extends HookWidget {
   @override
   Widget build(BuildContext context) {
     //final selectedProduct = useState<StoreProduct?>(null);
-    final selectedIndex = useState(0);
+    final selectedIndex = useState(-1);
     final isLoading = useState(false);
 
     return Container(
