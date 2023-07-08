@@ -10,6 +10,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:in_app_review/in_app_review.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -60,21 +61,24 @@ class SettingsPage extends HookWidget {
     }
   }
 
+  Future<String> getVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    return packageInfo.version;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isSubscribed = useState(false);
-    // final future = useMemoized(() => Purchases.getCustomerInfo());
-    // final customerInfo = useFuture(future, initialData: null);
-    // useEffect(() {
-    //   if (customerInfo.data != null) {
-    //     final entitlement =
-    //         customerInfo.data!.entitlements.active[entitlementId];
-    //     isSubscribed.value = entitlement != null;
-    //   } else {
-    //     isSubscribed.value = false;
-    //   }
-    //   return null;
-    // }, [customerInfo.data]);
+
+    final currentVersion = useState("");
+    final future = useMemoized(() => getVersion());
+    final version = useFuture(future, initialData: "");
+    useEffect(() {
+      if (version.data != null) {
+        currentVersion.value = version.data!;
+      }
+      return null;
+    }, [version.data]);
 
     useEffect(() {
       Purchases.addCustomerInfoUpdateListener((customerInfo) {
@@ -324,7 +328,7 @@ class SettingsPage extends HookWidget {
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
               child: Text(
-                "BudgetUp v1.0.1s",
+                "BudgetUp v${currentVersion.value}",
                 style: TextStyle(fontSize: 12.0),
                 textAlign: TextAlign.center,
               ),
