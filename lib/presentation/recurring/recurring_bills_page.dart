@@ -535,6 +535,15 @@ class RecurringBillsPage extends HookWidget {
                                 ),
                               )
                             else if (item.reminderDate != null &&
+                                item.interval ==
+                                    RecurringBillInterval.weekly.name)
+                              Text(
+                                "every ${formatDate(item.reminderDate!, "EEEE")}",
+                                style: TextStyle(
+                                  fontSize: 12.0,
+                                ),
+                              )
+                            else if (item.reminderDate != null &&
                                 item.interval !=
                                     RecurringBillInterval.yearly.name)
                               Text(

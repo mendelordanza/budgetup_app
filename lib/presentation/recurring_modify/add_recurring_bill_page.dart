@@ -4,6 +4,7 @@ import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/custom/custom_button.dart';
 import 'package:budgetup_app/presentation/custom/custom_text_field.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,6 +19,7 @@ import '../../helper/keyboard_helper.dart';
 import 'bloc/recurring_modify_bloc.dart';
 
 enum RecurringBillInterval {
+  weekly,
   monthly,
   //quarterly,
   yearly,
@@ -30,6 +32,7 @@ class AddRecurringBillPage extends HookWidget {
   AddRecurringBillPage({this.recurringBill, Key? key}) : super(key: key);
 
   final intervals = [
+    RecurringBillInterval.weekly,
     RecurringBillInterval.monthly,
     //RecurringBillInterval.quarterly,
     RecurringBillInterval.yearly,
@@ -257,22 +260,92 @@ class AddRecurringBillPage extends HookWidget {
                                 padding: EdgeInsets.only(bottom: 8.0),
                                 child: Text("Every..."),
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: intervals.map((element) {
-                                  return _tab(
-                                    context,
-                                    label:
-                                        "${element.name[0].toUpperCase()}${element.name.substring(1)}",
-                                    isSelected:
-                                        selectedInterval.value == element,
-                                    onSelect: () {
-                                      selectedInterval.value = element;
-                                    },
-                                  );
-                                }).toList(),
+                              DropdownButtonFormField2(
+                                decoration: InputDecoration(
+                                  hintText: "Select inteval",
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: secondaryColor, width: 2.0),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xFFC62F3A), width: 2.0),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  focusedErrorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xFFC62F3A), width: 2.0),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  filled: true,
+                                  fillColor: Theme.of(context).cardColor,
+                                  contentPadding: EdgeInsets.all(16.0),
+                                  prefixIcon: Icon(
+                                    Iconsax.refresh,
+                                    size: 15.0,
+                                  ),
+                                ),
+                                isExpanded: true,
+                                value: selectedInterval.value,
+                                items: intervals
+                                    .map(
+                                      (item) => DropdownMenuItem<
+                                          RecurringBillInterval>(
+                                        value: item,
+                                        child: Text(
+                                          "${item.name[0].toUpperCase()}${item.name.substring(1)}",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Please select interval.';
+                                  }
+                                  return null;
+                                },
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    selectedInterval.value = value;
+                                  }
+                                },
+                                iconStyleData: IconStyleData(
+                                  icon: SvgPicture.asset(
+                                    "assets/icons/ic_arrow_down.svg",
+                                    color: secondaryColor,
+                                  ),
+                                ),
+                                dropdownStyleData: DropdownStyleData(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                ),
                               ),
+
+                              // Row(
+                              //   mainAxisAlignment:
+                              //       MainAxisAlignment.spaceEvenly,
+                              //   children: intervals.map((element) {
+                              //     return _tab(
+                              //       context,
+                              //       label:
+                              //           "${element.name[0].toUpperCase()}${element.name.substring(1)}",
+                              //       isSelected:
+                              //           selectedInterval.value == element,
+                              //       onSelect: () {
+                              //         selectedInterval.value = element;
+                              //       },
+                              //     );
+                              //   }).toList(),
+                              // ),
                             ],
                           )
                         ],
