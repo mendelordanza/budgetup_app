@@ -191,7 +191,30 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
                 reminderDate: DateTime(DateTime.now().year,
                     DateTime.now().month, bill.reminderDate!.day)));
           }
-        } else if (bill.interval == RecurringBillInterval.yearly.name) {
+        }
+        else if (bill.interval == RecurringBillInterval.weekly.name) {
+          final billReminderDate = DateTime(
+            DateTime.now().year,
+            DateTime.now().month,
+            bill.reminderDate!.day,
+          );
+          if (billReminderDate.isBefore(DateTime.now())) {
+            data.add(bill.copy(
+                reminderDate: DateTime(DateTime.now().year,
+                    DateTime.now().month, DateTime.now().day + 7)));
+          } else {
+            data.add(
+              bill.copy(
+                reminderDate: DateTime(
+                  DateTime.now().year,
+                  DateTime.now().month,
+                  bill.reminderDate!.day,
+                ),
+              ),
+            );
+          }
+        }
+        else if (bill.interval == RecurringBillInterval.yearly.name) {
           final billReminderDate = DateTime(DateTime.now().year,
               bill.reminderDate!.month, bill.reminderDate!.day);
 
