@@ -197,6 +197,17 @@ class SettingsPage extends HookWidget {
                           ),
                           Divider(),
                           SettingItem(
+                            onTap: () {},
+                            icon:
+                                SvgPicture.asset("assets/icons/ic_archive.svg"),
+                            iconBackgroundColor: Color(0xFFff3030),
+                            label: "Archived Bills",
+                            suffix: SvgPicture.asset(
+                              "assets/icons/ic_arrow_right.svg",
+                            ),
+                          ),
+                          Divider(),
+                          SettingItem(
                             onTap: () {
                               Navigator.pushNamed(context, RouteStrings.widget);
                             },
@@ -284,9 +295,10 @@ class SettingsPage extends HookWidget {
                               child: Icon(
                                 Iconsax.book,
                                 size: 15,
+                                color: Colors.white,
                               ),
                             ),
-                            iconBackgroundColor: Color(0xFF668042),
+                            iconBackgroundColor: Color(0xFFff7a7a),
                             label: "Terms of Service",
                             suffix: SvgPicture.asset(
                               "assets/icons/ic_arrow_right.svg",
@@ -302,9 +314,10 @@ class SettingsPage extends HookWidget {
                               child: Icon(
                                 Iconsax.security,
                                 size: 15,
+                                color: Colors.white,
                               ),
                             ),
-                            iconBackgroundColor: Color(0xFF4f1d5e),
+                            iconBackgroundColor: Color(0xFF42a68a),
                             label: "Privacy Policy",
                             suffix: SvgPicture.asset(
                               "assets/icons/ic_arrow_right.svg",

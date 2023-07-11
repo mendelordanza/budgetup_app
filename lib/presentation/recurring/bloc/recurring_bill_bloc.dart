@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:budgetup_app/domain/recurring_bill.dart';
-import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -119,10 +118,7 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
               (selectedDate.month < bill.archivedDate!.month &&
                   selectedDate.year == bill.archivedDate!.year);
 
-      return notArchived &&
-              bill.interval == RecurringBillInterval.monthly.name ||
-          (bill.interval == RecurringBillInterval.yearly.name &&
-              bill.reminderDate!.month == selectedDate.month);
+      return notArchived;
     }).toList();
 
     final convertedRecurringBills = filteredRecurringBills.map((bill) {
@@ -146,7 +142,17 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
     final paidRecurringBills =
         await recurringBillsRepo.getPaidRecurringBills(selectedDate);
 
-    final convertedPaidRecurringBills = paidRecurringBills.map((bill) {
+    //Filter out monthly and yearly
+    final filteredRecurringBills = paidRecurringBills.where((bill) {
+      final notArchived = bill.archivedDate == null ||
+          bill.archivedDate != null &&
+              (selectedDate.month < bill.archivedDate!.month &&
+                  selectedDate.year == bill.archivedDate!.year);
+
+      return notArchived;
+    }).toList();
+
+    final convertedPaidRecurringBills = filteredRecurringBills.map((bill) {
       final convertedAmount = currencyCode == "USD"
           ? (bill.amount ?? 0.00)
           : (bill.amount ?? 0.00) * currencyRate;
@@ -191,8 +197,7 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
                 reminderDate: DateTime(DateTime.now().year,
                     DateTime.now().month, bill.reminderDate!.day)));
           }
-        }
-        else if (bill.interval == RecurringBillInterval.weekly.name) {
+        } else if (bill.interval == RecurringBillInterval.weekly.name) {
           final billReminderDate = DateTime(
             DateTime.now().year,
             DateTime.now().month,
@@ -213,8 +218,7 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
               ),
             );
           }
-        }
-        else if (bill.interval == RecurringBillInterval.yearly.name) {
+        } else if (bill.interval == RecurringBillInterval.yearly.name) {
           final billReminderDate = DateTime(DateTime.now().year,
               bill.reminderDate!.month, bill.reminderDate!.day);
 
