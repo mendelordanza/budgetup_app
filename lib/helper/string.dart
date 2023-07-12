@@ -18,12 +18,10 @@ String decimalFormatter(double number) {
 }
 
 removeFormatting(String formattedValue) {
-  final sharedPrefs = getIt<SharedPrefs>();
-  final numberFormat = NumberFormat('#,##0.###');
-  return numberFormat
-      .parse(
-          formattedValue.replaceAll('${sharedPrefs.getCurrencySymbol()}', ''))
-      .toString();
+  String unformattedAmount = formattedValue.replaceAll(RegExp(r'[^0-9.]'), '');
+  double amount = double.parse(unformattedAmount);
+  String result = amount.toStringAsFixed(2);
+  return result;
 }
 
 class NumberInputFormatter extends TextInputFormatter {

@@ -29,7 +29,7 @@ class RecurringBillsRepository {
   Future<int> saveRecurringBill(
     RecurringBill recurringBill,
   ) async {
-    final newRecurringBill = recurringBill.toIsarObject();
+    final newRecurringBill = recurringBill.toIsar();
     return await _isarService.saveRecurringBill(newRecurringBill);
   }
 
@@ -37,7 +37,7 @@ class RecurringBillsRepository {
     RecurringBill recurringBill,
     DateTime selectedDate,
   ) async {
-    final recurringBillEntity = recurringBill.toIsarObject();
+    final recurringBillEntity = recurringBill.toIsar();
     await _isarService.softDeleteRecurringBill(
       recurringBillEntity,
       selectedDate,

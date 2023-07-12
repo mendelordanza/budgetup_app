@@ -33,7 +33,8 @@ class SummaryPage extends HookWidget {
     useEffect(() {
       Purchases.addCustomerInfoUpdateListener((customerInfo) {
         final entitlement = customerInfo.entitlements.active[entitlementId];
-        isSubscribed.value = entitlement != null;
+        isSubscribed.value =
+            entitlement != null && entitlement.isSandbox == false;
       });
       return null;
     }, []);

@@ -12,7 +12,7 @@ class CurrencyData {
         conversionRates: json["conversion_rates"],
       );
 
-  Map<String, Object?> toJson() => {
+  Map<String, dynamic> toJson() => {
         "base_code": baseCode,
         "conversion_rates": conversionRates,
       };

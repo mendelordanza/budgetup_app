@@ -127,7 +127,8 @@ class SettingsPage extends HookWidget {
                                   await Purchases.getCustomerInfo();
                               if (customerInfo
                                       .entitlements.active[entitlementId] !=
-                                  null) {
+                                  null &&
+                                  customerInfo.entitlements.active[entitlementId]!.isSandbox == false) {
                                 isSubscribed.value = true;
                                 if (context.mounted) {
                                   Navigator.pushNamed(
@@ -196,17 +197,17 @@ class SettingsPage extends HookWidget {
                             ),
                           ),
                           Divider(),
-                          SettingItem(
-                            onTap: () {},
-                            icon:
-                                SvgPicture.asset("assets/icons/ic_archive.svg"),
-                            iconBackgroundColor: Color(0xFFff3030),
-                            label: "Archived Bills",
-                            suffix: SvgPicture.asset(
-                              "assets/icons/ic_arrow_right.svg",
-                            ),
-                          ),
-                          Divider(),
+                          // SettingItem(
+                          //   onTap: () {},
+                          //   icon:
+                          //       SvgPicture.asset("assets/icons/ic_archive.svg"),
+                          //   iconBackgroundColor: Color(0xFFff3030),
+                          //   label: "Archived Bills",
+                          //   suffix: SvgPicture.asset(
+                          //     "assets/icons/ic_arrow_right.svg",
+                          //   ),
+                          // ),
+                          // Divider(),
                           SettingItem(
                             onTap: () {
                               Navigator.pushNamed(context, RouteStrings.widget);
@@ -221,11 +222,13 @@ class SettingsPage extends HookWidget {
                           ),
                           Divider(),
                           SettingItem(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.pushNamed(context, RouteStrings.backup);
+                            },
                             icon: SvgPicture.asset(
                                 "assets/icons/ic_import_export.svg"),
                             iconBackgroundColor: Color(0xFFC26900),
-                            label: "Import / Export Data - Coming Soon!",
+                            label: "Import / Export Data",
                             suffix: SvgPicture.asset(
                               "assets/icons/ic_arrow_right.svg",
                             ),
@@ -457,6 +460,9 @@ class SettingItem extends StatelessWidget {
                 children: [
                   Text(
                     label,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   if (subtitle != null)
                     Text(

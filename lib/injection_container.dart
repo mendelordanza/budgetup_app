@@ -1,6 +1,7 @@
 import 'package:budgetup_app/data/currency_repository.dart';
 import 'package:budgetup_app/data/expenses_repository.dart';
 import 'package:budgetup_app/data/http_service.dart';
+import 'package:budgetup_app/data/local/backup/file_manager.dart';
 import 'package:budgetup_app/data/local/isar_service.dart';
 import 'package:budgetup_app/data/notification_service.dart';
 import 'package:budgetup_app/data/recurring_bills_repository.dart';
@@ -114,6 +115,7 @@ Future<void> setup() async {
   getIt.registerLazySingleton<SharedPrefs>(() => SharedPrefs());
   getIt.registerLazySingleton<IsarService>(() => IsarService());
   getIt.registerLazySingleton<HttpService>(() => HttpService());
+  getIt.registerLazySingleton<FileManager>(() => FileManager());
 
   getIt.registerLazySingleton<NotificationService>(() => NotificationService());
 }

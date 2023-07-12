@@ -12,4 +12,5 @@ class RouteStrings {
   static const String widget = '/widget';
   static const String debug = '/debug';
   static const String subStatus = '/subStatus';
+  static const String backup = '/backup';
 }

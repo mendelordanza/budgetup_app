@@ -44,8 +44,9 @@ class RecurringBillsPage extends HookWidget {
   Future _setWidget() async {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
-      final isSubscribed =
-          customerInfo.entitlements.active[entitlementId] != null;
+      final isSubscribed = customerInfo.entitlements.active[entitlementId] !=
+              null &&
+          customerInfo.entitlements.active[entitlementId]!.isSandbox == false;
       return Future.wait([
         HomeWidget.saveWidgetData<bool>('isSubscribed', isSubscribed),
       ]);
@@ -107,7 +108,9 @@ class RecurringBillsPage extends HookWidget {
     final currentDateFilterType =
         sharedPrefs.getRecurringSelectedDateFilterType();
 
-    final tabController = useTabController(initialLength: 4);
+    final tabController = useTabController(
+      initialLength: 4,
+    );
 
     final isSubscribed = useState(false);
     useEffect(() {
@@ -116,7 +119,8 @@ class RecurringBillsPage extends HookWidget {
           .add(LoadRecurringBills(currentSelectedDate));
       Purchases.addCustomerInfoUpdateListener((customerInfo) {
         final entitlement = customerInfo.entitlements.active[entitlementId];
-        isSubscribed.value = entitlement != null;
+        isSubscribed.value =
+            entitlement != null && entitlement.isSandbox == false;
         _setWidget();
         _updateWidget();
       });
@@ -267,7 +271,8 @@ class RecurringBillsPage extends HookWidget {
                                 "${item.name[0].toUpperCase()}${item.name.substring(1)}"),
                       )
                       .toList()
-                    ..add(
+                    ..insert(
+                      0,
                       Tab(text: "All"),
                     ),
                   isScrollable: false,
@@ -288,8 +293,11 @@ class RecurringBillsPage extends HookWidget {
                             final customerInfo =
                                 await Purchases.getCustomerInfo();
                             final hasData = customerInfo
-                                    .entitlements.active[entitlementId] !=
-                                null;
+                                        .entitlements.active[entitlementId] !=
+                                    null &&
+                                customerInfo.entitlements.active[entitlementId]!
+                                        .isSandbox ==
+                                    false;
 
                             if (context.mounted) {
                               if (hasData ||
@@ -368,7 +376,8 @@ class RecurringBillsPage extends HookWidget {
                             state: state,
                           );
                         }).toList()
-                          ..add(
+                          ..insert(
+                            0,
                             allTab(context,
                                 state: state,
                                 currentSelectedDate: currentSelectedDate,
@@ -432,7 +441,10 @@ class RecurringBillsPage extends HookWidget {
               onPressed: () async {
                 final customerInfo = await Purchases.getCustomerInfo();
                 final hasData =
-                    customerInfo.entitlements.active[entitlementId] != null;
+                    customerInfo.entitlements.active[entitlementId] != null &&
+                        customerInfo.entitlements.active[entitlementId]!
+                                .isSandbox ==
+                            false;
 
                 if (context.mounted) {
                   if (hasData ||
@@ -532,57 +544,59 @@ class RecurringBillsPage extends HookWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 14.0),
-                              child: SizedBox(
-                                height: 44.0,
-                                child: OutlinedButton(
-                                  onPressed: () {
-                                    //to remove the first dialog
-                                    Navigator.pop(context);
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return DeleteDialog(
-                                          title: "Delete",
-                                          description:
-                                              "This will only delete the selected and future schedule of this bill. Are you sure you want to delete this bill?",
-                                          onPositive: () {
-                                            context
-                                                .read<RecurringModifyBloc>()
-                                                .add(ArchiveRecurringBill(
-                                                  selectedDate: selectedDate,
-                                                  recurringBill: item,
-                                                ));
-                                          },
-                                          onNegative: () {
-                                            Navigator.pop(context);
-                                          },
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: Text(
-                                    "for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), selectedDate)} and following months",
-                                    style: TextStyle(
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.w700,
+                            if (item.archived == null || item.archived == false)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 14.0),
+                                child: SizedBox(
+                                  height: 44.0,
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      //to remove the first dialog
+                                      Navigator.pop(context);
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return DeleteDialog(
+                                            title: "Delete",
+                                            description:
+                                                "This will only delete the selected and future schedule of this bill. Are you sure you want to delete this bill?",
+                                            onPositive: () {
+                                              context
+                                                  .read<RecurringModifyBloc>()
+                                                  .add(ArchiveRecurringBill(
+                                                    selectedDate: selectedDate,
+                                                    recurringBill: item,
+                                                  ));
+                                            },
+                                            onNegative: () {
+                                              Navigator.pop(context);
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Text(
+                                      "for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), selectedDate)} and following months",
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
+                                    style: OutlinedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                      side: BorderSide(
+                                        width: 1.0,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                      elevation: 0,
                                     ),
-                                    side: BorderSide(
-                                      width: 1.0,
-                                      color: Theme.of(context).primaryColor,
-                                    ),
-                                    elevation: 0,
                                   ),
                                 ),
                               ),
-                            ),
                             Padding(
                               padding: const EdgeInsets.only(bottom: 14.0),
                               child: SizedBox(

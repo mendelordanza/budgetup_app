@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../helper/shared_prefs.dart';
+import '../../injection_container.dart';
+import '../custom/whats_new_dialog.dart';
+
 class HomePage extends HookWidget {
   HomePage({super.key});
 
@@ -13,9 +17,31 @@ class HomePage extends HookWidget {
     TransactionsPage(),
   ];
 
+  showWhatsNew(BuildContext context) async {
+    final sharedPrefs = getIt<SharedPrefs>();
+    final hasSeen = sharedPrefs.getSeenWhatsNew() ?? false;
+    final isFinishedOnboarding = sharedPrefs.getFinishedOnboarding() ?? false;
+    if (!hasSeen && isFinishedOnboarding) {
+      //SHOW POPUP
+      print("POPUP!");
+      await showDialog(
+          context: context,
+          builder: (context) {
+            return WhatsNewDialog();
+          });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final _selectedIndex = useState<int>(0);
+
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showWhatsNew(context);
+      });
+      return null;
+    }, []);
 
     return Scaffold(
       appBar: AppBar(

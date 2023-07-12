@@ -7,6 +7,7 @@ import 'package:budgetup_app/presentation/dashboard/dashboard_page.dart';
 import 'package:budgetup_app/presentation/landing/landing_page.dart';
 import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
 import 'package:budgetup_app/presentation/settings/appearance/appearance_page.dart';
+import 'package:budgetup_app/presentation/settings/backup_data/import_export_data.dart';
 import 'package:budgetup_app/presentation/settings/debug/debug_page.dart';
 import 'package:budgetup_app/presentation/settings/settings_page.dart';
 import 'package:budgetup_app/presentation/settings/subscription/subscribed_page.dart';
@@ -102,6 +103,10 @@ class RouteGenerator {
       case RouteStrings.debug:
         return _navigate(
           builder: (_) => DebugPage(),
+        );
+      case RouteStrings.backup:
+        return _navigate(
+          builder: (_) => ImportExportData(),
         );
       default:
         return _errorRoute();

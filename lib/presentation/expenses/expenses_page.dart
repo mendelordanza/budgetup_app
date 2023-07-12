@@ -49,8 +49,9 @@ class ExpensesPage extends HookWidget {
   Future _setWidget() async {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
-      final isSubscribed =
-          customerInfo.entitlements.active[entitlementId] != null;
+      final isSubscribed = customerInfo.entitlements.active[entitlementId] !=
+              null &&
+          customerInfo.entitlements.active[entitlementId]!.isSandbox == false;
       return Future.wait([
         HomeWidget.saveWidgetData<bool>('isSubscribed', isSubscribed),
       ]);
@@ -122,7 +123,8 @@ class ExpensesPage extends HookWidget {
 
       Purchases.addCustomerInfoUpdateListener((customerInfo) {
         final entitlement = customerInfo.entitlements.active[entitlementId];
-        isSubscribed.value = entitlement != null;
+        isSubscribed.value =
+            entitlement != null && entitlement.isSandbox == false;
         _setWidget();
         _updateWidget();
       });
@@ -294,8 +296,11 @@ class ExpensesPage extends HookWidget {
                               final customerInfo =
                                   await Purchases.getCustomerInfo();
                               final hasData = customerInfo
-                                      .entitlements.active[entitlementId] !=
-                                  null;
+                                          .entitlements.active[entitlementId] !=
+                                      null &&
+                                  customerInfo.entitlements
+                                          .active[entitlementId]!.isSandbox ==
+                                      false;
 
                               if (context.mounted) {
                                 if (hasData ||
@@ -383,7 +388,9 @@ class ExpensesPage extends HookWidget {
                                       await Purchases.getCustomerInfo();
                                   final hasData = customerInfo
                                           .entitlements.active[entitlementId] !=
-                                      null;
+                                      null && customerInfo.entitlements
+                                      .active[entitlementId]!.isSandbox ==
+                                      false;
 
                                   if (context.mounted) {
                                     if (hasData ||

@@ -1,3 +1,4 @@
+import 'package:budgetup_app/data/local/entities/recurring_bill_txn_entity.dart';
 import 'package:budgetup_app/domain/recurring_bill_txn.dart';
 import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:budgetup_app/helper/string.dart';
@@ -46,14 +47,33 @@ class RecurringBill extends Equatable {
         interval: json["interval"],
         reminderDate: json["reminderDate"],
         recurringBillTxns: List<RecurringBillTxn>.from(json["recurringBillTxns"]
-            .map((txn) => RecurringBillTxn.fromJson(txn.toJson()))),
+            .map((txn) => RecurringBillTxn.fromJson(
+                (txn as RecurringBillTxnEntity).toJson()))),
         archived: json["archived"],
         archivedDate: json["archivedDate"],
         createdAt: json["createdAt"],
         updatedAt: json["updatedAt"],
       );
 
-  Map<String, Object?> toJson() => {
+  factory RecurringBill.fromJsonFile(Map<dynamic, dynamic> json) {
+    return RecurringBill(
+      id: json["id"],
+      title: json["title"],
+      amount: double.parse(removeFormatting(json["amount"].toString())),
+      interval: json["interval"],
+      reminderDate: DateTime.parse(json["reminderDate"]),
+      recurringBillTxns: List<RecurringBillTxn>.from(json["recurringBillTxns"]
+          .map((txn) => RecurringBillTxn.fromJsonFile(txn))),
+      archived: json["archived"],
+      archivedDate: json["archivedDate"] == null
+          ? null
+          : DateTime.parse(json["archivedDate"]),
+      createdAt: DateTime.parse(json["createdAt"]),
+      updatedAt: DateTime.parse(json["updatedAt"]),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
         "id": id,
         "title": title,
         "amount": decimalFormatterWithSymbol(amount ?? 0.00),
@@ -66,7 +86,7 @@ class RecurringBill extends Equatable {
         "updatedAt": updatedAt?.toIso8601String(),
       };
 
-  RecurringBillEntity toIsarObject() {
+  RecurringBillEntity toIsar() {
     return RecurringBillEntity()
       ..id = id != null ? id! : Isar.autoIncrement
       ..title = title

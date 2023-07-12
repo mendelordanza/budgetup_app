@@ -239,8 +239,9 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
       final upcomingBills = jsonEncode(jsonData);
 
       final customerInfo = await Purchases.getCustomerInfo();
-      final isSubscribed =
-          customerInfo.entitlements.active[entitlementId] != null;
+      final isSubscribed = customerInfo.entitlements.active[entitlementId] !=
+              null &&
+          customerInfo.entitlements.active[entitlementId]!.isSandbox == false;
       print("BILLS SEND!: $upcomingBills");
       Future.wait([
         HomeWidget.saveWidgetData<String>('upcomingBills', upcomingBills),
