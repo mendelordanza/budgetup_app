@@ -196,8 +196,9 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
   }) async {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
-      final isSubscribed =
-          customerInfo.entitlements.active[entitlementId] != null;
+      final isSubscribed = customerInfo.entitlements.active[entitlementId] !=
+              null &&
+          customerInfo.entitlements.active[entitlementId]!.isSandbox == false;
       print("SEND!");
       Future.wait([
         HomeWidget.saveWidgetData<String>(

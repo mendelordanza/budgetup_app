@@ -44,23 +44,6 @@ class ExpensesRepository {
     await _isarService.deleteExpenseCategory(categoryId);
   }
 
-  Future<void> bulkEditCategory(
-    List<ExpenseCategory> categories,
-  ) async {
-    final updatedCategories = categories.map((category) {
-      final isarObject = ExpenseCategoryEntity()
-        ..id = category.id != null ? category.id! : Isar.autoIncrement
-        ..icon = category.icon
-        ..title = category.title
-        ..budget = category.budget
-        ..createdAt = category.createdAt
-        ..updatedAt = category.updatedAt;
-      return isarObject;
-    }).toList();
-
-    await _isarService.bulkEditCategory(updatedCategories);
-  }
-
   Future<void> saveCategory(ExpenseCategory category) async {
     final isarObject = ExpenseCategoryEntity()
       ..id = category.id != null ? category.id! : Isar.autoIncrement
@@ -74,15 +57,8 @@ class ExpensesRepository {
 
   Future<void> addTransaction(
       ExpenseCategory category, ExpenseTxn expenseTxn) async {
-    final txnObject = ExpenseTxnEntity()
-      ..notes = expenseTxn.notes
-      ..amount = expenseTxn.amount
-      ..category.value = category.toIsar()
-      ..createdAt = expenseTxn.createdAt
-      ..updatedAt = expenseTxn.updatedAt;
-
     if (category.id != null) {
-      await _isarService.addTransaction(txnObject);
+      await _isarService.addTransaction(expenseTxn.toIsar(category: category));
     }
   }
 
@@ -95,19 +71,6 @@ class ExpensesRepository {
       ..updatedAt = expenseTxn.updatedAt;
 
     await _isarService.editTransaction(txnObject);
-  }
-
-  Future<void> bulkEditTxns(List<ExpenseTxn> txns) async {
-    final updatedTxns = txns.map((expenseTxn) {
-      final txnObject = ExpenseTxnEntity()
-        ..id = expenseTxn.id != null ? expenseTxn.id! : Isar.autoIncrement
-        ..notes = expenseTxn.notes
-        ..amount = expenseTxn.amount
-        ..createdAt = expenseTxn.createdAt
-        ..updatedAt = expenseTxn.updatedAt;
-      return txnObject;
-    }).toList();
-    await _isarService.bulkEditTxns(updatedTxns);
   }
 
   Future<void> deleteTransaction(int txnId) async {

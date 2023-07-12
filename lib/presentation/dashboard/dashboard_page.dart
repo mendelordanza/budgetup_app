@@ -83,6 +83,7 @@ class DashboardPage extends HookWidget {
                             ],
                           ),
                         ),
+                        totalAlign: TextAlign.center,
                         total: state.overallTotal);
                   }
                   return Balance(
@@ -106,6 +107,7 @@ class DashboardPage extends HookWidget {
                         ],
                       ),
                     ),
+                    totalAlign: TextAlign.center,
                     total: 0.00,
                   );
                 },

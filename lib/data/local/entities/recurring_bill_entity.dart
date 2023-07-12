@@ -13,6 +13,8 @@ class RecurringBillEntity {
   DateTime? reminderDate;
   DateTime? createdAt;
   DateTime? updatedAt;
+  bool? archived;
+  DateTime? archivedDate;
   final recurringBillTxns = IsarLinks<RecurringBillTxnEntity>();
 
   Map<String, dynamic> toJson() {
@@ -23,8 +25,32 @@ class RecurringBillEntity {
       'interval': interval,
       'reminderDate': reminderDate,
       'recurringBillTxns': recurringBillTxns,
+      'archived': archived,
+      'archivedDate': archivedDate,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
   }
+
+  RecurringBillEntity copy({
+    int? id,
+    String? title,
+    double? amount,
+    String? interval,
+    DateTime? reminderDate,
+    bool? archived,
+    DateTime? archivedDate,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) =>
+      RecurringBillEntity()
+        ..id = id ?? this.id
+        ..title = title ?? this.title
+        ..amount = amount ?? this.amount
+        ..interval = interval ?? this.interval
+        ..reminderDate = reminderDate ?? this.reminderDate
+        ..archived = archived ?? this.archived
+        ..archivedDate = archivedDate ?? this.archivedDate
+        ..createdAt = createdAt ?? this.createdAt
+        ..updatedAt = updatedAt ?? this.updatedAt;
 }

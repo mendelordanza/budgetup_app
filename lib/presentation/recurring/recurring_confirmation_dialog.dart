@@ -22,7 +22,8 @@ class RecurringConfirmationDialog extends HookWidget {
 
     final focusNode = useFocusNode();
     final dateTextController = useTextEditingController();
-    final currentTransactionDate = useState<DateTime>(selectedDate.value);
+    final currentTransactionDate = useState<DateTime>(DateTime(
+        selectedDate.value.year, selectedDate.value.month, DateTime.now().day));
 
     useEffect(() {
       dateTextController.text =

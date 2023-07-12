@@ -54,30 +54,14 @@ class NotificationService {
     tz.initializeTimeZones();
     final localTimezone = await FlutterTimezone.getLocalTimezone();
 
-    // Workmanager().initialize(
-    //     callbackDispatcher, // The top level function, aka callbackDispatcher
-    //     isInDebugMode:
-    //         true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
-    //     );
-    // if (Platform.isAndroid) {
-    //   Workmanager().registerPeriodicTask(
-    //     "recurring-bill-task-identifier",
-    //     "recurringBillReminderTask",
-    //     frequency: Duration(minutes: 15),
-    //   );
-    // } else {
-    //   await flutterLocalNotificationsPlugin.zonedSchedule(
-    //     id,
-    //     title,
-    //     body,
-    //     _nextInstance(interval, date, localTimezone),
-    //     notificationDetails(),
-    //     androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-    //     uiLocalNotificationDateInterpretation:
-    //         UILocalNotificationDateInterpretation.absoluteTime,
-    //     matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
-    //   );
-    // }
+    DateTimeComponents dateTimeComponents;
+    if (interval == RecurringBillInterval.monthly.name) {
+      dateTimeComponents = DateTimeComponents.dayOfMonthAndTime;
+    } else if (interval == RecurringBillInterval.weekly.name) {
+      dateTimeComponents = DateTimeComponents.dayOfWeekAndTime;
+    } else {
+      dateTimeComponents = DateTimeComponents.dateAndTime;
+    }
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
       id,
@@ -88,19 +72,8 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: interval == RecurringBillInterval.monthly.name
-          ? DateTimeComponents.dayOfMonthAndTime
-          : DateTimeComponents.dateAndTime,
+      matchDateTimeComponents: dateTimeComponents,
     );
-
-    // await flutterLocalNotificationsPlugin.periodicallyShow(
-    //   id,
-    //   title,
-    //   body,
-    //   RepeatInterval.everyMinute,
-    //   notificationDetails(),
-    //   androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-    // );
   }
 
   tz.TZDateTime _nextInstance(
@@ -161,7 +134,72 @@ class NotificationService {
               location);
         }
         return scheduledDate;
+      case RecurringBillInterval.weekly:
+        tz.TZDateTime scheduledDate = tz.TZDateTime.from(
+            DateTime(
+              now.year,
+              convertedDate.month,
+              convertedDate.day,
+              convertedDate.hour,
+              convertedDate.minute,
+            ),
+            location);
+        if (scheduledDate.isBefore(now)) {
+          scheduledDate = tz.TZDateTime.from(
+              DateTime(
+                now.year,
+                now.month,
+                now.day + 7,
+                convertedDate.hour,
+                convertedDate.minute,
+              ),
+              location);
+        }
+        return scheduledDate;
+      // case RecurringBillInterval.quarterly:
+      //   int quarter = ((convertedDate.month - 1) / 3).ceil() + 1;
+      //
+      //   tz.TZDateTime scheduledDate = tz.TZDateTime.from(
+      //       DateTime(
+      //         now.year,
+      //         getMonthFromQuarter(convertedDate, quarter),
+      //         convertedDate.day,
+      //         convertedDate.hour,
+      //         convertedDate.minute,
+      //       ),
+      //       location);
+      //   if (scheduledDate.isBefore(now)) {
+      //     scheduledDate = tz.TZDateTime.from(
+      //         DateTime(
+      //           now.year,
+      //           getMonthFromQuarter(convertedDate, quarter) + 3,
+      //           convertedDate.day,
+      //           convertedDate.hour,
+      //           convertedDate.minute,
+      //         ),
+      //         location);
+      //   }
+      //   return scheduledDate;
     }
+  }
+
+  getMonthFromQuarter(DateTime convertedDate, int quarter) {
+    var month = convertedDate.month;
+    switch (quarter) {
+      case 1:
+        month = 3;
+        break;
+      case 2:
+        month = 6;
+        break;
+      case 3:
+        month = 9;
+        break;
+      case 4:
+        month = 12;
+        break;
+    }
+    return month;
   }
 
   cancelNotif(int id) async {

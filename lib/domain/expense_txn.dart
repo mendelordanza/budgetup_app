@@ -1,3 +1,4 @@
+import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
 import 'package:equatable/equatable.dart';
 
 import 'expense_category.dart';
@@ -25,7 +26,15 @@ class ExpenseTxn extends Equatable {
         updatedAt: json["updatedAt"],
       );
 
-  Map<String, Object?> toJson() => {
+  factory ExpenseTxn.fromJsonFile(Map<dynamic, dynamic> json) => ExpenseTxn(
+        id: json["id"],
+        notes: json["notes"],
+        amount: json["amount"],
+        createdAt: DateTime.parse(json["createdAt"]),
+        updatedAt: DateTime.parse(json["updatedAt"]),
+      );
+
+  Map<String, dynamic> toJson() => {
         "id": id,
         "notes": notes,
         "amount": amount,
@@ -48,6 +57,16 @@ class ExpenseTxn extends Equatable {
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
+
+  ExpenseTxnEntity toIsar({required ExpenseCategory category}) {
+    final isarObject = ExpenseTxnEntity()
+      ..amount = amount
+      ..notes = notes
+      ..category.value = category.toIsar()
+      ..createdAt = createdAt
+      ..updatedAt = updatedAt;
+    return isarObject;
+  }
 
   @override
   List<Object?> get props => [

@@ -25,6 +25,14 @@ class RemoveRecurringBill extends RecurringModifyEvent {
       {required this.selectedDate, required this.recurringBill});
 }
 
+class ArchiveRecurringBill extends RecurringModifyEvent {
+  final DateTime selectedDate;
+  final RecurringBill recurringBill;
+
+  ArchiveRecurringBill(
+      {required this.selectedDate, required this.recurringBill});
+}
+
 class AddRecurringBillTxn extends RecurringModifyEvent {
   final DateTime selectedDate;
   final RecurringBill recurringBill;

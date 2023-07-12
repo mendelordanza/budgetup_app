@@ -1,3 +1,4 @@
+import 'package:budgetup_app/data/local/entities/recurring_bill_txn_entity.dart';
 import 'package:budgetup_app/domain/recurring_bill.dart';
 import 'package:equatable/equatable.dart';
 
@@ -19,7 +20,22 @@ class RecurringBillTxn extends Equatable {
         datePaid: json["datePaid"],
       );
 
-  Map<String, Object?> toJson() => {
+  factory RecurringBillTxn.fromJsonFile(Map<dynamic, dynamic> json) =>
+      RecurringBillTxn(
+        id: json["id"],
+        isPaid: json["isPaid"],
+        datePaid: DateTime.parse(json["datePaid"]),
+      );
+
+  RecurringBillTxnEntity toIsar({required RecurringBill bill}) {
+    return RecurringBillTxnEntity()
+      ..id = id!
+      ..recurringBill.value = bill.toIsar()
+      ..isPaid = isPaid
+      ..datePaid = datePaid;
+  }
+
+  Map<String, dynamic> toJson() => {
         "id": id,
         "isPaid": isPaid,
         "datePaid": datePaid?.toIso8601String(),

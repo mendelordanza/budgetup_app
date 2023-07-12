@@ -15,7 +15,7 @@ class LandingPage extends HookWidget {
     useEffect(() {
       context.read<ConvertCurrencyCubit>().loadCurrencies();
       return null;
-    });
+    }, []);
 
     return BlocBuilder<OnboardingCubit, OnboardingState>(
       builder: (context, state) {

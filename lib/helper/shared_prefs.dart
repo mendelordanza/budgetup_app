@@ -21,7 +21,7 @@ class SharedPrefs {
   static const String KEY_BASE_CURRENCY_RATE = "key_base_currency_rate";
   static const String KEY_CURRENCY_RATE = "key_currency_rate";
   static const String KEY_APPEARANCE = "key_appearance";
-  static const String KEY_ENTITLED = "key_entitled";
+  static const String KEY_WHATS_NEW = "key_whats_new";
 
   Future setFinishedOnboarding(bool isFinished) async {
     await _preferences?.setBool(KEY_IS_FINISHED, isFinished);
@@ -91,9 +91,9 @@ class SharedPrefs {
   String getAppearance() =>
       _preferences?.getString(KEY_APPEARANCE) ?? AppearanceType.system.name;
 
-  Future setEntitled(bool isEntitled) async {
-    await _preferences?.setBool(KEY_ENTITLED, isEntitled);
+  Future setSeenWhatsNew(bool seen) async {
+    await _preferences?.setBool(KEY_WHATS_NEW, seen);
   }
 
-  bool? getEntited() => _preferences?.getBool(KEY_ENTITLED);
+  bool? getSeenWhatsNew() => _preferences?.getBool(KEY_WHATS_NEW);
 }

@@ -56,13 +56,13 @@ String getMonthText(DateFilterType dateFilterType, DateTime date) {
           DateTime.now().isBefore(getEndDate(date))) {
         return "This week";
       } else {
-        return "${formatDate(getStartDate(date), 'MMM dd, yyyy')} - ${formatDate(getEndDate(date), 'MMM dd, yyyy')}";
+        return "${formatDate(getStartDate(date), 'MMM dd, yy')} -\n${formatDate(getEndDate(date), 'MMM dd, yy')}";
       }
     case DateFilterType.monthly:
       if (date.month == DateTime.now().month) {
-        return "This month - ${formatDate(date, 'MMMM yyyy')}";
+        return "This month";
       } else {
-        return "${formatDate(date, 'MMMM yyyy')}";
+        return "${formatDate(date, 'MMM yyyy')}";
       }
   }
 }
@@ -133,30 +133,10 @@ List<DateTime> getPrevMonths(int year) {
   }
 }
 
-bool isWithin30Days(DateTime date) {
-  DateTime currentDate = DateTime.now();
-  DateTime thirtyDaysFromNow = currentDate.add(Duration(days: 30));
-
-  return date.isAfter(currentDate) && date.isBefore(thirtyDaysFromNow);
-}
-
-int getNextMonthDate(DateTime currentDate) {
-  int currentMonth = currentDate.month;
-
-  // Calculate the next month
-  int nextMonth = currentMonth + 1;
-
-  if (nextMonth > 12) {
-    nextMonth = 1;
+int getQuarterFromMonth(int month) {
+  if (month < 1 || month > 12) {
+    return 0; // Invalid month
   }
 
-  // Handle the case where the current date has already passed
-  if (currentDate.day > 1) {
-    nextMonth -= 1;
-    if (nextMonth == 0) {
-      nextMonth = 12;
-    }
-  }
-
-  return nextMonth;
+  return ((month - 1) ~/ 3) + 1;
 }

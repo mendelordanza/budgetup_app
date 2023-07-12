@@ -23,28 +23,38 @@ const RecurringBillEntitySchema = CollectionSchema(
       name: r'amount',
       type: IsarType.double,
     ),
-    r'createdAt': PropertySchema(
+    r'archived': PropertySchema(
       id: 1,
+      name: r'archived',
+      type: IsarType.bool,
+    ),
+    r'archivedDate': PropertySchema(
+      id: 2,
+      name: r'archivedDate',
+      type: IsarType.dateTime,
+    ),
+    r'createdAt': PropertySchema(
+      id: 3,
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
     r'interval': PropertySchema(
-      id: 2,
+      id: 4,
       name: r'interval',
       type: IsarType.string,
     ),
     r'reminderDate': PropertySchema(
-      id: 3,
+      id: 5,
       name: r'reminderDate',
       type: IsarType.dateTime,
     ),
     r'title': PropertySchema(
-      id: 4,
+      id: 6,
       name: r'title',
       type: IsarType.string,
     ),
     r'updatedAt': PropertySchema(
-      id: 5,
+      id: 7,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -98,11 +108,13 @@ void _recurringBillEntitySerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeDouble(offsets[0], object.amount);
-  writer.writeDateTime(offsets[1], object.createdAt);
-  writer.writeString(offsets[2], object.interval);
-  writer.writeDateTime(offsets[3], object.reminderDate);
-  writer.writeString(offsets[4], object.title);
-  writer.writeDateTime(offsets[5], object.updatedAt);
+  writer.writeBool(offsets[1], object.archived);
+  writer.writeDateTime(offsets[2], object.archivedDate);
+  writer.writeDateTime(offsets[3], object.createdAt);
+  writer.writeString(offsets[4], object.interval);
+  writer.writeDateTime(offsets[5], object.reminderDate);
+  writer.writeString(offsets[6], object.title);
+  writer.writeDateTime(offsets[7], object.updatedAt);
 }
 
 RecurringBillEntity _recurringBillEntityDeserialize(
@@ -113,12 +125,14 @@ RecurringBillEntity _recurringBillEntityDeserialize(
 ) {
   final object = RecurringBillEntity();
   object.amount = reader.readDoubleOrNull(offsets[0]);
-  object.createdAt = reader.readDateTimeOrNull(offsets[1]);
+  object.archived = reader.readBoolOrNull(offsets[1]);
+  object.archivedDate = reader.readDateTimeOrNull(offsets[2]);
+  object.createdAt = reader.readDateTimeOrNull(offsets[3]);
   object.id = id;
-  object.interval = reader.readStringOrNull(offsets[2]);
-  object.reminderDate = reader.readDateTimeOrNull(offsets[3]);
-  object.title = reader.readStringOrNull(offsets[4]);
-  object.updatedAt = reader.readDateTimeOrNull(offsets[5]);
+  object.interval = reader.readStringOrNull(offsets[4]);
+  object.reminderDate = reader.readDateTimeOrNull(offsets[5]);
+  object.title = reader.readStringOrNull(offsets[6]);
+  object.updatedAt = reader.readDateTimeOrNull(offsets[7]);
   return object;
 }
 
@@ -132,14 +146,18 @@ P _recurringBillEntityDeserializeProp<P>(
     case 0:
       return (reader.readDoubleOrNull(offset)) as P;
     case 1:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readBoolOrNull(offset)) as P;
     case 2:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 3:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 4:
       return (reader.readStringOrNull(offset)) as P;
     case 5:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 6:
+      return (reader.readStringOrNull(offset)) as P;
+    case 7:
       return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -324,6 +342,108 @@ extension RecurringBillEntityQueryFilter on QueryBuilder<RecurringBillEntity,
         upper: upper,
         includeUpper: includeUpper,
         epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      archivedIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'archived',
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      archivedIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'archived',
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      archivedEqualTo(bool? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'archived',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      archivedDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'archivedDate',
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      archivedDateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'archivedDate',
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      archivedDateEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'archivedDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      archivedDateGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'archivedDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      archivedDateLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'archivedDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterFilterCondition>
+      archivedDateBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'archivedDate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -1000,6 +1120,34 @@ extension RecurringBillEntityQuerySortBy
   }
 
   QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      sortByArchived() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'archived', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      sortByArchivedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'archived', Sort.desc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      sortByArchivedDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'archivedDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      sortByArchivedDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'archivedDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
       sortByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.asc);
@@ -1083,6 +1231,34 @@ extension RecurringBillEntityQuerySortThenBy
       thenByAmountDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'amount', Sort.desc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      thenByArchived() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'archived', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      thenByArchivedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'archived', Sort.desc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      thenByArchivedDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'archivedDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QAfterSortBy>
+      thenByArchivedDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'archivedDate', Sort.desc);
     });
   }
 
@@ -1181,6 +1357,20 @@ extension RecurringBillEntityQueryWhereDistinct
   }
 
   QueryBuilder<RecurringBillEntity, RecurringBillEntity, QDistinct>
+      distinctByArchived() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'archived');
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QDistinct>
+      distinctByArchivedDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'archivedDate');
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, RecurringBillEntity, QDistinct>
       distinctByCreatedAt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'createdAt');
@@ -1228,6 +1418,20 @@ extension RecurringBillEntityQueryProperty
       amountProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'amount');
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, bool?, QQueryOperations>
+      archivedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'archived');
+    });
+  }
+
+  QueryBuilder<RecurringBillEntity, DateTime?, QQueryOperations>
+      archivedDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'archivedDate');
     });
   }
 

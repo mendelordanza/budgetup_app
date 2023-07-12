@@ -1,11 +1,19 @@
+import 'dart:convert';
+
 import 'package:budgetup_app/data/local/entities/currency_rate_entity.dart';
 import 'package:budgetup_app/data/local/entities/expense_category_entity.dart';
 import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
 import 'package:budgetup_app/data/local/entities/recurring_bill_entity.dart';
 import 'package:budgetup_app/data/local/entities/recurring_bill_txn_entity.dart';
+import 'package:budgetup_app/domain/recurring_bill.dart';
 import 'package:budgetup_app/helper/date_helper.dart';
+import 'package:budgetup_app/helper/shared_prefs.dart';
+import 'package:budgetup_app/injection_container.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../../domain/expense_category.dart';
+import 'backup/file_manager.dart';
 
 class IsarService {
   late Future<Isar> db;
@@ -68,15 +76,42 @@ class IsarService {
     });
   }
 
-  Future<void> bulkEditCategory(
-    List<ExpenseCategoryEntity> updatedCategories,
+  Future<bool> bulkAdd({
+    required List<ExpenseCategoryEntity> updatedCategories,
+    required List<ExpenseTxnEntity> updatedTxns,
+    required List<RecurringBillEntity> updatedRecurringBills,
+    required List<RecurringBillTxnEntity> updatedRecurringBillTxns,
+  }) async {
+    final isar = await db;
+    final success = isar.writeTxnSync(() {
+      isar.expenseCategoryEntitys.clearSync();
+      isar.expenseTxnEntitys.clearSync();
+
+      isar.recurringBillEntitys.clearSync();
+      isar.recurringBillTxnEntitys.clearSync();
+
+      isar.expenseCategoryEntitys.putAllSync(updatedCategories);
+      final expensesAdded = isar.expenseTxnEntitys.putAllSync(updatedTxns);
+
+      isar.recurringBillEntitys.putAllSync(updatedRecurringBills);
+      final recurringBillsAdded =
+          isar.recurringBillTxnEntitys.putAllSync(updatedRecurringBillTxns);
+      return expensesAdded.isNotEmpty && recurringBillsAdded.isNotEmpty;
+    });
+    return success;
+  }
+
+  Future<bool> bulkAddCategoryTxns(
+    List<ExpenseTxnEntity> updatedTxns,
   ) async {
     final isar = await db;
-    await isar.writeTxn(() async {
-      final success =
-          await isar.expenseCategoryEntitys.putAll(updatedCategories);
-      print('deleted: $success');
+    final success = await isar.writeTxn(() async {
+      await isar.expenseTxnEntitys.clear();
+      final success = await isar.expenseTxnEntitys.putAll(updatedTxns);
+      print('added: $success');
+      return success.isNotEmpty;
     });
+    return success;
   }
 
   Future<void> deleteAllTxns(int categoryId) async {
@@ -165,6 +200,28 @@ class IsarService {
     });
   }
 
+  Future<void> softDeleteRecurringBill(
+    RecurringBillEntity recurringBillEntity,
+    DateTime selectedDate,
+  ) async {
+    final isar = await db;
+
+    final sharedPrefs = getIt<SharedPrefs>();
+    final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
+        ? (recurringBillEntity.amount ?? 0.00)
+        : (recurringBillEntity.amount ?? 0.00) / sharedPrefs.getCurrencyRate();
+
+    await isar.writeTxn(() async {
+      final success =
+          await isar.recurringBillEntitys.put(recurringBillEntity.copy(
+        amount: convertedAmount,
+        archived: true,
+        archivedDate: removeTimeFromDate(selectedDate),
+      ));
+      print('deleted: $success');
+    });
+  }
+
   Future<void> deleteAllRecurringBillTxns(int recurringBillId) async {
     final isar = await db;
     await isar.writeTxn(() async {
@@ -215,6 +272,69 @@ class IsarService {
     return list;
   }
 
+  Future<bool> importFromJson() async {
+    final jsonString = await FileManager().readJsonFile();
+    final categoriesData = jsonString["expenseCategories"];
+    final recurringBillsData = jsonString["recurringBills"];
+
+    final categories = List<ExpenseCategory>.from(categoriesData.map((txn) {
+      final category = ExpenseCategory.fromJsonFile(txn);
+      return category;
+    }));
+
+    final isarCategories = categories.map((e) {
+      return e.toIsar();
+    }).toList();
+
+    List<ExpenseTxnEntity> isarCategoryTxns = [];
+    categories.forEach((category) {
+      category.expenseTransactions?.forEach((txn) {
+        isarCategoryTxns.add(txn.toIsar(category: category));
+      });
+    });
+
+    final recurringBills =
+        List<RecurringBill>.from(recurringBillsData.map((bill) {
+      return RecurringBill.fromJsonFile(bill);
+    }));
+
+    final isarBills = recurringBills.map((e) {
+      return e.toIsar();
+    }).toList();
+    List<RecurringBillTxnEntity> isarBillsTxns = [];
+    recurringBills.forEach((bill) {
+      bill.recurringBillTxns?.forEach((billTxn) {
+        isarBillsTxns.add(billTxn.toIsar(bill: bill));
+      });
+    });
+
+    return bulkAdd(
+      updatedCategories: isarCategories,
+      updatedTxns: isarCategoryTxns,
+      updatedRecurringBills: isarBills,
+      updatedRecurringBillTxns: isarBillsTxns,
+    );
+  }
+
+  Future<bool> exportToJson() async {
+    final recurringBills = await getAllRecurringBills();
+    final jsonRecurringBills = recurringBills.map((recurringBillEntity) {
+      final bill = RecurringBill.fromJson(recurringBillEntity.toJson());
+      return bill.toJson();
+    }).toList();
+
+    final categories = await getAllExpenseCategories();
+    final jsonCategories = categories.map((categoryEntity) {
+      final category = ExpenseCategory.fromJson(categoryEntity.toJson());
+      return category.toJson();
+    }).toList();
+    final all = {
+      "expenseCategories": jsonCategories,
+      "recurringBills": jsonRecurringBills
+    };
+    return FileManager().writeJsonFile(jsonEncode(all));
+  }
+
   Future<void> cleanDb() async {
     final isar = await db;
     await isar.writeTxn(() => isar.clear());
@@ -235,7 +355,6 @@ class IsarService {
         directory: dir.path,
       );
     }
-
     return Future.value(Isar.getInstance());
   }
 }

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:budgetup_app/data/notification_service.dart';
-import 'package:budgetup_app/data/recurring_bills_repository.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/presentation/dashboard/bloc/dashboard_cubit.dart';
 import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
@@ -11,7 +10,6 @@ import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_b
 import 'package:budgetup_app/presentation/landing/bloc/onboarding_cubit.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
-import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
 import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
 import 'package:budgetup_app/presentation/settings/appearance/bloc/appearance_cubit.dart';
 import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currency_cubit.dart';
@@ -68,20 +66,6 @@ class _MyAppState extends State<MyApp> {
         ?.requestPermission();
   }
 
-  ensureScheduledNotifications() async {
-    final recurringRepo = getIt<RecurringBillsRepository>();
-    final recurringBills = await recurringRepo.getRecurringBills();
-    recurringBills.forEach((recurring) {
-      notificationService.scheduleNotification(
-        0,
-        "Have you paid your bill yet?",
-        "${recurring.title} amounting to ${recurring.amount}",
-        recurring.reminderDate!.toIso8601String(),
-        recurring.interval ?? RecurringBillInterval.monthly.name,
-      );
-    });
-  }
-
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -89,7 +73,6 @@ class _MyAppState extends State<MyApp> {
       notificationPermission();
       notificationService.initNotification();
     });
-    //ensureScheduledNotifications();
     super.initState();
   }
 

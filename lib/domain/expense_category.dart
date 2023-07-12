@@ -1,3 +1,5 @@
+
+import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
 import 'package:budgetup_app/domain/expense_txn.dart';
 import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:equatable/equatable.dart';
@@ -95,24 +97,42 @@ class ExpenseCategory extends Equatable {
     return isarObject;
   }
 
-  factory ExpenseCategory.fromJson(Map<dynamic, dynamic> json) =>
-      ExpenseCategory(
-        id: json["id"],
-        title: json["title"],
-        icon: json["icon"],
-        budget: json["budget"],
-        expenseTransactions: List<ExpenseTxn>.from(json["expenseTransactions"]
-            .map((txn) => ExpenseTxn.fromJson(txn.toJson()))),
-        createdAt: json["createdAt"],
-        updatedAt: json["updatedAt"],
-      );
+  factory ExpenseCategory.fromJson(Map<dynamic, dynamic> json) {
+    return ExpenseCategory(
+      id: json["id"],
+      title: json["title"],
+      icon: json["icon"],
+      budget: json["budget"],
+      expenseTransactions: List<ExpenseTxn>.from(json["expenseTransactions"]
+          .map((txn) =>
+              ExpenseTxn.fromJson((txn as ExpenseTxnEntity).toJson()))),
+      createdAt: json["createdAt"],
+      updatedAt: json["updatedAt"],
+    );
+  }
 
-  Map<String, Object?> toJson() => {
+  factory ExpenseCategory.fromJsonFile(Map<dynamic, dynamic> json) {
+    return ExpenseCategory(
+      id: json["id"],
+      title: json["title"],
+      icon: json["icon"],
+      budget: json["budget"],
+      expenseTransactions: List<ExpenseTxn>.from(json["expenseTransactions"]
+          .map((txn) => ExpenseTxn.fromJsonFile(txn))),
+      createdAt: DateTime.parse(json["createdAt"]),
+      updatedAt: DateTime.parse(json["updatedAt"]),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
         "id": id,
         "title": title,
         "icon": icon,
         "budget": budget,
-        "expenseTransactions": expenseTransactions
+        "expenseTransactions":
+            expenseTransactions?.map((e) => e.toJson()).toList(),
+        "createdAt": createdAt?.toIso8601String(),
+        "updatedAt": updatedAt?.toIso8601String(),
       };
 
   ExpenseCategory copy({

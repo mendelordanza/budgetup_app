@@ -4,11 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:purchases_flutter/models/offering_wrapper.dart';
-import 'package:purchases_flutter/models/package_wrapper.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import '../../helper/colors.dart';
-import '../../helper/constant.dart';
 import '../custom/custom_button.dart';
 import '../custom/platform_progress_indicator.dart';
 import 'package:collection/collection.dart';
@@ -21,14 +18,12 @@ class PaywallView extends HookWidget {
 
   restorePurchase(BuildContext context) async {
     try {
-      final customerInfo = await Purchases.restorePurchases();
-      print(customerInfo.entitlements.active);
-      if (customerInfo.entitlements.active[entitlementId] != null) {
-        //TODO set entitlement
-      } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("No previous purchase")));
-      }
+      await Purchases.restorePurchases().then((value) {
+        Navigator.pop(context);
+      }).onError((error, stackTrace) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("No previous purchase found.")));
+      });
     } on PlatformException catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.message ?? "Error")));
@@ -150,11 +145,11 @@ class PaywallView extends HookWidget {
                             icon: Icon(Iconsax.home_hashtag),
                             title: "Home Screen Widget",
                             desc:
-                                "get a glance of your budget in your home screen",
+                                "get a glance of your finances in your home screen",
                           ),
                           featureItem(
                             icon: Icon(Iconsax.back_square),
-                            title: "Data Backup - coming soon!",
+                            title: "Data Backup",
                             desc:
                                 "import and export data to continue using on other device",
                           ),
@@ -236,7 +231,7 @@ class PaywallView extends HookWidget {
                 Text(
                   desc,
                   style: TextStyle(
-                    fontSize: 12.0,
+                    fontSize: 13.0,
                   ),
                 ),
               ],
