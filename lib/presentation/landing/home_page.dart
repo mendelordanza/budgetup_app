@@ -23,12 +23,15 @@ class HomePage extends HookWidget {
     final isFinishedOnboarding = sharedPrefs.getFinishedOnboarding() ?? false;
     if (!hasSeen && isFinishedOnboarding) {
       //SHOW POPUP
-      print("POPUP!");
       await showDialog(
           context: context,
           builder: (context) {
             return WhatsNewDialog();
-          });
+          }).then((seen) {
+        if (seen) {
+          sharedPrefs.setSeenWhatsNew(true);
+        }
+      });
     }
   }
 

@@ -148,7 +148,7 @@ class RecurringBillsPage extends HookWidget {
                           return Balance(
                             headerLabel: Tooltip(
                               message:
-                                  'Sum of all checked recurring bills for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), currentSelectedDate)}',
+                                  'Sum of all paid recurring bills for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), currentSelectedDate)}',
                               textAlign: TextAlign.center,
                               triggerMode: TooltipTriggerMode.tap,
                               child: Row(

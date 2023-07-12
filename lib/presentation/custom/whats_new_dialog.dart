@@ -1,5 +1,3 @@
-import 'package:budgetup_app/helper/shared_prefs.dart';
-import 'package:budgetup_app/injection_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -16,7 +14,6 @@ class WhatsNewDialog extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sharedPrefs = getIt<SharedPrefs>();
     final pageController = usePageController();
     final tabPageController = useTabController(initialLength: 3);
     final currentVersion = useState("");
@@ -92,11 +89,21 @@ class WhatsNewDialog extends HookWidget {
                 //     indicatorSize: 8.0,
                 //   ),
                 // ),
-                Text("Import and export data is here!"),
+                Text(
+                  "• Import and export data is here! You can check it out in the settings page",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                  ),
+                ),
                 SizedBox(
                   height: 10.0,
                 ),
-                Text("Separated recurring bills tabs for easier navigation"),
+                Text(
+                  "• Separated recurring bills via tabs for easier navigation",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                  ),
+                ),
               ],
             ),
           ),
@@ -109,7 +116,7 @@ class WhatsNewDialog extends HookWidget {
             ),
             child: CustomButton(
               onPressed: () {
-                sharedPrefs.setSeenWhatsNew(true);
+                Navigator.pop(context, true);
               },
               child: Text(
                 "I'll check it out",
