@@ -76,40 +76,33 @@ class IsarService {
     });
   }
 
-  Future<bool> bulkAdd({
+  Future<bool> bulkAddCategories({
     required List<ExpenseCategoryEntity> updatedCategories,
     required List<ExpenseTxnEntity> updatedTxns,
-    required List<RecurringBillEntity> updatedRecurringBills,
-    required List<RecurringBillTxnEntity> updatedRecurringBillTxns,
   }) async {
     final isar = await db;
     final success = isar.writeTxnSync(() {
       isar.expenseCategoryEntitys.clearSync();
       isar.expenseTxnEntitys.clearSync();
-
-      isar.recurringBillEntitys.clearSync();
-      isar.recurringBillTxnEntitys.clearSync();
-
       isar.expenseCategoryEntitys.putAllSync(updatedCategories);
       final expensesAdded = isar.expenseTxnEntitys.putAllSync(updatedTxns);
-
-      isar.recurringBillEntitys.putAllSync(updatedRecurringBills);
-      final recurringBillsAdded =
-          isar.recurringBillTxnEntitys.putAllSync(updatedRecurringBillTxns);
-      return expensesAdded.isNotEmpty && recurringBillsAdded.isNotEmpty;
+      return expensesAdded.isNotEmpty;
     });
     return success;
   }
 
-  Future<bool> bulkAddCategoryTxns(
-    List<ExpenseTxnEntity> updatedTxns,
-  ) async {
+  Future<bool> bulkAddRecurringBills({
+    required List<RecurringBillEntity> updatedRecurringBills,
+    required List<RecurringBillTxnEntity> updatedRecurringBillTxns,
+  }) async {
     final isar = await db;
-    final success = await isar.writeTxn(() async {
-      await isar.expenseTxnEntitys.clear();
-      final success = await isar.expenseTxnEntitys.putAll(updatedTxns);
-      print('added: $success');
-      return success.isNotEmpty;
+    final success = isar.writeTxnSync(() {
+      isar.recurringBillEntitys.clearSync();
+      isar.recurringBillTxnEntitys.clearSync();
+      isar.recurringBillEntitys.putAllSync(updatedRecurringBills);
+      final recurringBillsAdded =
+          isar.recurringBillTxnEntitys.putAllSync(updatedRecurringBillTxns);
+      return recurringBillsAdded.isNotEmpty;
     });
     return success;
   }
@@ -308,11 +301,13 @@ class IsarService {
       });
     });
 
-    return bulkAdd(
-      updatedCategories: isarCategories,
-      updatedTxns: isarCategoryTxns,
+    bulkAddRecurringBills(
       updatedRecurringBills: isarBills,
       updatedRecurringBillTxns: isarBillsTxns,
+    );
+    return bulkAddCategories(
+      updatedCategories: isarCategories,
+      updatedTxns: isarCategoryTxns,
     );
   }
 
