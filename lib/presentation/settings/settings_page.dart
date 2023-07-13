@@ -83,7 +83,8 @@ class SettingsPage extends HookWidget {
     useEffect(() {
       Purchases.addCustomerInfoUpdateListener((customerInfo) {
         final entitlement = customerInfo.entitlements.active[entitlementId];
-        isSubscribed.value = entitlement != null;
+        isSubscribed.value =
+            entitlement != null && entitlement.isSandbox == false;
       });
       return null;
     }, []);
@@ -126,9 +127,11 @@ class SettingsPage extends HookWidget {
                               final customerInfo =
                                   await Purchases.getCustomerInfo();
                               if (customerInfo
-                                      .entitlements.active[entitlementId] !=
-                                  null &&
-                                  customerInfo.entitlements.active[entitlementId]!.isSandbox == false) {
+                                          .entitlements.active[entitlementId] !=
+                                      null &&
+                                  customerInfo.entitlements
+                                          .active[entitlementId]!.isSandbox ==
+                                      false) {
                                 isSubscribed.value = true;
                                 if (context.mounted) {
                                   Navigator.pushNamed(

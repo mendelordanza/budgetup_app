@@ -12,10 +12,14 @@ class FileManager {
       if (Platform.isIOS) {
         directory = await getApplicationDocumentsDirectory();
       } else {
-        directory = Directory('/storage/emulated/0/Download');
+        String? selectedDirectory =
+            await FilePicker.platform.getDirectoryPath();
+        if (selectedDirectory != null) {
+          directory = Directory(selectedDirectory);
+        }
         // Put file in global download folder, if for an unknown reason it didn't exist, we fallback
         // ignore: avoid_slow_async_io
-        if (!await directory.exists()) {
+        if (!await directory!.exists()) {
           directory = await getExternalStorageDirectory();
         }
       }
@@ -35,7 +39,7 @@ class FileManager {
 
     File? file;
     final result = await FilePicker.platform.pickFiles(
-      allowedExtensions: ['.json'],
+      allowedExtensions: ['json'],
       type: FileType.custom,
     );
     if (result != null && result.files.single.path != null) {
@@ -56,14 +60,19 @@ class FileManager {
   Future<bool> writeJsonFile(String jsonData) async {
     File file = await _jsonFile;
     final newFile = await file.writeAsString(jsonData);
-    final saved = await Share.shareXFiles(
-      [
-        XFile(
-          newFile.path,
-          mimeType: "application/json",
-        )
-      ],
-    );
-    return saved.status == ShareResultStatus.success;
+
+    if (Platform.isIOS) {
+      final saved = await Share.shareXFiles(
+        [
+          XFile(
+            newFile.path,
+            mimeType: "application/json",
+          )
+        ],
+      );
+      return saved.status == ShareResultStatus.success;
+    } else {
+      return newFile.exists();
+    }
   }
 }
