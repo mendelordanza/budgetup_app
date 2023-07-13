@@ -151,7 +151,9 @@ class SummaryPage extends HookWidget {
         onTap: () async {
           final customerInfo = await Purchases.getCustomerInfo();
           final hasData =
-              customerInfo.entitlements.active[entitlementId] != null;
+              customerInfo.entitlements.active[entitlementId] != null &&
+                  customerInfo.entitlements.active[entitlementId]!.isSandbox ==
+                      false;
 
           if (context.mounted) {
             if (hasData ||
