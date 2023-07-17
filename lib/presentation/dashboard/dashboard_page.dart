@@ -58,11 +58,38 @@ class DashboardPage extends HookWidget {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: BlocBuilder<DashboardCubit, DashboardState>(
-                  builder: (context, state) {
-                    if (state is DashboardLoaded) {
-                      return Balance(
+                padding: const EdgeInsets.only(bottom: 24.0),
+                child: Column(
+                  children: [
+                    BlocBuilder<DashboardCubit, DashboardState>(
+                      builder: (context, state) {
+                        if (state is DashboardLoaded) {
+                          return Balance(
+                              headerLabel: Tooltip(
+                                message:
+                                    'Total Spent + Total Paid Recurring Bills for the month of $currentMonth',
+                                textAlign: TextAlign.center,
+                                triggerMode: TooltipTriggerMode.tap,
+                                showDuration: Duration(seconds: 3),
+                                child: const Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text("Total"),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Icon(
+                                      Iconsax.info_circle,
+                                      size: 16,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              totalAlign: TextAlign.center,
+                              total: state.overallTotal);
+                        }
+                        return Balance(
                           headerLabel: Tooltip(
                             message:
                                 'Total Spent + Total Paid Recurring Bills for the month of $currentMonth',
@@ -85,33 +112,45 @@ class DashboardPage extends HookWidget {
                             ),
                           ),
                           totalAlign: TextAlign.center,
-                          total: state.overallTotal);
-                    }
-                    return Balance(
-                      headerLabel: Tooltip(
-                        message:
-                            'Total Spent + Total Paid Recurring Bills for the month of $currentMonth',
-                        textAlign: TextAlign.center,
-                        triggerMode: TooltipTriggerMode.tap,
-                        showDuration: Duration(seconds: 3),
-                        child: const Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text("Total"),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Icon(
-                              Iconsax.info_circle,
-                              size: 16,
-                            ),
-                          ],
-                        ),
-                      ),
-                      totalAlign: TextAlign.center,
-                      total: 0.00,
-                    );
-                  },
+                          total: 0.00,
+                        );
+                      },
+                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       Column(
+                    //         crossAxisAlignment: CrossAxisAlignment.start,
+                    //         children: [
+                    //           Text("Allocated Budget"),
+                    //           Text(
+                    //             "P10,000.00",
+                    //             style: TextStyle(
+                    //               fontSize: 18.0,
+                    //               fontWeight: FontWeight.w600,
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //       Column(
+                    //         crossAxisAlignment: CrossAxisAlignment.end,
+                    //         children: [
+                    //           Text("Remaining"),
+                    //           Text(
+                    //             "P10,000.00",
+                    //             style: TextStyle(
+                    //               fontSize: 18.0,
+                    //               fontWeight: FontWeight.w600,
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       )
+                    //     ],
+                    //   ),
+                    // ),
+                  ],
                 ),
               ),
               Stack(
@@ -166,8 +205,8 @@ class DashboardPage extends HookWidget {
       padding: EdgeInsets.symmetric(vertical: 16.0),
       child: BlocBuilder<DashboardCubit, DashboardState>(
         builder: (context, state) {
-          if (state is DashboardLoaded) {
-            final total = decimalFormatterWithSymbol(state.mostSpentCategory
+          if (state is DashboardLoaded && state.mostSpentCategory != null) {
+            final total = decimalFormatterWithSymbol(state.mostSpentCategory!
                 .getTotalByDate(DateFilterType.monthly, date));
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -192,7 +231,7 @@ class DashboardPage extends HookWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                          "${state.mostSpentCategory.icon} ${state.mostSpentCategory.title}"),
+                          "${state.mostSpentCategory!.icon} ${state.mostSpentCategory!.title}"),
                       Text(total),
                     ],
                   ),
@@ -216,15 +255,11 @@ class DashboardPage extends HookWidget {
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8.0),
-                  color: Colors.black54,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                 ),
                 padding: EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Transportation"),
-                    Text("P2,000.00"),
-                  ],
+                child: Text(
+                  "Most spent category for the month of ${formatDate(date, "MMMM yyyy")} will show here",
                 ),
               )
             ],

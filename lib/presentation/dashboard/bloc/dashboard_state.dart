@@ -8,7 +8,7 @@ class DashboardInitial extends DashboardState {}
 class DashboardLoaded extends DashboardState {
   final double overallTotal;
 
-  final ExpenseCategory mostSpentCategory;
+  final ExpenseCategory? mostSpentCategory;
 
   final List<ExpenseCategory> expensesCategories;
   final double expensesTotal;
@@ -18,7 +18,7 @@ class DashboardLoaded extends DashboardState {
 
   DashboardLoaded({
     this.overallTotal = 0.00,
-    required this.mostSpentCategory,
+    this.mostSpentCategory,
     required this.expensesCategories,
     this.expensesTotal = 0.00,
     required this.paidRecurringBills,
