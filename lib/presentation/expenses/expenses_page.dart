@@ -389,6 +389,7 @@ class ExpensesPage extends HookWidget {
                       if (state is ExpenseCategoryLoaded &&
                           state.expenseCategories.isNotEmpty) {
                         return GridView.builder(
+                          padding: EdgeInsets.only(bottom: 100.0),
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: state.expenseCategories.length,

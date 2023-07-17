@@ -46,6 +46,7 @@ class AllTxnsCubit extends Cubit<AllTxnsState> {
       );
       return newTxn;
     }).toList();
+    convertedTxns.sort((a, b) => b.updatedAt!.compareTo(a.updatedAt!));
 
     emit(
       AllTxnsLoaded(
