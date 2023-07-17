@@ -12,6 +12,17 @@ class ExpensesRepository {
     required IsarService isarService,
   }) : _isarService = isarService;
 
+  Future<List<ExpenseTxn>> getAllTransactions() async {
+    final objects = await _isarService.getAllTransactions();
+    return objects.map((txn) {
+      return ExpenseTxn.fromJson(txn.toJson()).copy(
+        categoryId: txn.category.value?.id,
+        categoryTitle:
+            "${txn.category.value?.icon} ${txn.category.value?.title}",
+      );
+    }).toList();
+  }
+
   Future<List<ExpenseCategory>> getExpenseCategories() async {
     final objects = await _isarService.getAllExpenseCategories();
     return objects.map((category) {

@@ -19,7 +19,7 @@ import '../../helper/shared_prefs.dart';
 class DashboardPage extends HookWidget {
   final DateTime date;
 
-  DashboardPage({required this.date, super.key});
+  const DashboardPage({required this.date, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -52,114 +52,107 @@ class DashboardPage extends HookWidget {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              BlocBuilder<DashboardCubit, DashboardState>(
-                builder: (context, state) {
-                  if (state is DashboardLoaded) {
-                    return Balance(
-                        headerLabel: Tooltip(
-                          message:
-                              'Total Spent + Total Paid Recurring Bills for the month of $currentMonth',
-                          textAlign: TextAlign.center,
-                          triggerMode: TooltipTriggerMode.tap,
-                          showDuration: Duration(seconds: 3),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Total"),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Icon(
-                                Iconsax.info_circle,
-                                size: 16,
-                              ),
-                            ],
-                          ),
-                        ),
-                        totalAlign: TextAlign.center,
-                        total: state.overallTotal);
-                  }
-                  return Balance(
-                    headerLabel: Tooltip(
-                      message:
-                          'Total Spent + Total Paid Recurring Bills for the month of $currentMonth',
-                      textAlign: TextAlign.center,
-                      triggerMode: TooltipTriggerMode.tap,
-                      showDuration: Duration(seconds: 3),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text("Total"),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Icon(
-                            Iconsax.info_circle,
-                            size: 16,
-                          ),
-                        ],
-                      ),
-                    ),
-                    totalAlign: TextAlign.center,
-                    total: 0.00,
-                  );
-                },
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24.0),
-                    child: Column(
-                      children: [
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(top: 20.0),
-                              child: Container(
-                                padding: const EdgeInsets.all(16.0),
-                                color: Theme.of(context).cardColor,
-                                child: Column(
-                                  children: [
-                                    _yourExpenses(currentMonth),
-                                    SizedBox(
-                                      height: 20,
-                                    ),
-                                    _billsPaid(currentMonth),
-                                  ],
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: BlocBuilder<DashboardCubit, DashboardState>(
+                  builder: (context, state) {
+                    if (state is DashboardLoaded) {
+                      return Balance(
+                          headerLabel: Tooltip(
+                            message:
+                                'Total Spent + Total Paid Recurring Bills for the month of $currentMonth',
+                            textAlign: TextAlign.center,
+                            triggerMode: TooltipTriggerMode.tap,
+                            showDuration: Duration(seconds: 3),
+                            child: const Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text("Total"),
+                                SizedBox(
+                                  width: 5,
                                 ),
-                              ),
+                                Icon(
+                                  Iconsax.info_circle,
+                                  size: 16,
+                                ),
+                              ],
                             ),
-                            Positioned(
-                              top: -20,
-                              left: 0,
-                              right: 0,
-                              child: SvgPicture.asset(
-                                "assets/icons/ic_receipt_up.svg",
-                                width: MediaQuery.of(context).size.width,
-                                color: Theme.of(context).cardColor,
-                                fit: BoxFit.fill,
-                              ),
+                          ),
+                          totalAlign: TextAlign.center,
+                          total: state.overallTotal);
+                    }
+                    return Balance(
+                      headerLabel: Tooltip(
+                        message:
+                            'Total Spent + Total Paid Recurring Bills for the month of $currentMonth',
+                        textAlign: TextAlign.center,
+                        triggerMode: TooltipTriggerMode.tap,
+                        showDuration: Duration(seconds: 3),
+                        child: const Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text("Total"),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Icon(
+                              Iconsax.info_circle,
+                              size: 16,
                             ),
                           ],
                         ),
-                        SvgPicture.asset(
-                          "assets/icons/ic_receipt_down.svg",
-                          width: MediaQuery.of(context).size.width,
-                          color: Theme.of(context).cardColor,
-                          fit: BoxFit.fill,
-                        ),
-                      ],
+                      ),
+                      totalAlign: TextAlign.center,
+                      total: 0.00,
+                    );
+                  },
+                ),
+              ),
+              Stack(
+                clipBehavior: Clip.none,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      color: Theme.of(context).cardColor,
+                      child: Column(
+                        children: [
+                          _biggestCategory(),
+                          Divider(),
+                          // _biggestTransaction(),
+                          // Divider(),
+                          _yourExpenses(currentMonth),
+                          Divider(),
+                          _billsPaid(currentMonth),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                  Positioned(
+                    top: -10,
+                    left: 0,
+                    right: 0,
+                    child: SvgPicture.asset(
+                      "assets/icons/ic_receipt_up.svg",
+                      width: MediaQuery.of(context).size.width,
+                      color: Theme.of(context).cardColor,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                ],
+              ),
+              SvgPicture.asset(
+                "assets/icons/ic_receipt_down.svg",
+                width: MediaQuery.of(context).size.width,
+                color: Theme.of(context).cardColor,
+                fit: BoxFit.fill,
               ),
             ],
           ),
@@ -168,91 +161,209 @@ class DashboardPage extends HookWidget {
     );
   }
 
-  Widget _yourExpenses(String currentMonth) {
-    return BlocBuilder<DashboardCubit, DashboardState>(
-      builder: (context, state) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              "Your Expenses",
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
+  Widget _biggestCategory() {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 16.0),
+      child: BlocBuilder<DashboardCubit, DashboardState>(
+        builder: (context, state) {
+          if (state is DashboardLoaded) {
+            final total = decimalFormatterWithSymbol(state.mostSpentCategory
+                .getTotalByDate(DateFilterType.monthly, date));
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  "Your Most Spent Category 😱",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(
+                  height: 16.0,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                  ),
+                  padding: EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                          "${state.mostSpentCategory.icon} ${state.mostSpentCategory.title}"),
+                      Text(total),
+                    ],
+                  ),
+                )
+              ],
+            );
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                "Your Most Spent Category 😱",
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
+              SizedBox(
+                height: 16.0,
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: Colors.black54,
+                ),
+                padding: EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Transportation"),
+                    Text("P2,000.00"),
+                  ],
+                ),
+              )
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _biggestTransaction() {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            "Your Biggest Transaction 😱",
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.w600,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: (state is DashboardLoaded &&
-                      state.expensesCategories.isNotEmpty)
-                  ? Column(
-                      children: [
-                        ListView.builder(
-                          physics: NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: state.expensesCategories.length,
-                          itemBuilder: (context, index) {
-                            final item = state.expensesCategories[index];
-                            if (item.expenseTransactions != null &&
-                                item.expenseTransactions!.isNotEmpty) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 10.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        "${item.title}",
-                                        style: TextStyle(
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
+          ),
+          SizedBox(
+            height: 16.0,
+          ),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              color: Colors.black54,
+            ),
+            padding: EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("on July 25, 2023"),
+                Text("P10,000.00"),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _yourExpenses(String currentMonth) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            "Your Expenses",
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(
+            height: 16.0,
+          ),
+          BlocBuilder<DashboardCubit, DashboardState>(
+            builder: (context, state) {
+              if ((state is DashboardLoaded &&
+                  state.expensesCategories.isNotEmpty)) {
+                state.expensesCategories.sort(
+                  (a, b) => b
+                      .getTotalByDate(DateFilterType.monthly, date)
+                      .compareTo(
+                          a.getTotalByDate(DateFilterType.monthly, date)),
+                );
+                return Column(
+                  children: [
+                    ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: state.expensesCategories.length,
+                      itemBuilder: (context, index) {
+                        final item = state.expensesCategories[index];
+                        if (item.expenseTransactions != null &&
+                            item.expenseTransactions!.isNotEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 10.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    "${item.title}",
+                                    style: const TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w500,
                                     ),
-                                    Text(decimalFormatterWithSymbol(
-                                        item.getTotalByDate(
-                                            DateFilterType.monthly, date))),
-                                  ],
-                                ),
-                              );
-                            }
-                            return Container();
-                          },
-                        ),
-                        Divider(),
-                        if (state.expensesCategories.isNotEmpty)
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  "TOTAL",
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                              ),
-                              Text(
-                                decimalFormatterWithSymbol(state.expensesTotal),
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w600,
-                                  color: secondaryColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                      ],
-                    )
-                  : Center(
-                      child: Text(
-                        "Your expenses for $currentMonth will show here.",
-                        textAlign: TextAlign.center,
-                      ),
+                                Text(decimalFormatterWithSymbol(
+                                    item.getTotalByDate(
+                                        DateFilterType.monthly, date))),
+                              ],
+                            ),
+                          );
+                        }
+                        return Container();
+                      },
                     ),
-            ),
-          ],
-        );
-      },
+                    if (state.expensesCategories.isNotEmpty)
+                      Row(
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              "TOTAL",
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            decimalFormatterWithSymbol(state.expensesTotal),
+                            style: const TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w600,
+                              color: secondaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                );
+              } else {
+                return Center(
+                  child: Text(
+                    "Your expenses for $currentMonth will show here.",
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -264,108 +375,112 @@ class DashboardPage extends HookWidget {
   }
 
   Widget _billsPaid(String currentMonth) {
-    return BlocBuilder<DashboardCubit, DashboardState>(
-        builder: (context, state) {
-      return Column(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
+          const Text(
             "Bills you've paid",
             style: TextStyle(
               fontSize: 16.0,
               fontWeight: FontWeight.w600,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: (state is DashboardLoaded &&
-                    state.paidRecurringBills.isNotEmpty)
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: state.paidRecurringBills.length,
-                        itemBuilder: (context, index) {
-                          final item = state.paidRecurringBills[index];
-                          final txn = item.recurringBillTxns?.firstWhereOrNull(
-                            (element) =>
-                                getMonthFromDate(element.datePaid!) ==
-                                getMonthFromDate(date),
-                          );
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      Text(
-                                        item.title ?? "",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                        ),
+          SizedBox(
+            height: 16.0,
+          ),
+          BlocBuilder<DashboardCubit, DashboardState>(
+            builder: (context, state) {
+              if (state is DashboardLoaded &&
+                  state.paidRecurringBills.isNotEmpty) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: state.paidRecurringBills.length,
+                      itemBuilder: (context, index) {
+                        final item = state.paidRecurringBills[index];
+                        final txn = item.recurringBillTxns?.firstWhereOrNull(
+                          (element) =>
+                              getMonthFromDate(element.datePaid!) ==
+                              getMonthFromDate(date),
+                        );
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text(
+                                      item.title ?? "",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
                                       ),
-                                      if (txn != null && txn.datePaid != null)
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 3.0),
-                                          child: Text(
-                                            "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",
-                                            style: TextStyle(fontSize: 12.0),
-                                          ),
-                                        )
-                                    ],
-                                  ),
-                                ),
-                                Text(
-                                  decimalFormatterWithSymbol(
-                                      item.amount ?? 0.00),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                      Divider(),
-                      if (state.paidRecurringBills.isNotEmpty)
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                "TOTAL",
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w600,
+                                    ),
+                                    if (txn != null && txn.datePaid != null)
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 3.0),
+                                        child: Text(
+                                          "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",
+                                          style: TextStyle(fontSize: 12.0),
+                                        ),
+                                      )
+                                  ],
                                 ),
                               ),
-                            ),
-                            Text(
-                              decimalFormatterWithSymbol(
-                                  state.recurringBillTotal),
+                              Text(
+                                decimalFormatterWithSymbol(item.amount ?? 0.00),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    if (state.paidRecurringBills.isNotEmpty)
+                      Row(
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              "TOTAL",
                               style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.w600,
-                                color: secondaryColor,
                               ),
                             ),
-                          ],
-                        ),
-                    ],
-                  )
-                : Center(
-                    child: Text(
-                      "Your bills paid for $currentMonth will show here.",
-                      textAlign: TextAlign.center,
-                    ),
+                          ),
+                          Text(
+                            decimalFormatterWithSymbol(
+                                state.recurringBillTotal),
+                            style: const TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w600,
+                              color: secondaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                );
+              } else {
+                return Center(
+                  child: Text(
+                    "Your bills paid for $currentMonth will show here.",
+                    textAlign: TextAlign.center,
                   ),
+                );
+              }
+            },
           ),
         ],
-      );
-    });
+      ),
+    );
   }
 }

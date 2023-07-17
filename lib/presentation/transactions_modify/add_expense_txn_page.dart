@@ -185,15 +185,17 @@ class AddTransaction extends HookWidget {
                                       child: TextFormField(
                                         focusNode: amountFocusNode,
                                         controller: amountTextController,
-                                        decoration: InputDecoration(
+                                        decoration: const InputDecoration(
                                           fillColor: Colors.transparent,
                                           filled: true,
                                           border: InputBorder.none,
                                           contentPadding: EdgeInsets.zero,
                                         ),
-                                        style: TextStyle(
+                                        autofocus: true,
+                                        style: const TextStyle(
                                           fontSize: 24.0,
                                           fontWeight: FontWeight.w600,
+                                          decoration: TextDecoration.underline,
                                         ),
                                         textAlign: TextAlign.center,
                                         textInputAction: TextInputAction.next,
@@ -437,11 +439,6 @@ class AddTransaction extends HookWidget {
             ),
           ),
           isExpanded: true,
-          // hint: Text(
-          //   selectedCategory != null
-          //       ? selectedCategory.title!
-          //       : 'Select category',
-          // ),
           items: items
               .map(
                 (item) => DropdownMenuItem<int>(

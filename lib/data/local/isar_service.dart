@@ -37,6 +37,12 @@ class IsarService {
     return total;
   }
 
+  Future<List<ExpenseTxnEntity>> getAllTransactions() async {
+    final isar = await db;
+    final list = await isar.expenseTxnEntitys.where().findAll();
+    return list;
+  }
+
   Future<List<ExpenseCategoryEntity>> getAllExpenseCategories() async {
     final isar = await db;
     final list = await isar.expenseCategoryEntitys.where().findAll();
