@@ -314,10 +314,7 @@ class ExpensesPage extends HookWidget {
                                         width: 5,
                                       ),
                                       Text(
-                                        "View All Transactions",
-                                        style: TextStyle(
-                                          decoration: TextDecoration.underline,
-                                        ),
+                                        "All Transactions",
                                       ),
                                     ],
                                   ),
@@ -358,9 +355,6 @@ class ExpensesPage extends HookWidget {
                                 ),
                                 Text(
                                   "Add Category",
-                                  style: TextStyle(
-                                    decoration: TextDecoration.underline,
-                                  ),
                                 ),
                               ],
                             ),
