@@ -255,7 +255,7 @@ class ExpenseTxnPage extends HookWidget {
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("No transactions"),
+                          Text("No transactions yet"),
                           TextButton(
                             onPressed: () async {
                               Navigator.pushNamed(

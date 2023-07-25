@@ -37,10 +37,39 @@ class DashboardCubit extends Cubit<DashboardState> {
   }
 
   getSummary(DateTime date) async {
-    print("DATE: $date");
     final dashboardCategories =
         await expensesRepository.getExpenseCategoriesByDate(date);
 
+    //MOST SPENT CATEGORY
+    ExpenseCategory? convertedMostSpentCategory;
+    if(dashboardCategories.isNotEmpty) {
+      final mostSpentCategory = dashboardCategories.reduce((value, element) {
+        final a = value.getTotalByDate(DateFilterType.monthly, date);
+        final b = element.getTotalByDate(DateFilterType.monthly, date);
+        if (a > b) {
+          return value;
+        } else {
+          return element;
+        }
+      });
+
+      convertedMostSpentCategory = mostSpentCategory.copy(
+          budget: sharedPrefs.getCurrencyCode() == "USD"
+              ? (mostSpentCategory.budget ?? 0.00)
+              : (mostSpentCategory.budget ?? 0.00) *
+              sharedPrefs.getCurrencyRate(),
+          expenseTransactions: mostSpentCategory.expenseTransactions?.map((txn) {
+            final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
+                ? (txn.amount ?? 0.00)
+                : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
+            final newTxn = txn.copy(
+              amount: convertedAmount,
+            );
+            return newTxn;
+          }).toList());
+    }
+
+    //YOUR EXPENSES
     final convertedCategories = dashboardCategories.map((category) {
       final convertedBudget = sharedPrefs.getCurrencyCode() == "USD"
           ? (category.budget ?? 0.00)
@@ -88,6 +117,7 @@ class DashboardCubit extends Cubit<DashboardState> {
     emit(
       DashboardLoaded(
         overallTotal: expensesTotal + recurringBillTotal,
+        mostSpentCategory: convertedMostSpentCategory,
         expensesCategories: convertedCategories,
         expensesTotal: expensesTotal,
         paidRecurringBills: convertedPaidRecurringBills,

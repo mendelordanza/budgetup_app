@@ -8,6 +8,7 @@ import 'package:budgetup_app/data/recurring_bills_repository.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/presentation/dashboard/bloc/dashboard_cubit.dart';
 import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
+import 'package:budgetup_app/presentation/expenses/bloc/all_txns_cubit.dart';
 import 'package:budgetup_app/presentation/expenses/bloc/expense_bloc.dart';
 import 'package:budgetup_app/presentation/expenses/bloc/single_category_cubit.dart';
 import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
@@ -100,6 +101,13 @@ Future<void> setup() async {
   );
   getIt.registerFactory(
     () => RecurringDateFilterBloc(sharedPrefs: getIt()),
+  );
+  getIt.registerFactory(
+    () => AllTxnsCubit(
+      expensesRepository: getIt(),
+      sharedPrefs: getIt(),
+      transactionsModifyBloc: getIt(),
+    ),
   );
 
   //Repository

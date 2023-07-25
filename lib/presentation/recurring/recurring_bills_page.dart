@@ -4,7 +4,6 @@ import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/custom/balance.dart';
 import 'package:budgetup_app/presentation/custom/custom_action_dialog.dart';
-import 'package:budgetup_app/presentation/custom/date_filter_button.dart';
 import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/recurring_confirmation_dialog.dart';
@@ -29,6 +28,16 @@ import '../../injection_container.dart';
 import '../custom/custom_button.dart';
 import '../custom/delete_dialog.dart';
 import '../paywall/paywall.dart';
+
+class AddRecurringBillArgs {
+  final RecurringBillInterval initialIntervalValue;
+  final RecurringBill? recurringBill;
+
+  AddRecurringBillArgs({
+    required this.initialIntervalValue,
+    this.recurringBill,
+  });
+}
 
 class RecurringBillsPage extends HookWidget {
   RecurringBillsPage({Key? key}) : super(key: key);
@@ -100,6 +109,7 @@ class RecurringBillsPage extends HookWidget {
     final tabController = useTabController(
       initialLength: 4,
     );
+    final selectedTab = useState(RecurringBillInterval.monthly);
 
     final isSubscribed = useState(false);
     useEffect(() {
@@ -112,265 +122,229 @@ class RecurringBillsPage extends HookWidget {
         _updateWidget();
       });
 
+      tabController.addListener(() {
+        selectedTab.value = RecurringBillInterval.values.singleWhereOrNull(
+              (element) => element.index == (tabController.index - 1),
+            ) ??
+            RecurringBillInterval.monthly;
+      });
+
       return null;
     }, []);
 
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(
-            16.0,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: BlocBuilder<RecurringBillBloc, RecurringBillState>(
-                      builder: (context, state) {
-                        if (state is RecurringBillsLoaded &&
-                            state.total != null) {
-                          return Balance(
-                            headerLabel: Tooltip(
-                              message:
-                                  'Sum of all paid recurring bills for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), currentSelectedDate)}',
-                              textAlign: TextAlign.center,
-                              triggerMode: TooltipTriggerMode.tap,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text("Total Paid"),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Icon(
-                                    Iconsax.info_circle,
-                                    size: 16,
-                                  ),
-                                ],
-                              ),
-                              showDuration: Duration(seconds: 3),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 8.0,
+          horizontal: 16.0,
+        ),
+        child: NestedScrollView(
+          headerSliverBuilder: (context, value) {
+            return [
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      "Recurring Bills",
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: BlocBuilder<RecurringBillBloc,
+                                RecurringBillState>(
+                              builder: (context, state) {
+                                if (state is RecurringBillsLoaded &&
+                                    state.total != null) {
+                                  return Balance(
+                                    headerLabel: Tooltip(
+                                      message:
+                                          'Sum of all paid recurring bills for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), currentSelectedDate)}',
+                                      textAlign: TextAlign.center,
+                                      triggerMode: TooltipTriggerMode.tap,
+                                      showDuration: Duration(seconds: 3),
+                                      child: const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text("Total Paid"),
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          Icon(
+                                            Iconsax.info_circle,
+                                            size: 16,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    totalAlign: TextAlign.center,
+                                    total: state.total!,
+                                  );
+                                }
+                                return Balance(
+                                  headerLabel: Text("Total Paid"),
+                                  totalAlign: TextAlign.center,
+                                  total: 0.00,
+                                );
+                              },
                             ),
-                            total: state.total!,
-                          );
-                        }
-                        return Balance(
-                          headerLabel: Text("Total Paid"),
-                          total: 0.00,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: TabBar(
+                        controller: tabController,
+                        tabs: RecurringBillInterval.values
+                            .map(
+                              (item) => Tab(
+                                  text:
+                                      "${item.name[0].toUpperCase()}${item.name.substring(1)}"),
+                            )
+                            .toList()
+                          ..insert(
+                            0,
+                            Tab(text: "All"),
+                          ),
+                        isScrollable: false,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        indicatorColor: Theme.of(context).primaryColor,
+                        labelColor: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
+                    BlocBuilder<RecurringBillBloc, RecurringBillState>(
+                      builder: (context, state) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  final customerInfo =
+                                      await Purchases.getCustomerInfo();
+                                  final hasData = customerInfo.entitlements
+                                              .active[entitlementId] !=
+                                          null &&
+                                      customerInfo
+                                              .entitlements
+                                              .active[entitlementId]!
+                                              .isSandbox ==
+                                          false;
+
+                                  if (context.mounted) {
+                                    if (hasData ||
+                                        (state is RecurringBillsLoaded &&
+                                            state.recurringBills.length < 5)) {
+                                      Navigator.pushNamed(
+                                        context,
+                                        RouteStrings.addRecurringBill,
+                                        arguments: AddRecurringBillArgs(
+                                          initialIntervalValue:
+                                              selectedTab.value,
+                                        ),
+                                      );
+                                    } else {
+                                      showPaywall(context);
+                                    }
+                                  }
+                                },
+                                behavior: HitTestBehavior.translucent,
+                                child: const Row(
+                                  children: [
+                                    Icon(
+                                      Iconsax.add,
+                                      size: 20.0,
+                                    ),
+                                    Text("Add Recurring Bill"),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         );
                       },
                     ),
-                  ),
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     showModalBottomSheet(
-                  //       backgroundColor: Colors.transparent,
-                  //       context: context,
-                  //       builder: (context) {
-                  //         return StatefulBuilder(builder: (context, setState) {
-                  //           return DateFilterBottomSheet(
-                  //             types: types,
-                  //             onSelectFilterType: (type) {
-                  //               selectedFilterType.value = type;
-                  //               context.read<RecurringDateFilterBloc>().add(
-                  //                   RecurringSelectDate(
-                  //                       type, selectedDate.value));
-                  //               context.read<RecurringBillBloc>().add(
-                  //                     LoadRecurringBills(),
-                  //                   );
-                  //               setState(() {});
-                  //             },
-                  //             onSelectDate: (date) {
-                  //               selectedDate.value = date;
-                  //               context.read<RecurringDateFilterBloc>().add(
-                  //                   RecurringSelectDate(
-                  //                       selectedFilterType.value, date));
-                  //               context.read<RecurringBillBloc>().add(
-                  //                     LoadRecurringBills(),
-                  //                   );
-                  //               setState(() {});
-                  //             },
-                  //             onSelectYear: (year) {
-                  //               context
-                  //                   .read<RecurringDateFilterBloc>()
-                  //                   .add(RecurringSelectDate(
-                  //                       selectedFilterType.value,
-                  //                       DateTime(
-                  //                         year,
-                  //                         selectedDate.value.month,
-                  //                         selectedDate.value.day,
-                  //                       )));
-                  //               context.read<RecurringBillBloc>().add(
-                  //                     LoadRecurringBills(),
-                  //                   );
-                  //             },
-                  //             selectedFilterType: selectedFilterType,
-                  //             selectedDate: selectedDate,
-                  //           );
-                  //         });
-                  //         //return RecurringDateBottomSheet();
-                  //       },
-                  //       isScrollControlled: true,
-                  //     );
-                  //   },
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.center,
-                  //     children: [
-                  //       BlocBuilder<RecurringDateFilterBloc,
-                  //           RecurringDateFilterState>(
-                  //         builder: (context, state) {
-                  //           if (state is RecurringDateFilterSelected) {
-                  //             return DateFilterButton(
-                  //               text: getMonthText(
-                  //                   state.dateFilterType, state.selectedDate),
-                  //             );
-                  //           }
-                  //           return DateFilterButton(
-                  //             text: getMonthText(
-                  //                 dateFilterTypeFromString(
-                  //                     currentDateFilterType),
-                  //                 currentSelectedDate),
-                  //           );
-                  //         },
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: TabBar(
-                  controller: tabController,
-                  tabs: RecurringBillInterval.values
-                      .map(
-                        (item) => Tab(
-                            text:
-                                "${item.name[0].toUpperCase()}${item.name.substring(1)}"),
-                      )
-                      .toList()
-                    ..insert(
-                      0,
-                      Tab(text: "All"),
-                    ),
-                  isScrollable: false,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicatorColor: Theme.of(context).primaryColor,
-                  labelColor: Theme.of(context).colorScheme.onSurface,
+                  ],
                 ),
               ),
-              BlocBuilder<RecurringBillBloc, RecurringBillState>(
-                builder: (context, state) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        GestureDetector(
-                          onTap: () async {
-                            final customerInfo =
-                                await Purchases.getCustomerInfo();
-                            final hasData = customerInfo
-                                        .entitlements.active[entitlementId] !=
-                                    null &&
-                                customerInfo.entitlements.active[entitlementId]!
-                                        .isSandbox ==
-                                    false;
-
-                            if (context.mounted) {
-                              if (hasData ||
-                                  (state is RecurringBillsLoaded &&
-                                      state.recurringBills.length < 5)) {
-                                Navigator.pushNamed(
-                                    context, RouteStrings.addRecurringBill);
-                              } else {
-                                showPaywall(context);
-                              }
-                            }
-                          },
-                          child: Row(
-                            children: [
-                              Icon(
-                                Iconsax.add,
-                                size: 20.0,
-                              ),
-                              Text("Add Recurring Bill"),
-                            ],
-                          ),
-                          behavior: HitTestBehavior.translucent,
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Expanded(
-                  child:
-                      BlocListener<RecurringModifyBloc, RecurringModifyState>(
-                listener: (context, state) {
-                  if (state is RecurringBillRemoved ||
-                      state is RecurringBillEdited ||
-                      state is RecurringBillAdded) {
-                    Navigator.maybePop(context);
-                  }
-                },
-                child: BlocBuilder<RecurringBillBloc, RecurringBillState>(
-                  builder: (context, state) {
-                    if (state is RecurringBillsLoaded) {
-                      return TabBarView(
-                        controller: tabController,
-                        children: RecurringBillInterval.values.map((interval) {
-                          final list = state.recurringBills
-                              .where((bill) => bill.interval == interval.name)
-                              .toList();
-                          if (list.isNotEmpty) {
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: list.length,
-                              itemBuilder: (context, index) {
-                                final item = list[index];
-                                final txn =
-                                    item.recurringBillTxns?.firstWhereOrNull(
-                                  (element) =>
-                                      element.datePaid?.month ==
-                                      currentSelectedDate.month,
-                                );
-                                return _recurringBillItem(
-                                  context,
-                                  item: item,
-                                  txn: txn,
-                                  currentSelectedDate: currentSelectedDate,
-                                  currentDateFilterType: currentDateFilterType,
-                                );
-                              },
+            ];
+          },
+          body: BlocListener<RecurringModifyBloc, RecurringModifyState>(
+            listener: (context, state) {
+              if (state is RecurringBillRemoved ||
+                  state is RecurringBillEdited ||
+                  state is RecurringBillAdded) {
+                Navigator.maybePop(context);
+              }
+            },
+            child: BlocBuilder<RecurringBillBloc, RecurringBillState>(
+              builder: (context, state) {
+                if (state is RecurringBillsLoaded) {
+                  return TabBarView(
+                    controller: tabController,
+                    children: RecurringBillInterval.values.map((interval) {
+                      final list = state.recurringBills
+                          .where((bill) => bill.interval == interval.name)
+                          .toList();
+                      if (list.isNotEmpty) {
+                        return ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: list.length,
+                          itemBuilder: (context, index) {
+                            final item = list[index];
+                            final txn =
+                                item.recurringBillTxns?.firstWhereOrNull(
+                              (element) =>
+                                  element.datePaid?.month ==
+                                  currentSelectedDate.month,
                             );
-                          }
-                          return emptyList(
-                            context,
-                            interval: interval.name,
-                            state: state,
-                          );
-                        }).toList()
-                          ..insert(
-                            0,
-                            allTab(context,
-                                state: state,
-                                currentSelectedDate: currentSelectedDate,
-                                currentDateFilterType: currentDateFilterType),
-                          ),
+                            return _recurringBillItem(
+                              context,
+                              item: item,
+                              txn: txn,
+                              interval: selectedTab.value,
+                              currentSelectedDate: currentSelectedDate,
+                              currentDateFilterType: currentDateFilterType,
+                            );
+                          },
+                        );
+                      }
+                      return emptyList(
+                        context,
+                        interval: interval,
+                        state: state,
                       );
-                    }
-                    return emptyList(context, state: state);
-                  },
-                ),
-              )),
-            ],
+                    }).toList()
+                      ..insert(
+                        0,
+                        allTab(context,
+                            state: state,
+                            interval: selectedTab.value,
+                            currentSelectedDate: currentSelectedDate,
+                            currentDateFilterType: currentDateFilterType),
+                      ),
+                  );
+                }
+                return emptyList(context,
+                    interval: selectedTab.value, state: state);
+              },
+            ),
           ),
         ),
       ),
@@ -380,11 +354,13 @@ class RecurringBillsPage extends HookWidget {
   Widget allTab(
     BuildContext context, {
     required RecurringBillState state,
+    required RecurringBillInterval interval,
     required DateTime currentSelectedDate,
     required String currentDateFilterType,
   }) {
     if (state is RecurringBillsLoaded && state.recurringBills.isNotEmpty) {
       return ListView.builder(
+        physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemCount: state.recurringBills.length,
         itemBuilder: (context, index) {
@@ -397,67 +373,72 @@ class RecurringBillsPage extends HookWidget {
             context,
             item: item,
             txn: txn,
+            interval: interval,
             currentSelectedDate: currentSelectedDate,
             currentDateFilterType: currentDateFilterType,
           );
         },
       );
     }
-    return emptyList(context, state: state);
+    return emptyList(context, interval: interval, state: state);
   }
 
   Widget emptyList(
     BuildContext context, {
-    String? interval,
+    required RecurringBillInterval interval,
     required RecurringBillState state,
   }) {
-    return Center(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Text(
-              "No ${interval ?? ""} recurring bills yet",
-              textAlign: TextAlign.center,
-            ),
-            TextButton(
-              onPressed: () async {
-                final customerInfo = await Purchases.getCustomerInfo();
-                final hasData =
-                    customerInfo.entitlements.active[entitlementId] != null &&
-                        customerInfo.entitlements.active[entitlementId]!
-                                .isSandbox ==
-                            false;
-
-                if (context.mounted) {
-                  if (hasData ||
-                      (state is RecurringBillsLoaded &&
-                          state.recurringBills.length < 5)) {
-                    Navigator.pushNamed(context, RouteStrings.addRecurringBill);
-                  } else {
-                    showPaywall(context);
-                  }
-                }
-              },
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Iconsax.add),
-                  Text("Add your first recurring bill"),
-                ],
-              ),
-            )
-          ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          "No recurring bills yet",
+          textAlign: TextAlign.center,
         ),
-      ),
+        TextButton(
+          onPressed: () async {
+            final customerInfo = await Purchases.getCustomerInfo();
+            final hasData = customerInfo.entitlements.active[entitlementId] !=
+                    null &&
+                customerInfo.entitlements.active[entitlementId]!.isSandbox ==
+                    false;
+
+            if (context.mounted) {
+              if (hasData ||
+                  (state is RecurringBillsLoaded &&
+                      state.recurringBills.length < 5)) {
+                Navigator.pushNamed(
+                  context,
+                  RouteStrings.addRecurringBill,
+                  arguments: AddRecurringBillArgs(
+                    initialIntervalValue: interval,
+                  ),
+                );
+              } else {
+                showPaywall(context);
+              }
+            }
+          },
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Iconsax.add),
+              Text("Add your first recurring bill"),
+            ],
+          ),
+        )
+      ],
     );
   }
 
   Widget _recurringBillItem(
     BuildContext context, {
     required RecurringBill item,
-    RecurringBillTxn? txn,
     required DateTime currentSelectedDate,
     required String currentDateFilterType,
+    required RecurringBillInterval interval,
+    RecurringBillTxn? txn,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 13.0),
@@ -466,7 +447,12 @@ class RecurringBillsPage extends HookWidget {
           Navigator.pushNamed(
             context,
             RouteStrings.addRecurringBill,
-            arguments: item,
+            arguments: AddRecurringBillArgs(
+              initialIntervalValue: RecurringBillInterval.values.singleWhere(
+                (element) => element.name == interval.name,
+              ),
+              recurringBill: item,
+            ),
           );
         },
         child: BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
@@ -508,7 +494,7 @@ class RecurringBillsPage extends HookWidget {
 
       // The end action pane is the one at the right or the bottom side.
       endActionPane: ActionPane(
-        motion: ScrollMotion(),
+        motion: const ScrollMotion(),
         children: [
           SlidableAction(
             onPressed: (context) {
@@ -556,14 +542,6 @@ class RecurringBillsPage extends HookWidget {
                                         },
                                       );
                                     },
-                                    child: Text(
-                                      "for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), selectedDate)} and following months",
-                                      style: TextStyle(
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
                                     style: OutlinedButton.styleFrom(
                                       shape: RoundedRectangleBorder(
                                         borderRadius:
@@ -574,6 +552,14 @@ class RecurringBillsPage extends HookWidget {
                                         color: Theme.of(context).primaryColor,
                                       ),
                                       elevation: 0,
+                                    ),
+                                    child: Text(
+                                      "for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), selectedDate)} and following months",
+                                      style: const TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ),
                                 ),
@@ -608,13 +594,6 @@ class RecurringBillsPage extends HookWidget {
                                       },
                                     );
                                   },
-                                  child: Text(
-                                    "Delete all",
-                                    style: TextStyle(
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
                                   style: OutlinedButton.styleFrom(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8.0),
@@ -625,6 +604,13 @@ class RecurringBillsPage extends HookWidget {
                                     ),
                                     elevation: 0,
                                   ),
+                                  child: const Text(
+                                    "Delete all",
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -632,7 +618,7 @@ class RecurringBillsPage extends HookWidget {
                               onPressed: () {
                                 Navigator.pop(context);
                               },
-                              child: Text(
+                              child: const Text(
                                 "Cancel",
                                 style: TextStyle(
                                   fontSize: 14.0,
@@ -654,7 +640,7 @@ class RecurringBillsPage extends HookWidget {
             foregroundColor: Colors.white,
             icon: Iconsax.trash,
             label: 'Delete',
-            borderRadius: BorderRadius.all(
+            borderRadius: const BorderRadius.all(
               Radius.circular(16.0),
             ),
           ),
@@ -740,7 +726,7 @@ class RecurringBillsPage extends HookWidget {
                                   Padding(
                                     padding: const EdgeInsets.only(left: 4.0),
                                     child: Container(
-                                      padding: EdgeInsets.symmetric(
+                                      padding: const EdgeInsets.symmetric(
                                         horizontal: 4.0,
                                         vertical: 2.0,
                                       ),
@@ -770,7 +756,7 @@ class RecurringBillsPage extends HookWidget {
                                 txn != null)
                               Text(
                                 "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12.0,
                                 ),
                               )
@@ -779,7 +765,7 @@ class RecurringBillsPage extends HookWidget {
                                     RecurringBillInterval.weekly.name)
                               Text(
                                 "every ${formatDate(item.reminderDate!, "EEEE")}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12.0,
                                 ),
                               )
@@ -788,7 +774,7 @@ class RecurringBillsPage extends HookWidget {
                                     RecurringBillInterval.yearly.name)
                               Text(
                                 "every ${item.reminderDate!.day}${getDayOfMonthSuffix(item.reminderDate!.day)} ${item.interval}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12.0,
                                 ),
                               )
@@ -797,7 +783,7 @@ class RecurringBillsPage extends HookWidget {
                                 "every ${formatDate(item.reminderDate!, "MMMM")} "
                                 "${item.reminderDate!.day}${getDayOfMonthSuffix(item.reminderDate!.day)} "
                                 "${item.interval}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12.0,
                                 ),
                               ),
@@ -806,7 +792,7 @@ class RecurringBillsPage extends HookWidget {
                       ),
                       Text(
                         decimalFormatterWithSymbol(item.amount ?? 0.00),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.w600,
                         ),

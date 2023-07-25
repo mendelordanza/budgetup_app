@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:budgetup_app/domain/expense_category.dart';
-import 'package:budgetup_app/domain/recurring_bill.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/presentation/dashboard/dashboard_page.dart';
+import 'package:budgetup_app/presentation/expenses/all_txns_page.dart';
 import 'package:budgetup_app/presentation/landing/landing_page.dart';
+import 'package:budgetup_app/presentation/recurring/recurring_bills_page.dart';
 import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
 import 'package:budgetup_app/presentation/settings/appearance/appearance_page.dart';
 import 'package:budgetup_app/presentation/settings/backup_data/import_export_data.dart';
@@ -91,10 +92,10 @@ class RouteGenerator {
           return _errorRoute();
         }
       case RouteStrings.addRecurringBill:
-        if (args is RecurringBill?) {
+        if (args is AddRecurringBillArgs) {
           return _navigate(
             builder: (_) => AddRecurringBillPage(
-              recurringBill: args,
+              args: args,
             ),
           );
         } else {
@@ -107,6 +108,10 @@ class RouteGenerator {
       case RouteStrings.backup:
         return _navigate(
           builder: (_) => ImportExportData(),
+        );
+      case RouteStrings.allTxns:
+        return _navigate(
+          builder: (_) => AllTransactionsPage(),
         );
       default:
         return _errorRoute();
