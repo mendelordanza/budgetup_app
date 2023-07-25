@@ -27,10 +27,8 @@ import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
 import '../custom/custom_button.dart';
-import '../custom/date_filter_bottom_sheet.dart';
 import '../custom/delete_dialog.dart';
 import '../paywall/paywall.dart';
-import '../recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
 
 class RecurringBillsPage extends HookWidget {
   RecurringBillsPage({Key? key}) : super(key: key);
@@ -95,14 +93,6 @@ class RecurringBillsPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
-
-    final selectedFilterType = useState<DateFilterType>(
-        dateFilterTypeFromString(sharedPrefs.getSelectedDateFilterType()));
-    final selectedDate = useState<DateTime>(
-      sharedPrefs.getExpenseSelectedDate().isNotEmpty
-          ? DateTime.parse(sharedPrefs.getExpenseSelectedDate())
-          : DateTime.now(),
-    );
     final currentSelectedDate =
         DateTime.parse(sharedPrefs.getExpenseSelectedDate());
     final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
@@ -174,81 +164,81 @@ class RecurringBillsPage extends HookWidget {
                       },
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet(
-                        backgroundColor: Colors.transparent,
-                        context: context,
-                        builder: (context) {
-                          return StatefulBuilder(builder: (context, setState) {
-                            return DateFilterBottomSheet(
-                              types: types,
-                              onSelectFilterType: (type) {
-                                selectedFilterType.value = type;
-                                context.read<RecurringDateFilterBloc>().add(
-                                    RecurringSelectDate(
-                                        type, selectedDate.value));
-                                context.read<RecurringBillBloc>().add(
-                                      LoadRecurringBills(),
-                                    );
-                                setState(() {});
-                              },
-                              onSelectDate: (date) {
-                                selectedDate.value = date;
-                                context.read<RecurringDateFilterBloc>().add(
-                                    RecurringSelectDate(
-                                        selectedFilterType.value, date));
-                                context.read<RecurringBillBloc>().add(
-                                      LoadRecurringBills(),
-                                    );
-                                setState(() {});
-                              },
-                              onSelectYear: (year) {
-                                context
-                                    .read<RecurringDateFilterBloc>()
-                                    .add(RecurringSelectDate(
-                                        selectedFilterType.value,
-                                        DateTime(
-                                          year,
-                                          selectedDate.value.month,
-                                          selectedDate.value.day,
-                                        )));
-                                context.read<RecurringBillBloc>().add(
-                                      LoadRecurringBills(),
-                                    );
-                              },
-                              selectedFilterType: selectedFilterType,
-                              selectedDate: selectedDate,
-                            );
-                          });
-                          //return RecurringDateBottomSheet();
-                        },
-                        isScrollControlled: true,
-                      );
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        BlocBuilder<RecurringDateFilterBloc,
-                            RecurringDateFilterState>(
-                          builder: (context, state) {
-                            if (state is RecurringDateFilterSelected) {
-                              return DateFilterButton(
-                                text: getMonthText(
-                                    state.dateFilterType, state.selectedDate),
-                              );
-                            }
-                            return DateFilterButton(
-                              text: getMonthText(
-                                  dateFilterTypeFromString(
-                                      currentDateFilterType),
-                                  currentSelectedDate),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     showModalBottomSheet(
+                  //       backgroundColor: Colors.transparent,
+                  //       context: context,
+                  //       builder: (context) {
+                  //         return StatefulBuilder(builder: (context, setState) {
+                  //           return DateFilterBottomSheet(
+                  //             types: types,
+                  //             onSelectFilterType: (type) {
+                  //               selectedFilterType.value = type;
+                  //               context.read<RecurringDateFilterBloc>().add(
+                  //                   RecurringSelectDate(
+                  //                       type, selectedDate.value));
+                  //               context.read<RecurringBillBloc>().add(
+                  //                     LoadRecurringBills(),
+                  //                   );
+                  //               setState(() {});
+                  //             },
+                  //             onSelectDate: (date) {
+                  //               selectedDate.value = date;
+                  //               context.read<RecurringDateFilterBloc>().add(
+                  //                   RecurringSelectDate(
+                  //                       selectedFilterType.value, date));
+                  //               context.read<RecurringBillBloc>().add(
+                  //                     LoadRecurringBills(),
+                  //                   );
+                  //               setState(() {});
+                  //             },
+                  //             onSelectYear: (year) {
+                  //               context
+                  //                   .read<RecurringDateFilterBloc>()
+                  //                   .add(RecurringSelectDate(
+                  //                       selectedFilterType.value,
+                  //                       DateTime(
+                  //                         year,
+                  //                         selectedDate.value.month,
+                  //                         selectedDate.value.day,
+                  //                       )));
+                  //               context.read<RecurringBillBloc>().add(
+                  //                     LoadRecurringBills(),
+                  //                   );
+                  //             },
+                  //             selectedFilterType: selectedFilterType,
+                  //             selectedDate: selectedDate,
+                  //           );
+                  //         });
+                  //         //return RecurringDateBottomSheet();
+                  //       },
+                  //       isScrollControlled: true,
+                  //     );
+                  //   },
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.center,
+                  //     children: [
+                  //       BlocBuilder<RecurringDateFilterBloc,
+                  //           RecurringDateFilterState>(
+                  //         builder: (context, state) {
+                  //           if (state is RecurringDateFilterSelected) {
+                  //             return DateFilterButton(
+                  //               text: getMonthText(
+                  //                   state.dateFilterType, state.selectedDate),
+                  //             );
+                  //           }
+                  //           return DateFilterButton(
+                  //             text: getMonthText(
+                  //                 dateFilterTypeFromString(
+                  //                     currentDateFilterType),
+                  //                 currentSelectedDate),
+                  //           );
+                  //         },
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                 ],
               ),
               Padding(

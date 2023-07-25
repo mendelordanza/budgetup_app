@@ -1,11 +1,12 @@
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
-import 'package:budgetup_app/presentation/transactions_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:iconsax/iconsax.dart';
 
+import '../../helper/colors.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
@@ -14,14 +15,16 @@ import '../custom/date_filter_button.dart';
 import '../custom/whats_new_dialog.dart';
 import '../expense_date_filter/bloc/date_filter_bloc.dart';
 import '../expenses/bloc/expense_bloc.dart';
+import '../expenses/expenses_page.dart';
+import '../recurring/recurring_bills_page.dart';
 
 class HomePage extends HookWidget {
   HomePage({super.key});
 
   final _pages = [
-    // ExpensesPage(),
-    // RecurringBillsPage(),
-    TransactionsPage(),
+    ExpensesPage(),
+    RecurringBillsPage(),
+    //TransactionsPage(),
   ];
 
   showWhatsNew(BuildContext context) async {
@@ -91,10 +94,8 @@ class HomePage extends HookWidget {
                   onPressed: () {
                     Navigator.pushNamed(context, RouteStrings.summary);
                   },
-                  icon: SvgPicture.asset(
-                    "assets/icons/ic_summary_thin.svg",
-                    height: 24.0,
-                    color: Theme.of(context).colorScheme.onSurface,
+                  icon: Icon(
+                    Iconsax.menu_board,
                   ),
                 ),
                 Expanded(child: DateFilter()),
@@ -110,6 +111,36 @@ class HomePage extends HookWidget {
                 ),
               ],
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Column(
+                children: [
+                  Text("Jul 2023 Salary"),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        "P 1,000.00",
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 5.0,
+                      ),
+                      Icon(
+                        Iconsax.edit,
+                        size: 14,
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Divider(),
             Expanded(
               child: IndexedStack(
                 index: _selectedIndex.value,
@@ -119,33 +150,33 @@ class HomePage extends HookWidget {
           ],
         ),
       ),
-      // bottomNavigationBar: BottomNavigationBar(
-      //   selectedItemColor: secondaryColor,
-      //   items: [
-      //     BottomNavigationBarItem(
-      //       icon: Icon(
-      //         Iconsax.money_send,
-      //         color: _selectedIndex.value == 0
-      //             ? secondaryColor
-      //             : Theme.of(context).colorScheme.onSurface,
-      //       ),
-      //       label: 'Expenses',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: SvgPicture.asset(
-      //         "assets/icons/ic_recurring.svg",
-      //         color: _selectedIndex.value == 1
-      //             ? secondaryColor
-      //             : Theme.of(context).colorScheme.onSurface,
-      //       ),
-      //       label: 'Recurring Bills',
-      //     ),
-      //   ],
-      //   currentIndex: _selectedIndex.value,
-      //   onTap: (index) {
-      //     _selectedIndex.value = index;
-      //   },
-      // ),
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: secondaryColor,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(
+              Iconsax.money_send,
+              color: _selectedIndex.value == 0
+                  ? secondaryColor
+                  : Theme.of(context).colorScheme.onSurface,
+            ),
+            label: 'Expenses',
+          ),
+          BottomNavigationBarItem(
+            icon: SvgPicture.asset(
+              "assets/icons/ic_recurring.svg",
+              color: _selectedIndex.value == 1
+                  ? secondaryColor
+                  : Theme.of(context).colorScheme.onSurface,
+            ),
+            label: 'Recurring Bills',
+          ),
+        ],
+        currentIndex: _selectedIndex.value,
+        onTap: (index) {
+          _selectedIndex.value = index;
+        },
+      ),
     );
   }
 }
