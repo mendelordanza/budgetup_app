@@ -1,12 +1,19 @@
 import 'package:budgetup_app/helper/route_strings.dart';
+import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
+import '../custom/date_filter_bottom_sheet.dart';
+import '../custom/date_filter_button.dart';
 import '../custom/whats_new_dialog.dart';
+import '../expense_date_filter/bloc/date_filter_bloc.dart';
+import '../expenses/bloc/expense_bloc.dart';
 
 class HomePage extends HookWidget {
   HomePage({super.key});
@@ -47,39 +54,70 @@ class HomePage extends HookWidget {
     }, []);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "BudgetUp",
-        ),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pushNamed(context, RouteStrings.summary);
-          },
-          icon: SvgPicture.asset(
-            "assets/icons/ic_summary_thin.svg",
-            height: 24.0,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, RouteStrings.settings);
-            },
-            icon: SvgPicture.asset(
-              "assets/icons/ic_setting.svg",
-              height: 24.0,
-              color: Theme.of(context).colorScheme.onSurface,
+      // appBar: AppBar(
+      //   title:
+      //   centerTitle: true,
+      //   elevation: 0,
+      //   backgroundColor: Colors.transparent,
+      //   leading: IconButton(
+      //     onPressed: () {
+      //       Navigator.pushNamed(context, RouteStrings.summary);
+      //     },
+      //     icon: SvgPicture.asset(
+      //       "assets/icons/ic_summary_thin.svg",
+      //       height: 24.0,
+      //       color: Theme.of(context).colorScheme.onSurface,
+      //     ),
+      //   ),
+      //   actions: [
+      //     IconButton(
+      //       onPressed: () {
+      //         Navigator.pushNamed(context, RouteStrings.settings);
+      //       },
+      //       icon: SvgPicture.asset(
+      //         "assets/icons/ic_setting.svg",
+      //         height: 24.0,
+      //         color: Theme.of(context).colorScheme.onSurface,
+      //       ),
+      //     ),
+      //   ],
+      // ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, RouteStrings.summary);
+                  },
+                  icon: SvgPicture.asset(
+                    "assets/icons/ic_summary_thin.svg",
+                    height: 24.0,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                Expanded(child: DateFilter()),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, RouteStrings.settings);
+                  },
+                  icon: SvgPicture.asset(
+                    "assets/icons/ic_setting.svg",
+                    height: 24.0,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-      body: IndexedStack(
-        index: _selectedIndex.value,
-        children: _pages,
+            Expanded(
+              child: IndexedStack(
+                index: _selectedIndex.value,
+                children: _pages,
+              ),
+            ),
+          ],
+        ),
       ),
       // bottomNavigationBar: BottomNavigationBar(
       //   selectedItemColor: secondaryColor,
@@ -108,6 +146,132 @@ class HomePage extends HookWidget {
       //     _selectedIndex.value = index;
       //   },
       // ),
+    );
+  }
+}
+
+class DateFilter extends HookWidget {
+  DateFilter({super.key});
+
+  final types = [
+    DateSelection(
+      "Daily",
+      DateFilterType.daily,
+    ),
+    DateSelection(
+      "Weekly",
+      DateFilterType.weekly,
+    ),
+    DateSelection(
+      "Monthly",
+      DateFilterType.monthly,
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final sharedPrefs = getIt<SharedPrefs>();
+
+    final selectedFilterType = useState<DateFilterType>(
+        dateFilterTypeFromString(sharedPrefs.getSelectedDateFilterType()));
+    final selectedDate = useState<DateTime>(
+      sharedPrefs.getExpenseSelectedDate().isNotEmpty
+          ? DateTime.parse(sharedPrefs.getExpenseSelectedDate())
+          : DateTime.now(),
+    );
+
+    final currentSelectedDate =
+        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
+    final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
+
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        showModalBottomSheet(
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          context: context,
+          builder: (context) {
+            return StatefulBuilder(builder: (context, setState) {
+              return DateFilterBottomSheet(
+                types: types,
+                onSelectFilterType: (type) {
+                  selectedFilterType.value = type;
+                  context
+                      .read<ExpenseDateFilterBloc>()
+                      .add(ExpenseSelectDate(type, selectedDate.value));
+                  context.read<ExpenseBloc>().add(
+                        LoadExpenseCategories(
+                          dateFilterType: type,
+                          selectedDate: selectedDate.value,
+                        ),
+                      );
+                  context.read<RecurringBillBloc>().add(LoadRecurringBills());
+                  setState(() {});
+                },
+                onSelectDate: (date) {
+                  selectedDate.value = date;
+                  context
+                      .read<ExpenseDateFilterBloc>()
+                      .add(ExpenseSelectDate(selectedFilterType.value, date));
+                  context.read<ExpenseBloc>().add(
+                        LoadExpenseCategories(
+                          dateFilterType: selectedFilterType.value,
+                          selectedDate: date,
+                        ),
+                      );
+                  context.read<RecurringBillBloc>().add(LoadRecurringBills());
+
+                  setState(() {});
+                },
+                onSelectYear: (year) {
+                  context.read<ExpenseDateFilterBloc>().add(ExpenseSelectDate(
+                      selectedFilterType.value,
+                      DateTime(
+                        year,
+                        selectedDate.value.month,
+                        selectedDate.value.day,
+                      )));
+                  context.read<ExpenseBloc>().add(
+                        LoadExpenseCategories(
+                          dateFilterType: selectedFilterType.value,
+                          selectedDate: DateTime(
+                            year,
+                            selectedDate.value.month,
+                            selectedDate.value.day,
+                          ),
+                        ),
+                      );
+                  context.read<RecurringBillBloc>().add(LoadRecurringBills());
+                },
+                selectedFilterType: selectedFilterType,
+                selectedDate: selectedDate,
+              );
+            });
+
+            //return ExpenseDateBottomSheet();
+          },
+        );
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
+            builder: (context, state) {
+              if (state is ExpenseDateFilterSelected) {
+                return DateFilterButton(
+                  text: getMonthText(state.dateFilterType, state.selectedDate),
+                );
+              }
+              return DateFilterButton(
+                text: getMonthText(
+                    dateFilterTypeFromString(currentDateFilterType),
+                    currentSelectedDate),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }

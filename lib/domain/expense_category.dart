@@ -47,8 +47,8 @@ class ExpenseCategory extends Equatable {
       case DateFilterType.weekly:
         filteredList = expenseTransactions?.where((element) {
           final txnDate = element.updatedAt!;
-          final startDate = getStartDate(removeTimeFromDate(selectedDate));
-          final endDate = getEndDate(removeTimeFromDate(selectedDate));
+          final startDate = getStartOfWeek(removeTimeFromDate(selectedDate));
+          final endDate = getEndOfWeek(removeTimeFromDate(selectedDate));
 
           return txnDate == startDate ||
               txnDate == endDate ||

@@ -3,6 +3,7 @@ import 'package:budgetup_app/data/local/entities/recurring_bill_txn_entity.dart'
 import 'package:budgetup_app/domain/recurring_bill.dart';
 import 'package:budgetup_app/domain/recurring_bill_txn.dart';
 
+import '../helper/date_helper.dart';
 import 'local/isar_service.dart';
 
 class RecurringBillsRepository {
@@ -19,8 +20,11 @@ class RecurringBillsRepository {
     }).toList();
   }
 
-  Future<List<RecurringBill>> getPaidRecurringBills(DateTime datePaid) async {
-    final objects = await _isarService.getPaidRecurringBills(datePaid);
+  Future<List<RecurringBill>> getPaidRecurringBills(
+    DateFilterType selectedDateFilterType,
+    DateTime datePaid,
+  ) async {
+    final objects = await _isarService.getPaidRecurringBills(selectedDateFilterType, datePaid);
     return objects.map((category) {
       return RecurringBill.fromJson(category.toJson());
     }).toList();

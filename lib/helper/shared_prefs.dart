@@ -45,24 +45,6 @@ class SharedPrefs {
       _preferences?.getString(KEY_EXPENSE_DATE_FILTER) ??
       DateFilterType.monthly.name;
 
-  Future setRecurringSelectedDate(String dateString) async {
-    await _preferences?.setString(KEY_RECURRING_SELECTED_DATE, dateString);
-  }
-
-  String getRecurringSelectedDate() =>
-      _preferences?.getString(KEY_RECURRING_SELECTED_DATE) ??
-      DateTime.now().toIso8601String();
-
-  Future setRecurringSelectedDateFilterType(
-      DateFilterType dateFilterType) async {
-    await _preferences?.setString(
-        KEY_RECURRING_DATE_FILTER, dateFilterType.name);
-  }
-
-  String getRecurringSelectedDateFilterType() =>
-      _preferences?.getString(KEY_RECURRING_DATE_FILTER) ??
-      DateFilterType.monthly.name;
-
   Future setCurrencySymbol(String symbol) async {
     await _preferences?.setString(KEY_CURRENCY_SYMBOL, symbol);
   }

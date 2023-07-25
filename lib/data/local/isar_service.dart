@@ -162,14 +162,35 @@ class IsarService {
   }
 
   Future<List<RecurringBillEntity>> getPaidRecurringBills(
-      DateTime datePaid) async {
+    DateFilterType selectedDateFilterType,
+    DateTime datePaid,
+  ) async {
     final isar = await db;
-    return await isar.recurringBillEntitys
-        .where()
-        .filter()
-        .recurringBillTxns((q) => q.datePaidBetween(
-            getFirstDayOfMonth(datePaid), getLastDayOfMonth(datePaid)))
-        .findAll();
+
+    switch (selectedDateFilterType) {
+      case DateFilterType.daily:
+        return await isar.recurringBillEntitys
+            .where()
+            .filter()
+            .recurringBillTxns((q) => q.datePaidBetween(
+                removeTimeFromDate(datePaid), getEndOfDay(datePaid)))
+            .findAll();
+      case DateFilterType.weekly:
+        return await isar.recurringBillEntitys
+            .where()
+            .filter()
+            .recurringBillTxns((q) => q.datePaidBetween(
+                removeTimeFromDate(getStartOfWeek((datePaid))),
+                removeTimeFromDate(getEndOfWeek((datePaid)))))
+            .findAll();
+      case DateFilterType.monthly:
+        return await isar.recurringBillEntitys
+            .where()
+            .filter()
+            .recurringBillTxns((q) => q.datePaidBetween(
+                getFirstDayOfMonth(datePaid), getLastDayOfMonth(datePaid)))
+            .findAll();
+    }
   }
 
   Future<int> saveRecurringBill(RecurringBillEntity recurringBillEntity) async {

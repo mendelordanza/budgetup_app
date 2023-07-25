@@ -5,6 +5,7 @@ import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/custom/balance.dart';
 import 'package:budgetup_app/presentation/custom/custom_action_dialog.dart';
 import 'package:budgetup_app/presentation/custom/date_filter_button.dart';
+import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/recurring_confirmation_dialog.dart';
 import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
@@ -96,17 +97,15 @@ class RecurringBillsPage extends HookWidget {
     final sharedPrefs = getIt<SharedPrefs>();
 
     final selectedFilterType = useState<DateFilterType>(
-        dateFilterTypeFromString(
-            sharedPrefs.getRecurringSelectedDateFilterType()));
+        dateFilterTypeFromString(sharedPrefs.getSelectedDateFilterType()));
     final selectedDate = useState<DateTime>(
-      sharedPrefs.getRecurringSelectedDate().isNotEmpty
-          ? DateTime.parse(sharedPrefs.getRecurringSelectedDate())
+      sharedPrefs.getExpenseSelectedDate().isNotEmpty
+          ? DateTime.parse(sharedPrefs.getExpenseSelectedDate())
           : DateTime.now(),
     );
     final currentSelectedDate =
-        DateTime.parse(sharedPrefs.getRecurringSelectedDate());
-    final currentDateFilterType =
-        sharedPrefs.getRecurringSelectedDateFilterType();
+        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
+    final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
 
     final tabController = useTabController(
       initialLength: 4,
@@ -114,9 +113,7 @@ class RecurringBillsPage extends HookWidget {
 
     final isSubscribed = useState(false);
     useEffect(() {
-      context
-          .read<RecurringBillBloc>()
-          .add(LoadRecurringBills(currentSelectedDate));
+      context.read<RecurringBillBloc>().add(LoadRecurringBills());
       Purchases.addCustomerInfoUpdateListener((customerInfo) {
         final entitlement = customerInfo.entitlements.active[entitlementId];
         isSubscribed.value =
@@ -192,7 +189,7 @@ class RecurringBillsPage extends HookWidget {
                                     RecurringSelectDate(
                                         type, selectedDate.value));
                                 context.read<RecurringBillBloc>().add(
-                                      LoadRecurringBills(selectedDate.value),
+                                      LoadRecurringBills(),
                                     );
                                 setState(() {});
                               },
@@ -202,7 +199,7 @@ class RecurringBillsPage extends HookWidget {
                                     RecurringSelectDate(
                                         selectedFilterType.value, date));
                                 context.read<RecurringBillBloc>().add(
-                                      LoadRecurringBills(date),
+                                      LoadRecurringBills(),
                                     );
                                 setState(() {});
                               },
@@ -217,13 +214,7 @@ class RecurringBillsPage extends HookWidget {
                                           selectedDate.value.day,
                                         )));
                                 context.read<RecurringBillBloc>().add(
-                                      LoadRecurringBills(
-                                        DateTime(
-                                          year,
-                                          selectedDate.value.month,
-                                          selectedDate.value.day,
-                                        ),
-                                      ),
+                                      LoadRecurringBills(),
                                     );
                               },
                               selectedFilterType: selectedFilterType,
@@ -408,8 +399,9 @@ class RecurringBillsPage extends HookWidget {
         itemCount: state.recurringBills.length,
         itemBuilder: (context, index) {
           final item = state.recurringBills[index];
-          final txn = item.recurringBillTxns?.firstWhereOrNull(
-            (element) => element.datePaid?.month == currentSelectedDate.month,
+          final txn = item.getTxn(
+            dateFilterTypeFromString(currentDateFilterType),
+            currentSelectedDate,
           );
           return _recurringBillItem(
             context,
@@ -487,13 +479,12 @@ class RecurringBillsPage extends HookWidget {
             arguments: item,
           );
         },
-        child: BlocBuilder<RecurringDateFilterBloc, RecurringDateFilterState>(
+        child: BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
           builder: (context, state) {
-            if (state is RecurringDateFilterSelected) {
-              final txn = item.recurringBillTxns?.firstWhereOrNull(
-                (element) =>
-                    getMonthFromDate(element.datePaid!) ==
-                    getMonthFromDate(state.selectedDate),
+            if (state is ExpenseDateFilterSelected) {
+              final txn = item.getTxn(
+                state.dateFilterType,
+                state.selectedDate,
               );
               return _checkboxItem(context,
                   selectedDate: state.selectedDate,
@@ -701,9 +692,16 @@ class RecurringBillsPage extends HookWidget {
                     3.0,
                   ),
                 ),
-                value: item.isPaid(selectedDate) ? true : false,
+                value: item.isPaid(
+                        dateFilterTypeFromString(currentDateFilterType),
+                        selectedDate)
+                    ? true
+                    : false,
                 onChanged: (checked) async {
-                  if (item.isPaid(selectedDate) && txn != null) {
+                  if (item.isPaid(
+                          dateFilterTypeFromString(currentDateFilterType),
+                          selectedDate) &&
+                      txn != null) {
                     context.read<RecurringModifyBloc>().add(
                           RemoveRecurringBillTxn(
                             selectedDate: selectedDate,
@@ -775,7 +773,11 @@ class RecurringBillsPage extends HookWidget {
                                   ),
                               ],
                             ),
-                            if (item.isPaid(selectedDate) && txn != null)
+                            if (item.isPaid(
+                                    dateFilterTypeFromString(
+                                        currentDateFilterType),
+                                    selectedDate) &&
+                                txn != null)
                               Text(
                                 "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",
                                 style: TextStyle(

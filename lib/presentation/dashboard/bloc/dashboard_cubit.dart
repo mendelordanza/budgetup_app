@@ -70,8 +70,8 @@ class DashboardCubit extends Cubit<DashboardState> {
       expensesTotal += totalByDate;
     });
 
-    final paidRecurringBills =
-        await recurringBillsRepository.getPaidRecurringBills(date);
+    final paidRecurringBills = await recurringBillsRepository
+        .getPaidRecurringBills(DateFilterType.monthly, date);
 
     final convertedPaidRecurringBills = paidRecurringBills.map((bill) {
       final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
