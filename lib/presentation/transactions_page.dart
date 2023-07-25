@@ -46,91 +46,89 @@ class TransactionsPage extends HookWidget {
     }, []);
 
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                16.0,
-                16.0,
-                16.0,
-                0.0,
-              ),
-              child: Container(
-                height: 45.0,
-                decoration: BoxDecoration(
-                  color: Color(0xFFB7B7B7),
-                  borderRadius: BorderRadius.circular(30.0),
-                ),
-                child: TabBar(
-                  controller: tabController,
-                  tabs: [
-                    Tab(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Iconsax.money_send,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            " Expenses",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Tab(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(
-                            "assets/icons/ic_recurring.svg",
-                            color: Colors.white,
-                            height: 18.0,
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            "Recurring Bills",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                  unselectedLabelColor: Colors.white,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicator: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30.0),
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              16.0,
+              16.0,
+              16.0,
+              0.0,
             ),
-            Expanded(
-              child: TabBarView(
+            child: Container(
+              height: 45.0,
+              decoration: BoxDecoration(
+                color: Color(0xFFB7B7B7),
+                borderRadius: BorderRadius.circular(30.0),
+              ),
+              child: TabBar(
                 controller: tabController,
-                children: [
-                  ExpensesPage(),
-                  RecurringBillsPage(),
+                tabs: [
+                  Tab(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Iconsax.money_send,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          " Expenses",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Tab(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          "assets/icons/ic_recurring.svg",
+                          color: Colors.white,
+                          height: 18.0,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          "Recurring Bills",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
+                unselectedLabelColor: Colors.white,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicator: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30.0),
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: tabController,
+              children: [
+                ExpensesPage(),
+                RecurringBillsPage(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

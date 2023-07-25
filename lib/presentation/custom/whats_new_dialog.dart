@@ -90,7 +90,7 @@ class WhatsNewDialog extends HookWidget {
                 //   ),
                 // ),
                 Text(
-                  "• Import and export data is here! You can check it out in the settings page",
+                  "• You can now view all of your transactions",
                   style: TextStyle(
                     fontSize: 16.0,
                   ),
@@ -99,7 +99,7 @@ class WhatsNewDialog extends HookWidget {
                   height: 10.0,
                 ),
                 Text(
-                  "• Separated recurring bills via tabs for easier navigation",
+                  "• Improvements and bug fixes",
                   style: TextStyle(
                     fontSize: 16.0,
                   ),

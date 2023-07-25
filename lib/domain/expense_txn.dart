@@ -7,6 +7,8 @@ class ExpenseTxn extends Equatable {
   final int? id;
   final String? notes;
   final double? amount;
+  final int? categoryId;
+  final String? categoryTitle;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -14,6 +16,8 @@ class ExpenseTxn extends Equatable {
     this.id,
     this.notes,
     this.amount,
+    this.categoryId,
+    this.categoryTitle,
     this.createdAt,
     this.updatedAt,
   });
@@ -22,6 +26,8 @@ class ExpenseTxn extends Equatable {
         id: json["id"],
         notes: json["notes"],
         amount: json["amount"],
+        categoryId: json["categoryId"],
+        categoryTitle: json["categoryTitle"],
         createdAt: json["createdAt"],
         updatedAt: json["updatedAt"],
       );
@@ -30,6 +36,8 @@ class ExpenseTxn extends Equatable {
         id: json["id"],
         notes: json["notes"],
         amount: json["amount"],
+        categoryId: json["categoryId"],
+        categoryTitle: json["categoryTitle"],
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
       );
@@ -38,6 +46,8 @@ class ExpenseTxn extends Equatable {
         "id": id,
         "notes": notes,
         "amount": amount,
+        "categoryId": categoryId,
+        "categoryTitle": categoryTitle,
         "createdAt": createdAt?.toIso8601String(),
         "updatedAt": updatedAt?.toIso8601String()
       };
@@ -46,14 +56,17 @@ class ExpenseTxn extends Equatable {
     int? id,
     String? notes,
     double? amount,
+    int? categoryId,
+    String? categoryTitle,
     DateTime? createdAt,
     DateTime? updatedAt,
-    ExpenseCategory? category,
   }) =>
       ExpenseTxn(
         id: id ?? this.id,
         notes: notes ?? this.notes,
         amount: amount ?? this.amount,
+        categoryId: categoryId ?? this.categoryId,
+        categoryTitle: categoryTitle ?? this.categoryTitle,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
@@ -73,6 +86,8 @@ class ExpenseTxn extends Equatable {
         id,
         notes,
         amount,
+        categoryId,
+        categoryTitle,
         createdAt,
         updatedAt,
       ];

@@ -4,6 +4,7 @@ import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/custom/custom_button.dart';
 import 'package:budgetup_app/presentation/custom/custom_text_field.dart';
+import 'package:budgetup_app/presentation/recurring/recurring_bills_page.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,10 +28,10 @@ enum RecurringBillInterval {
 }
 
 class AddRecurringBillPage extends HookWidget {
-  final RecurringBill? recurringBill;
+  final AddRecurringBillArgs args;
   final _formKey = GlobalKey<FormState>();
 
-  AddRecurringBillPage({this.recurringBill, Key? key}) : super(key: key);
+  AddRecurringBillPage({required this.args, Key? key}) : super(key: key);
 
   final intervals = [
     RecurringBillInterval.weekly,
@@ -44,10 +45,10 @@ class AddRecurringBillPage extends HookWidget {
     final sharedPrefs = getIt<SharedPrefs>();
 
     final titleTextController = useTextEditingController(
-        text: recurringBill != null ? recurringBill!.title : "");
+        text: args.recurringBill != null ? args.recurringBill!.title : "");
     final amountTextController = useTextEditingController(
-        text: recurringBill != null
-            ? decimalFormatterWithSymbol(recurringBill!.amount ?? 0.00)
+        text: args.recurringBill != null
+            ? decimalFormatterWithSymbol(args.recurringBill!.amount ?? 0.00)
             : "0.00");
     final amountFocusNode = FocusNode();
     final dateFocusNode = FocusNode();
@@ -55,20 +56,20 @@ class AddRecurringBillPage extends HookWidget {
 
     final dateTextController = useTextEditingController();
     final currentSelectedDate = useState<DateTime>(
-        recurringBill != null && recurringBill!.reminderDate != null
-            ? recurringBill!.reminderDate!
+        args.recurringBill != null && args.recurringBill!.reminderDate != null
+            ? args.recurringBill!.reminderDate!
             : DateTime.now());
 
     final timeTextController = useTextEditingController();
     final currentSelectedTime = useState<TimeOfDay>(
-        recurringBill != null && recurringBill!.reminderDate != null
-            ? TimeOfDay.fromDateTime(recurringBill!.reminderDate!)
+        args.recurringBill != null && args.recurringBill!.reminderDate != null
+            ? TimeOfDay.fromDateTime(args.recurringBill!.reminderDate!)
             : TimeOfDay.now());
 
     final selectedInterval = useState<RecurringBillInterval>(
-      recurringBill != null && recurringBill!.interval != null
-          ? RecurringBillInterval.values
-              .firstWhere((element) => element.name == recurringBill!.interval)
+      args.recurringBill != null && args.recurringBill!.interval != null
+          ? RecurringBillInterval.values.firstWhere(
+              (element) => element.name == args.recurringBill!.interval)
           : RecurringBillInterval.monthly,
     );
 
@@ -87,7 +88,9 @@ class AddRecurringBillPage extends HookWidget {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
-          recurringBill != null ? "Edit Recurring Bill" : "Add Recurring Bill",
+          args.recurringBill != null
+              ? "Edit Recurring Bill"
+              : "Add Recurring Bill",
         ),
         centerTitle: true,
         leading: InkWell(
@@ -102,7 +105,7 @@ class AddRecurringBillPage extends HookWidget {
           ),
         ),
         actions: [
-          if (recurringBill != null)
+          if (args.recurringBill != null)
             IconButton(
               icon: Icon(Iconsax.trash),
               onPressed: () {
@@ -117,7 +120,7 @@ class AddRecurringBillPage extends HookWidget {
                         context.read<RecurringModifyBloc>().add(
                             RemoveRecurringBill(
                                 selectedDate: currentSelectedDate.value,
-                                recurringBill: recurringBill!));
+                                recurringBill: args.recurringBill!));
                       },
                       onNegative: () {
                         Navigator.pop(context);
@@ -374,9 +377,9 @@ class AddRecurringBillPage extends HookWidget {
               CustomButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    if (recurringBill != null) {
+                    if (args.recurringBill != null) {
                       //Edit
-                      final editedRecurringBill = recurringBill!.copy(
+                      final editedRecurringBill = args.recurringBill!.copy(
                         title: titleTextController.text,
                         amount: convertRecurringBill(sharedPrefs,
                             amount: amountTextController.text),
