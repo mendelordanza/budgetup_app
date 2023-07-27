@@ -115,6 +115,7 @@ Future<void> setup() async {
       sharedPrefs: getIt(),
       recurringBillsRepository: getIt(),
       salaryRepository: getIt(),
+      modifyExpensesBloc: getIt(),
       transactionsModifyBloc: getIt(),
       convertCurrencyCubit: getIt(),
       recurringModifyBloc: getIt(),

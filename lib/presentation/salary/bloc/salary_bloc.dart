@@ -5,6 +5,7 @@ import 'package:budgetup_app/data/recurring_bills_repository.dart';
 import 'package:budgetup_app/data/salary_repository.dart';
 import 'package:budgetup_app/domain/salary.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
+import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
 import 'package:meta/meta.dart';
 
 import '../../../data/expenses_repository.dart';
@@ -21,10 +22,12 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
   final SalaryRepository salaryRepository;
   final ExpensesRepository expensesRepository;
   final RecurringBillsRepository recurringBillsRepository;
+  final ModifyExpensesBloc modifyExpensesBloc;
   final TransactionsModifyBloc transactionsModifyBloc;
   final RecurringModifyBloc recurringModifyBloc;
   final ConvertCurrencyCubit convertCurrencyCubit;
   StreamSubscription? _expenseTxnSubscription;
+  StreamSubscription? _expenseSubscription;
   StreamSubscription? _currencySubscription;
   StreamSubscription? _recurringSubscription;
   final SharedPrefs sharedPrefs;
@@ -32,6 +35,7 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
   @override
   Future<void> close() {
     _expenseTxnSubscription?.cancel();
+    _expenseSubscription?.cancel();
     _currencySubscription?.cancel();
     _recurringSubscription?.cancel();
     return super.close();
@@ -41,6 +45,7 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
     required this.salaryRepository,
     required this.expensesRepository,
     required this.recurringBillsRepository,
+    required this.modifyExpensesBloc,
     required this.transactionsModifyBloc,
     required this.recurringModifyBloc,
     required this.convertCurrencyCubit,
@@ -51,6 +56,11 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
         add(LoadSalary(
             selectedDate: DateTime.parse(sharedPrefs.getSelectedDate())));
       }
+    });
+
+    _expenseSubscription = modifyExpensesBloc.stream.listen((state) {
+      add(LoadSalary(
+          selectedDate: DateTime.parse(sharedPrefs.getSelectedDate())));
     });
 
     _expenseTxnSubscription = transactionsModifyBloc.stream.listen((state) {
