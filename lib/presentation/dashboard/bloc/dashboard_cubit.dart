@@ -1,10 +1,6 @@
-import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:budgetup_app/data/expenses_repository.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
-import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
-import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:meta/meta.dart';
 
 import '../../../data/recurring_bills_repository.dart';
@@ -18,23 +14,12 @@ class DashboardCubit extends Cubit<DashboardState> {
   final SharedPrefs sharedPrefs;
   final ExpensesRepository expensesRepository;
   final RecurringBillsRepository recurringBillsRepository;
-  final TransactionsModifyBloc transactionsModifyBloc;
-  final RecurringModifyBloc recurringModifyBloc;
-  StreamSubscription? _expenseTxnSubscription;
 
   DashboardCubit({
     required this.sharedPrefs,
     required this.expensesRepository,
     required this.recurringBillsRepository,
-    required this.transactionsModifyBloc,
-    required this.recurringModifyBloc,
   }) : super(DashboardInitial());
-
-  @override
-  Future<void> close() async {
-    _expenseTxnSubscription?.cancel();
-    return super.close();
-  }
 
   getSummary(DateTime date) async {
     final dashboardCategories =
@@ -42,7 +27,7 @@ class DashboardCubit extends Cubit<DashboardState> {
 
     //MOST SPENT CATEGORY
     ExpenseCategory? convertedMostSpentCategory;
-    if(dashboardCategories.isNotEmpty) {
+    if (dashboardCategories.isNotEmpty) {
       final mostSpentCategory = dashboardCategories.reduce((value, element) {
         final a = value.getTotalByDate(DateFilterType.monthly, date);
         final b = element.getTotalByDate(DateFilterType.monthly, date);
@@ -57,8 +42,9 @@ class DashboardCubit extends Cubit<DashboardState> {
           budget: sharedPrefs.getCurrencyCode() == "USD"
               ? (mostSpentCategory.budget ?? 0.00)
               : (mostSpentCategory.budget ?? 0.00) *
-              sharedPrefs.getCurrencyRate(),
-          expenseTransactions: mostSpentCategory.expenseTransactions?.map((txn) {
+                  sharedPrefs.getCurrencyRate(),
+          expenseTransactions:
+              mostSpentCategory.expenseTransactions?.map((txn) {
             final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
                 ? (txn.amount ?? 0.00)
                 : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();

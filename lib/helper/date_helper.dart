@@ -60,7 +60,7 @@ String getMonthText(DateFilterType dateFilterType, DateTime date) {
           DateTime.now().isBefore(getEndOfWeek(date))) {
         return "This week";
       } else {
-        return "${formatDate(getStartOfWeek(date), 'MMM dd, yy')} -\n${formatDate(getEndOfWeek(date), 'MMM dd, yy')}";
+        return "${formatDate(getStartOfWeek(date), 'MMM dd, yyyy')} - ${formatDate(getEndOfWeek(date), 'MMM dd, yyyy')}";
       }
     case DateFilterType.monthly:
       if (date.month == DateTime.now().month) {

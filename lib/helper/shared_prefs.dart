@@ -29,11 +29,11 @@ class SharedPrefs {
 
   bool? getFinishedOnboarding() => _preferences?.getBool(KEY_IS_FINISHED);
 
-  Future setExpenseSelectedDate(String dateString) async {
+  Future setSelectedDate(String dateString) async {
     await _preferences?.setString(KEY_EXPENSE_SELECTED_DATE, dateString);
   }
 
-  String getExpenseSelectedDate() =>
+  String getSelectedDate() =>
       _preferences?.getString(KEY_EXPENSE_SELECTED_DATE) ??
       DateTime.now().toIso8601String();
 

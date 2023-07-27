@@ -1,4 +1,6 @@
 import 'package:budgetup_app/helper/route_strings.dart';
+import 'package:budgetup_app/helper/string.dart';
+import 'package:budgetup_app/presentation/salary/input_salary.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,7 +8,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconsax/iconsax.dart';
 
-import '../../helper/colors.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
@@ -15,16 +16,16 @@ import '../custom/date_filter_button.dart';
 import '../custom/whats_new_dialog.dart';
 import '../expense_date_filter/bloc/date_filter_bloc.dart';
 import '../expenses/bloc/expense_bloc.dart';
-import '../expenses/expenses_page.dart';
-import '../recurring/recurring_bills_page.dart';
+import '../salary/bloc/salary_bloc.dart';
+import '../transactions_page.dart';
 
 class HomePage extends HookWidget {
   HomePage({super.key});
 
   final _pages = [
-    ExpensesPage(),
-    RecurringBillsPage(),
-    //TransactionsPage(),
+    // ExpensesPage(),
+    // RecurringBillsPage(),
+    TransactionsPage(),
   ];
 
   showWhatsNew(BuildContext context) async {
@@ -49,42 +50,20 @@ class HomePage extends HookWidget {
   Widget build(BuildContext context) {
     final _selectedIndex = useState<int>(0);
 
+    final sharedPrefs = getIt<SharedPrefs>();
+    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
+
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         showWhatsNew(context);
       });
+      context
+          .read<SalaryBloc>()
+          .add(LoadSalary(selectedDate: currentSelectedDate));
       return null;
     }, []);
 
     return Scaffold(
-      // appBar: AppBar(
-      //   title:
-      //   centerTitle: true,
-      //   elevation: 0,
-      //   backgroundColor: Colors.transparent,
-      //   leading: IconButton(
-      //     onPressed: () {
-      //       Navigator.pushNamed(context, RouteStrings.summary);
-      //     },
-      //     icon: SvgPicture.asset(
-      //       "assets/icons/ic_summary_thin.svg",
-      //       height: 24.0,
-      //       color: Theme.of(context).colorScheme.onSurface,
-      //     ),
-      //   ),
-      //   actions: [
-      //     IconButton(
-      //       onPressed: () {
-      //         Navigator.pushNamed(context, RouteStrings.settings);
-      //       },
-      //       icon: SvgPicture.asset(
-      //         "assets/icons/ic_setting.svg",
-      //         height: 24.0,
-      //         color: Theme.of(context).colorScheme.onSurface,
-      //       ),
-      //     ),
-      //   ],
-      // ),
       body: SafeArea(
         child: Column(
           children: [
@@ -112,35 +91,67 @@ class HomePage extends HookWidget {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Column(
                 children: [
-                  Text("Jul 2023 Salary"),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        "P 1,000.00",
+                  Text(
+                    "Remaining Salary",
+                    textAlign: TextAlign.center,
+                  ),
+                  BlocBuilder<SalaryBloc, SalaryState>(
+                    builder: (context, state) {
+                      if (state is SalaryLoaded) {
+                        print("REMAINING: ${state.remainingSalary}");
+                        return GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return InputSalary(
+                                  currSalary: state.salary,
+                                );
+                              },
+                            );
+                          },
+                          behavior: HitTestBehavior.translucent,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                decimalFormatterWithSymbol(
+                                    state.remainingSalary),
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w600,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 5.0,
+                              ),
+                              Icon(
+                                Iconsax.edit,
+                                size: 14,
+                                color: Theme.of(context).colorScheme.primary,
+                              )
+                            ],
+                          ),
+                        );
+                      }
+                      return Text(
+                        decimalFormatterWithSymbol(0.00),
                         style: TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.w600,
                           decoration: TextDecoration.underline,
                         ),
-                      ),
-                      SizedBox(
-                        width: 5.0,
-                      ),
-                      Icon(
-                        Iconsax.edit,
-                        size: 14,
-                      )
-                    ],
+                      );
+                    },
                   ),
                 ],
               ),
             ),
-            Divider(),
             Expanded(
               child: IndexedStack(
                 index: _selectedIndex.value,
@@ -150,33 +161,33 @@ class HomePage extends HookWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: secondaryColor,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(
-              Iconsax.money_send,
-              color: _selectedIndex.value == 0
-                  ? secondaryColor
-                  : Theme.of(context).colorScheme.onSurface,
-            ),
-            label: 'Expenses',
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              "assets/icons/ic_recurring.svg",
-              color: _selectedIndex.value == 1
-                  ? secondaryColor
-                  : Theme.of(context).colorScheme.onSurface,
-            ),
-            label: 'Recurring Bills',
-          ),
-        ],
-        currentIndex: _selectedIndex.value,
-        onTap: (index) {
-          _selectedIndex.value = index;
-        },
-      ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   selectedItemColor: secondaryColor,
+      //   items: [
+      //     BottomNavigationBarItem(
+      //       icon: Icon(
+      //         Iconsax.money_send,
+      //         color: _selectedIndex.value == 0
+      //             ? secondaryColor
+      //             : Theme.of(context).colorScheme.onSurface,
+      //       ),
+      //       label: 'Expenses',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: SvgPicture.asset(
+      //         "assets/icons/ic_recurring.svg",
+      //         color: _selectedIndex.value == 1
+      //             ? secondaryColor
+      //             : Theme.of(context).colorScheme.onSurface,
+      //       ),
+      //       label: 'Recurring Bills',
+      //     ),
+      //   ],
+      //   currentIndex: _selectedIndex.value,
+      //   onTap: (index) {
+      //     _selectedIndex.value = index;
+      //   },
+      // ),
     );
   }
 }
@@ -206,13 +217,12 @@ class DateFilter extends HookWidget {
     final selectedFilterType = useState<DateFilterType>(
         dateFilterTypeFromString(sharedPrefs.getSelectedDateFilterType()));
     final selectedDate = useState<DateTime>(
-      sharedPrefs.getExpenseSelectedDate().isNotEmpty
-          ? DateTime.parse(sharedPrefs.getExpenseSelectedDate())
+      sharedPrefs.getSelectedDate().isNotEmpty
+          ? DateTime.parse(sharedPrefs.getSelectedDate())
           : DateTime.now(),
     );
 
-    final currentSelectedDate =
-        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
+    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
     final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
 
     return GestureDetector(
@@ -238,6 +248,9 @@ class DateFilter extends HookWidget {
                         ),
                       );
                   context.read<RecurringBillBloc>().add(LoadRecurringBills());
+                  context
+                      .read<SalaryBloc>()
+                      .add(LoadSalary(selectedDate: selectedDate.value));
                   setState(() {});
                 },
                 onSelectDate: (date) {
@@ -252,7 +265,9 @@ class DateFilter extends HookWidget {
                         ),
                       );
                   context.read<RecurringBillBloc>().add(LoadRecurringBills());
-
+                  context
+                      .read<SalaryBloc>()
+                      .add(LoadSalary(selectedDate: date));
                   setState(() {});
                 },
                 onSelectYear: (year) {
@@ -274,6 +289,9 @@ class DateFilter extends HookWidget {
                         ),
                       );
                   context.read<RecurringBillBloc>().add(LoadRecurringBills());
+                  context
+                      .read<SalaryBloc>()
+                      .add(LoadSalary(selectedDate: selectedDate.value));
                 },
                 selectedFilterType: selectedFilterType,
                 selectedDate: selectedDate,

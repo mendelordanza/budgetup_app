@@ -5,6 +5,7 @@ import 'package:budgetup_app/data/local/entities/expense_category_entity.dart';
 import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
 import 'package:budgetup_app/data/local/entities/recurring_bill_entity.dart';
 import 'package:budgetup_app/data/local/entities/recurring_bill_txn_entity.dart';
+import 'package:budgetup_app/data/local/entities/salary_entity.dart';
 import 'package:budgetup_app/domain/recurring_bill.dart';
 import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
@@ -20,6 +21,23 @@ class IsarService {
 
   IsarService() {
     db = openDB();
+  }
+
+  Future<void> saveSalary(SalaryEntity salaryEntity) async {
+    final isar = await db;
+    isar.writeTxnSync<int>(() => isar.salaryEntitys.putSync(salaryEntity));
+  }
+
+  Future<SalaryEntity?> getSalary(DateTime date) async {
+    final isar = await db;
+    final salary = await isar.salaryEntitys
+        .where()
+        .filter()
+        .monthEqualTo(date.month)
+        .and()
+        .yearEqualTo(date.year)
+        .findFirst();
+    return salary;
   }
 
   Future<double> getTotalExpenseByDate(DateTime date) async {
@@ -372,6 +390,7 @@ class IsarService {
           RecurringBillEntitySchema,
           RecurringBillTxnEntitySchema,
           CurrencyRateEntitySchema,
+          SalaryEntitySchema,
         ],
         inspector: true,
         directory: dir.path,

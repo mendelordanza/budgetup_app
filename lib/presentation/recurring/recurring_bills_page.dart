@@ -103,7 +103,7 @@ class RecurringBillsPage extends HookWidget {
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
     final currentSelectedDate =
-        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
+        DateTime.parse(sharedPrefs.getSelectedDate());
     final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
 
     final tabController = useTabController(
@@ -134,69 +134,46 @@ class RecurringBillsPage extends HookWidget {
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 8.0,
-          horizontal: 16.0,
-        ),
+        padding: const EdgeInsets.all(24.0),
         child: NestedScrollView(
           headerSliverBuilder: (context, value) {
             return [
               SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                child: Row(
                   children: [
-                    Text(
-                      "Recurring Bills",
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: BlocBuilder<RecurringBillBloc,
-                                RecurringBillState>(
-                              builder: (context, state) {
-                                if (state is RecurringBillsLoaded &&
-                                    state.total != null) {
-                                  return Balance(
-                                    headerLabel: Tooltip(
-                                      message:
-                                          'Sum of all paid recurring bills for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), currentSelectedDate)}',
-                                      textAlign: TextAlign.center,
-                                      triggerMode: TooltipTriggerMode.tap,
-                                      showDuration: Duration(seconds: 3),
-                                      child: const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text("Total Paid"),
-                                          SizedBox(
-                                            width: 5,
-                                          ),
-                                          Icon(
-                                            Iconsax.info_circle,
-                                            size: 16,
-                                          ),
-                                        ],
-                                      ),
+                    Expanded(
+                      child: BlocBuilder<RecurringBillBloc, RecurringBillState>(
+                        builder: (context, state) {
+                          if (state is RecurringBillsLoaded &&
+                              state.total != null) {
+                            return Balance(
+                              headerLabel: Tooltip(
+                                message:
+                                    'Sum of all paid recurring bills for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), currentSelectedDate)}',
+                                textAlign: TextAlign.center,
+                                triggerMode: TooltipTriggerMode.tap,
+                                showDuration: Duration(seconds: 3),
+                                child: const Row(
+                                  children: [
+                                    Text("Total Paid"),
+                                    SizedBox(
+                                      width: 5,
                                     ),
-                                    totalAlign: TextAlign.center,
-                                    total: state.total!,
-                                  );
-                                }
-                                return Balance(
-                                  headerLabel: Text("Total Paid"),
-                                  totalAlign: TextAlign.center,
-                                  total: 0.00,
-                                );
-                              },
-                            ),
-                          ),
-                        ],
+                                    Icon(
+                                      Iconsax.info_circle,
+                                      size: 16,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              total: state.total!,
+                            );
+                          }
+                          return Balance(
+                            headerLabel: Text("Total Paid"),
+                            total: 0.00,
+                          );
+                        },
                       ),
                     ),
                   ],

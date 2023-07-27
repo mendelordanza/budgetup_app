@@ -23,7 +23,7 @@ class TransactionsPage extends HookWidget {
 
     final sharedPrefs = getIt<SharedPrefs>();
     final expensesCurrentSelectedDate =
-        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
+        DateTime.parse(sharedPrefs.getSelectedDate());
 
     useEffect(() {
       context.read<ExpenseBloc>().add(

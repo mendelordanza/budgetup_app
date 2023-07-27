@@ -58,7 +58,7 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
     });
 
     on<LoadRecurringBills>((event, emit) async {
-      final selectedDate = DateTime.parse(sharedPrefs.getExpenseSelectedDate());
+      final selectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
       final selectedDateFilterType =
           dateFilterTypeFromString(sharedPrefs.getSelectedDateFilterType());
       final allRecurringBills = await getRecurringBillList(
@@ -85,14 +85,14 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
         final allRecurringBills = await getRecurringBillList(
             currencyCode: event.currencyCode,
             currencyRate: event.currencyRate,
-            selectedDate: DateTime.parse(sharedPrefs.getExpenseSelectedDate()));
+            selectedDate: DateTime.parse(sharedPrefs.getSelectedDate()));
 
         final paidRecurringBills = await getPaidRecurringBillList(
             currencyCode: event.currencyCode,
             currencyRate: event.currencyRate,
             selectedDateFilterType: dateFilterTypeFromString(
                 sharedPrefs.getSelectedDateFilterType()),
-            selectedDate: DateTime.parse(sharedPrefs.getExpenseSelectedDate()));
+            selectedDate: DateTime.parse(sharedPrefs.getSelectedDate()));
 
         //GET UPCOMING BILLS
         _setupWidget(recurringBills: allRecurringBills);

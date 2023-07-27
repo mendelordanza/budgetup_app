@@ -17,24 +17,27 @@ class Balance extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        headerLabel,
-        SizedBox(
-          height: 5.0,
-        ),
-        Text(
-          decimalFormatterWithSymbol(total),
-          textAlign: totalAlign,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 2,
-          style: TextStyle(
-            fontSize: 28.0,
-            fontWeight: FontWeight.w700,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          headerLabel,
+          SizedBox(
+            height: 5.0,
           ),
-        ),
-      ],
+          Text(
+            decimalFormatterWithSymbol(total),
+            textAlign: totalAlign,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+            style: TextStyle(
+              fontSize: 28.0,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -281,12 +281,13 @@ class SettingsPage extends HookWidget {
                           Divider(),
                           SettingItem(
                             onTap: () {
+                              //TODO open about page
                               _launchEmail("ralph@trybudgetup.com");
                             },
                             icon:
                                 SvgPicture.asset("assets/icons/ic_contact.svg"),
                             iconBackgroundColor: Color(0xFFff9cf5),
-                            label: "Contact Us",
+                            label: "Contact",
                             suffix: SvgPicture.asset(
                               "assets/icons/ic_arrow_right.svg",
                             ),

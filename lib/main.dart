@@ -12,6 +12,7 @@ import 'package:budgetup_app/presentation/landing/bloc/onboarding_cubit.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
+import 'package:budgetup_app/presentation/salary/bloc/salary_bloc.dart';
 import 'package:budgetup_app/presentation/settings/appearance/bloc/appearance_cubit.dart';
 import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currency_cubit.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
@@ -123,6 +124,9 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => getIt<AllTxnsCubit>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<SalaryBloc>(),
           ),
         ],
         child: BlocBuilder<AppearanceCubit, AppearanceState>(

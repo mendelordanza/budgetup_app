@@ -14,7 +14,7 @@ class ExpenseDateFilterBloc extends Bloc<ExpenseDateFilterEvent, ExpenseDateFilt
   ExpenseDateFilterBloc({required this.sharedPrefs}) : super(ExpenseDateFilterInitial()) {
     on<ExpenseSelectDate>((event, emit) {
       sharedPrefs.setSelectedDateFilterType(event.dateFilterType);
-      sharedPrefs.setExpenseSelectedDate(event.selectedDate.toIso8601String());
+      sharedPrefs.setSelectedDate(event.selectedDate.toIso8601String());
       emit(ExpenseDateFilterSelected(event.dateFilterType, event.selectedDate));
     });
   }
