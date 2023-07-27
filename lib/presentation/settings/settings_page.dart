@@ -28,12 +28,6 @@ class SettingsPage extends HookWidget {
     }
   }
 
-  _launchEmail(String email) async {
-    if (!await launchUrl(Uri.parse("mailto:$email"))) {
-      throw Exception('Could not launch mailto:$email');
-    }
-  }
-
   showPaywall(BuildContext context) async {
     try {
       final offerings = await Purchases.getOfferings();
@@ -282,7 +276,8 @@ class SettingsPage extends HookWidget {
                           SettingItem(
                             onTap: () {
                               //TODO open about page
-                              _launchEmail("ralph@trybudgetup.com");
+                              Navigator.pushNamed(
+                                  context, RouteStrings.contact);
                             },
                             icon:
                                 SvgPicture.asset("assets/icons/ic_contact.svg"),

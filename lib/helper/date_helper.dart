@@ -1,6 +1,6 @@
 import 'package:intl/intl.dart';
 
-removeTimeFromDate(DateTime date) {
+DateTime removeTimeFromDate(DateTime date) {
   return DateTime(date.year, date.month, date.day);
 }
 
@@ -143,4 +143,15 @@ int getQuarterFromMonth(int month) {
   }
 
   return ((month - 1) ~/ 3) + 1;
+}
+
+int getMyAge() {
+  final now = removeTimeFromDate(DateTime.now());
+  final birthday = DateTime(1998, 04, 19);
+
+  if (now.month == birthday.month && now.day > birthday.day) {
+    return (now.year - birthday.year) - 1;
+  } else {
+    return (now.year - birthday.year);
+  }
 }
