@@ -260,18 +260,18 @@ class SettingsPage extends HookWidget {
                           //     "assets/icons/ic_arrow_right.svg",
                           //   ),
                           // ),
-                          Divider(),
-                          SettingItem(
-                            onTap: () {
-                              _launchUrl("https://forms.gle/M5qmLiT2FSLXAz8Y7");
-                            },
-                            icon: SvgPicture.asset("assets/icons/ic_send.svg"),
-                            iconBackgroundColor: Color(0xFF0069B6),
-                            label: "Send feedback",
-                            suffix: SvgPicture.asset(
-                              "assets/icons/ic_arrow_right.svg",
-                            ),
-                          ),
+                          //Divider(),
+                          // SettingItem(
+                          //   onTap: () {
+                          //     _launchUrl("https://forms.gle/M5qmLiT2FSLXAz8Y7");
+                          //   },
+                          //   icon: SvgPicture.asset("assets/icons/ic_send.svg"),
+                          //   iconBackgroundColor: Color(0xFF0069B6),
+                          //   label: "Send feedback",
+                          //   suffix: SvgPicture.asset(
+                          //     "assets/icons/ic_arrow_right.svg",
+                          //   ),
+                          // ),
                           Divider(),
                           SettingItem(
                             onTap: () {

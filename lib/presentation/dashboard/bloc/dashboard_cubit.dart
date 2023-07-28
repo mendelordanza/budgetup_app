@@ -26,9 +26,9 @@ class DashboardCubit extends Cubit<DashboardState> {
         await expensesRepository.getExpenseCategoriesByDate(date);
 
     //MOST SPENT CATEGORY
-    ExpenseCategory? convertedMostSpentCategory;
+    ExpenseCategory? mostSpentCategory;
     if (dashboardCategories.isNotEmpty) {
-      final mostSpentCategory = dashboardCategories.reduce((value, element) {
+      mostSpentCategory = dashboardCategories.reduce((value, element) {
         final a = value.getTotalByDate(DateFilterType.monthly, date);
         final b = element.getTotalByDate(DateFilterType.monthly, date);
         if (a > b) {
@@ -37,50 +37,10 @@ class DashboardCubit extends Cubit<DashboardState> {
           return element;
         }
       });
-
-      convertedMostSpentCategory = mostSpentCategory.copy(
-          budget: sharedPrefs.getCurrencyCode() == "USD"
-              ? (mostSpentCategory.budget ?? 0.00)
-              : (mostSpentCategory.budget ?? 0.00) *
-                  sharedPrefs.getCurrencyRate(),
-          expenseTransactions:
-              mostSpentCategory.expenseTransactions?.map((txn) {
-            final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
-                ? (txn.amount ?? 0.00)
-                : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
-            final newTxn = txn.copy(
-              amount: convertedAmount,
-            );
-            return newTxn;
-          }).toList());
     }
 
-    //YOUR EXPENSES
-    final convertedCategories = dashboardCategories.map((category) {
-      final convertedBudget = sharedPrefs.getCurrencyCode() == "USD"
-          ? (category.budget ?? 0.00)
-          : (category.budget ?? 0.00) * sharedPrefs.getCurrencyRate();
-
-      final convertedTxns = category.expenseTransactions?.map((txn) {
-        final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
-            ? (txn.amount ?? 0.00)
-            : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
-        final newTxn = txn.copy(
-          amount: convertedAmount,
-        );
-        return newTxn;
-      }).toList();
-
-      final newCategory = category.copy(
-        budget: convertedBudget,
-        expenseTransactions: convertedTxns,
-      );
-
-      return newCategory;
-    }).toList();
-
     var expensesTotal = 0.0;
-    convertedCategories.forEach((element) {
+    dashboardCategories.forEach((element) {
       final totalByDate = element.getTotalByDate(DateFilterType.monthly, date);
       expensesTotal += totalByDate;
     });
@@ -88,25 +48,18 @@ class DashboardCubit extends Cubit<DashboardState> {
     final paidRecurringBills = await recurringBillsRepository
         .getPaidRecurringBills(DateFilterType.monthly, date);
 
-    final convertedPaidRecurringBills = paidRecurringBills.map((bill) {
-      final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
-          ? (bill.amount ?? 0.00)
-          : (bill.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
-      return bill.copy(amount: convertedAmount);
-    }).toList();
-
     var recurringBillTotal = 0.0;
-    convertedPaidRecurringBills.forEach((element) {
+    paidRecurringBills.forEach((element) {
       recurringBillTotal += element.amount ?? 0.0;
     });
 
     emit(
       DashboardLoaded(
         overallTotal: expensesTotal + recurringBillTotal,
-        mostSpentCategory: convertedMostSpentCategory,
-        expensesCategories: convertedCategories,
+        mostSpentCategory: mostSpentCategory,
+        expensesCategories: dashboardCategories,
         expensesTotal: expensesTotal,
-        paidRecurringBills: convertedPaidRecurringBills,
+        paidRecurringBills: paidRecurringBills,
         recurringBillTotal: recurringBillTotal,
       ),
     );

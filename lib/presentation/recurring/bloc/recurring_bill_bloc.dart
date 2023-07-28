@@ -44,17 +44,7 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
     });
 
     _recurringSubscription = recurringModifyBloc.stream.listen((state) {
-      if (state is RecurringBillAdded) {
-        add(LoadRecurringBills());
-      } else if (state is RecurringBillEdited) {
-        add(LoadRecurringBills());
-      } else if (state is RecurringBillRemoved) {
-        add(LoadRecurringBills());
-      } else if (state is MarkAsPaid) {
-        add(LoadRecurringBills());
-      } else if (state is UnmarkAsPaid) {
-        add(LoadRecurringBills());
-      }
+      add(LoadRecurringBills());
     });
 
     on<LoadRecurringBills>((event, emit) async {
@@ -122,17 +112,11 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
       return notArchived;
     }).toList();
 
-    final convertedRecurringBills = filteredRecurringBills.map((bill) {
-      final convertedAmount = currencyCode == "USD"
-          ? (bill.amount ?? 0.00)
-          : (bill.amount ?? 0.00) * currencyRate;
-      return bill.copy(amount: convertedAmount);
-    }).toList();
-    convertedRecurringBills.sort((a, b) {
+    filteredRecurringBills.sort((a, b) {
       return a.reminderDate!.compareTo(b.reminderDate!);
     });
 
-    return convertedRecurringBills;
+    return filteredRecurringBills;
   }
 
   getPaidRecurringBillList({
@@ -156,16 +140,10 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
       return notArchived;
     }).toList();
 
-    final convertedPaidRecurringBills = filteredRecurringBills.map((bill) {
-      final convertedAmount = currencyCode == "USD"
-          ? (bill.amount ?? 0.00)
-          : (bill.amount ?? 0.00) * currencyRate;
-      return bill.copy(amount: convertedAmount);
-    }).toList();
-    convertedPaidRecurringBills
+    filteredRecurringBills
         .sort((a, b) => a.reminderDate!.compareTo(b.reminderDate!));
 
-    return convertedPaidRecurringBills;
+    return filteredRecurringBills;
   }
 
   getPaidRecurringBillTotal(List<RecurringBill> paidRecurringBills) {

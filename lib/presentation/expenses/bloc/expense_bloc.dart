@@ -64,34 +64,11 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     on<LoadExpenseCategories>((event, emit) async {
       final categories = await expensesRepository.getExpenseCategories();
 
-      final convertedCategories = categories.map((category) {
-        final convertedBudget = sharedPrefs.getCurrencyCode() == "USD"
-            ? (category.budget ?? 0.00)
-            : (category.budget ?? 0.00) * sharedPrefs.getCurrencyRate();
-
-        final convertedTxns = category.expenseTransactions?.map((txn) {
-          final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
-              ? (txn.amount ?? 0.00)
-              : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
-          final newTxn = txn.copy(
-            amount: convertedAmount,
-          );
-          return newTxn;
-        }).toList();
-
-        final newCategory = category.copy(
-          budget: convertedBudget,
-          expenseTransactions: convertedTxns,
-        );
-
-        return newCategory;
-      }).toList();
-
       var total = 0.00;
       var todayTotal = 0.00;
       var thisMonthTotal = 0.00;
       var thisWeekTotal = 0.00;
-      convertedCategories.forEach((element) {
+      categories.forEach((element) {
         total += element.getTotalByDate(
             event.dateFilterType ?? DateFilterType.monthly,
             event.selectedDate ?? DateTime.now());
@@ -111,12 +88,12 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
           thisWeekTotal: thisWeekTotal);
 
       var budget = 0.00;
-      convertedCategories.forEach((element) {
+      categories.forEach((element) {
         budget += element.budget ?? 0.00;
       });
 
       emit(ExpenseCategoryLoaded(
-        expenseCategories: convertedCategories,
+        expenseCategories: categories,
         total: total,
         totalBudget: budget,
       ));
@@ -124,34 +101,11 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
     on<ConvertExpenseBudget>((event, emit) async {
       final categories = await expensesRepository.getExpenseCategories();
 
-      final updatedCategories = categories.map((category) {
-        final convertedBudget = event.currencyCode == "USD"
-            ? (category.budget ?? 0.00)
-            : (category.budget ?? 0.00) * event.currencyRate;
-
-        final convertedTxns = category.expenseTransactions?.map((txn) {
-          final convertedAmount = event.currencyCode == "USD"
-              ? (txn.amount ?? 0.00)
-              : (txn.amount ?? 0.00) * event.currencyRate;
-          final newTxn = txn.copy(
-            amount: convertedAmount,
-          );
-          return newTxn;
-        }).toList();
-
-        final newCategory = category.copy(
-          budget: convertedBudget,
-          expenseTransactions: convertedTxns,
-        );
-
-        return newCategory;
-      }).toList();
-
       var total = 0.00;
       var todayTotal = 0.00;
       var thisMonthTotal = 0.00;
       var thisWeekTotal = 0.00;
-      updatedCategories.forEach((element) {
+      categories.forEach((element) {
         total += element.getTotalByDate(DateFilterType.monthly, DateTime.now());
 
         //For Widget
@@ -169,12 +123,12 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
           thisWeekTotal: thisWeekTotal);
 
       var budget = 0.00;
-      updatedCategories.forEach((element) {
+      categories.forEach((element) {
         budget += element.budget ?? 0.00;
       });
 
       emit(ExpenseCategoryLoaded(
-        expenseCategories: updatedCategories,
+        expenseCategories: categories,
         total: total,
         totalBudget: budget,
       ));

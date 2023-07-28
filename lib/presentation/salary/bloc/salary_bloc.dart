@@ -79,39 +79,13 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
 
     on<LoadSalary>((event, emit) async {
       final salary = await salaryRepository.getSalaryByDate(event.selectedDate);
-      final convertedSalary = salary?.copy(
-          amount: sharedPrefs.getCurrencyCode() == "USD"
-              ? (salary.amount ?? 0.00)
-              : (salary.amount ?? 0.00) * sharedPrefs.getCurrencyRate());
 
       //YOUR EXPENSES
       final dashboardCategories = await expensesRepository
           .getExpenseCategoriesByDate(event.selectedDate);
-      final convertedCategories = dashboardCategories.map((category) {
-        final convertedBudget = sharedPrefs.getCurrencyCode() == "USD"
-            ? (category.budget ?? 0.00)
-            : (category.budget ?? 0.00) * sharedPrefs.getCurrencyRate();
-
-        final convertedTxns = category.expenseTransactions?.map((txn) {
-          final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
-              ? (txn.amount ?? 0.00)
-              : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
-          final newTxn = txn.copy(
-            amount: convertedAmount,
-          );
-          return newTxn;
-        }).toList();
-
-        final newCategory = category.copy(
-          budget: convertedBudget,
-          expenseTransactions: convertedTxns,
-        );
-
-        return newCategory;
-      }).toList();
 
       var expensesTotal = 0.0;
-      convertedCategories.forEach((element) {
+      dashboardCategories.forEach((element) {
         final totalByDate =
             element.getTotalByDate(DateFilterType.monthly, event.selectedDate);
         expensesTotal += totalByDate;
@@ -120,24 +94,17 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
       final paidRecurringBills = await recurringBillsRepository
           .getPaidRecurringBills(DateFilterType.monthly, event.selectedDate);
 
-      final convertedPaidRecurringBills = paidRecurringBills.map((bill) {
-        final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
-            ? (bill.amount ?? 0.00)
-            : (bill.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
-        return bill.copy(amount: convertedAmount);
-      }).toList();
-
       var recurringBillTotal = 0.0;
-      convertedPaidRecurringBills.forEach((element) {
+      paidRecurringBills.forEach((element) {
         recurringBillTotal += element.amount ?? 0.0;
       });
 
-      final remainingSalary = (convertedSalary?.amount ?? 0.00) -
+      final remainingSalary = (salary?.amount ?? 0.00) -
           expensesTotal -
           recurringBillTotal;
 
       emit(SalaryLoaded(
-        salary: convertedSalary,
+        salary: salary,
         totalExpense: expensesTotal,
         totalPaidBills: recurringBillTotal,
         remainingSalary: remainingSalary.isNegative ? 0.00 : remainingSalary,

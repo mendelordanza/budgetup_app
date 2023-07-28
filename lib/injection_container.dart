@@ -123,14 +123,20 @@ Future<void> setup() async {
   );
 
   //Repository
-  getIt.registerLazySingleton(() => ExpensesRepository(isarService: getIt()));
-  getIt.registerLazySingleton(
-      () => RecurringBillsRepository(isarService: getIt()));
+  getIt.registerLazySingleton(() => ExpensesRepository(
+        isarService: getIt(),
+        sharedPrefs: getIt(),
+      ));
+  getIt.registerLazySingleton(() =>
+      RecurringBillsRepository(isarService: getIt(), sharedPrefs: getIt()));
   getIt.registerLazySingleton(() => CurrencyRepository(
         httpService: getIt(),
         isarService: getIt(),
       ));
-  getIt.registerLazySingleton(() => SalaryRepository(isarService: getIt()));
+  getIt.registerLazySingleton(() => SalaryRepository(
+        isarService: getIt(),
+        sharedPrefs: getIt(),
+      ));
 
   //Data
   getIt.registerLazySingleton<SharedPrefs>(() => SharedPrefs());
