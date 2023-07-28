@@ -33,6 +33,7 @@ Future<void> setup() async {
       sharedPrefs: getIt(),
       expensesRepository: getIt(),
       recurringBillsRepository: getIt(),
+      salaryRepository: getIt(),
     ),
   );
   getIt.registerLazySingleton(

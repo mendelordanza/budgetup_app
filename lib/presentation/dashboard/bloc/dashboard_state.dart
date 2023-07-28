@@ -16,12 +16,17 @@ class DashboardLoaded extends DashboardState {
   final List<RecurringBill> paidRecurringBills;
   final double recurringBillTotal;
 
+  final double initialSalary;
+  final double remainingSalary;
+
   DashboardLoaded({
+    required this.expensesCategories,
+    required this.paidRecurringBills,
     this.overallTotal = 0.00,
     this.mostSpentCategory,
-    required this.expensesCategories,
     this.expensesTotal = 0.00,
-    required this.paidRecurringBills,
     this.recurringBillTotal = 0.00,
+    this.initialSalary = 0.00,
+    this.remainingSalary = 0.00,
   });
 }

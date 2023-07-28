@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
-import 'package:budgetup_app/presentation/dashboard/dashboard_page.dart';
+import 'package:budgetup_app/presentation/dashboard/summary_detail_page.dart';
 import 'package:budgetup_app/presentation/expenses/all_txns_page.dart';
 import 'package:budgetup_app/presentation/landing/landing_page.dart';
 import 'package:budgetup_app/presentation/recurring/recurring_bills_page.dart';
@@ -48,7 +48,7 @@ class RouteGenerator {
       case RouteStrings.summaryDetail:
         if (args is DateTime) {
           return CustomPageRoute(
-            page: DashboardPage(date: args),
+            page: SummaryDetailPage(date: args),
             offset: Offset(-1.0, 0.0),
           );
         } else {

@@ -61,16 +61,6 @@ class ExpenseTxnBloc extends Bloc<ExpenseTxnEvent, ExpenseTxnState> {
       if (state is ExpenseTxnLoaded) {
         final currentState = state as ExpenseTxnLoaded;
 
-        // final convertedTxns = currentState.expenseTxns.map((txn) {
-        //   final convertedAmount = event.currencyCode == "USD"
-        //       ? (txn.amount ?? 0.00)
-        //       : (txn.amount ?? 0.00) * event.currencyRate;
-        //   final newTxn = txn.copy(
-        //     amount: convertedAmount,
-        //   );
-        //   return newTxn;
-        // }).toList();
-
         var total = 0.00;
         currentState.expenseTxns.forEach((e) {
           total += e.amount ?? 0.00;
