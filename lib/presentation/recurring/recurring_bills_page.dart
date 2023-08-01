@@ -134,7 +134,7 @@ class RecurringBillsPage extends HookWidget {
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: NestedScrollView(
           headerSliverBuilder: (context, value) {
             return [

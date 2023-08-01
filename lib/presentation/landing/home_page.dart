@@ -65,6 +65,7 @@ class HomePage extends HookWidget {
 
     return Scaffold(
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             Row(

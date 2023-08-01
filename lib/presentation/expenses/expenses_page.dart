@@ -98,8 +98,7 @@ class ExpensesPage extends HookWidget {
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
 
-    final currentSelectedDate =
-        DateTime.parse(sharedPrefs.getSelectedDate());
+    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
     final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
 
     final editMode = useState(false);
@@ -132,7 +131,7 @@ class ExpensesPage extends HookWidget {
       child: Scaffold(
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -149,7 +148,7 @@ class ExpensesPage extends HookWidget {
                                     'Sum of all the categories for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), currentSelectedDate)}',
                                 textAlign: TextAlign.center,
                                 triggerMode: TooltipTriggerMode.tap,
-                                child: Row(
+                                child: const Row(
                                   children: [
                                     Text("Total Spent"),
                                     SizedBox(
@@ -472,8 +471,7 @@ class ExpensesPage extends HookWidget {
     required Function() onLongPress,
   }) {
     final sharedPrefs = getIt<SharedPrefs>();
-    final currentSelectedDate =
-        DateTime.parse(sharedPrefs.getSelectedDate());
+    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
     final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
 
     return Stack(
