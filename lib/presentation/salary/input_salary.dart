@@ -138,7 +138,7 @@ class InputSalary extends HookWidget {
             children: [
               Expanded(child: Text("Total Expenses")),
               Text(
-                "- ${decimalFormatterWithSymbol(totalExpense)}",
+                "– ${decimalFormatterWithSymbol(totalExpense)}",
                 style: const TextStyle(
                   color: Colors.red,
                   fontWeight: FontWeight.w600,
@@ -153,7 +153,7 @@ class InputSalary extends HookWidget {
             children: [
               Expanded(child: Text("Total Paid Bills")),
               Text(
-                "- ${decimalFormatterWithSymbol(totalPaidBills)}",
+                "– ${decimalFormatterWithSymbol(totalPaidBills)}",
                 style: const TextStyle(
                   color: Colors.red,
                   fontWeight: FontWeight.w600,

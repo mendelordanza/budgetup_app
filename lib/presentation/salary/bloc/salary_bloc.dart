@@ -107,7 +107,7 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
         salary: salary,
         totalExpense: expensesTotal,
         totalPaidBills: recurringBillTotal,
-        remainingSalary: remainingSalary.isNegative ? 0.00 : remainingSalary,
+        remainingSalary: remainingSalary,
       ));
     });
     on<AddSalary>((event, emit) async {
@@ -130,7 +130,7 @@ class SalaryBloc extends Bloc<SalaryEvent, SalaryState> {
           salary: convertedSalary,
           totalExpense: data.totalExpense,
           totalPaidBills: data.totalPaidBills,
-          remainingSalary: remainingSalary.isNegative ? 0.00 : remainingSalary,
+          remainingSalary: remainingSalary,
         ));
       }
     });
