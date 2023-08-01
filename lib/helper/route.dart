@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
-import 'package:budgetup_app/presentation/dashboard/dashboard_page.dart';
+import 'package:budgetup_app/presentation/dashboard/summary_detail_page.dart';
 import 'package:budgetup_app/presentation/expenses/all_txns_page.dart';
 import 'package:budgetup_app/presentation/landing/landing_page.dart';
 import 'package:budgetup_app/presentation/recurring/recurring_bills_page.dart';
 import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
 import 'package:budgetup_app/presentation/settings/appearance/appearance_page.dart';
 import 'package:budgetup_app/presentation/settings/backup_data/import_export_data.dart';
+import 'package:budgetup_app/presentation/settings/contact/contact_page.dart';
 import 'package:budgetup_app/presentation/settings/debug/debug_page.dart';
 import 'package:budgetup_app/presentation/settings/settings_page.dart';
 import 'package:budgetup_app/presentation/settings/subscription/subscribed_page.dart';
@@ -47,7 +48,7 @@ class RouteGenerator {
       case RouteStrings.summaryDetail:
         if (args is DateTime) {
           return CustomPageRoute(
-            page: DashboardPage(date: args),
+            page: SummaryDetailPage(date: args),
             offset: Offset(-1.0, 0.0),
           );
         } else {
@@ -112,6 +113,10 @@ class RouteGenerator {
       case RouteStrings.allTxns:
         return _navigate(
           builder: (_) => AllTransactionsPage(),
+        );
+      case RouteStrings.contact:
+        return _navigate(
+          builder: (_) => ContactPage(),
         );
       default:
         return _errorRoute();

@@ -15,9 +15,9 @@ class RecurringDateFilterBloc
   RecurringDateFilterBloc({required this.sharedPrefs})
       : super(RecurringDateFilterInitial()) {
     on<RecurringSelectDate>((event, emit) {
-      sharedPrefs.setRecurringSelectedDateFilterType(event.dateFilterType);
+      sharedPrefs.setSelectedDateFilterType(event.dateFilterType);
       sharedPrefs
-          .setRecurringSelectedDate(event.selectedDate.toIso8601String());
+          .setSelectedDate(event.selectedDate.toIso8601String());
       emit(RecurringDateFilterSelected(
           event.dateFilterType, event.selectedDate));
     });

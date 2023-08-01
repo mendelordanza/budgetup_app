@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:budgetup_app/domain/recurring_bill.dart';
+import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,33 +44,23 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
     });
 
     _recurringSubscription = recurringModifyBloc.stream.listen((state) {
-      if (state is RecurringBillAdded) {
-        add(LoadRecurringBills(state.selectedDate));
-      } else if (state is RecurringBillEdited) {
-        add(LoadRecurringBills(state.selectedDate));
-      } else if (state is RecurringBillRemoved) {
-        add(LoadRecurringBills(state.selectedDate));
-      } else if (state is MarkAsPaid) {
-        final currentSelectedDate =
-            DateTime.parse(sharedPrefs.getRecurringSelectedDate());
-        add(LoadRecurringBills(currentSelectedDate));
-      } else if (state is UnmarkAsPaid) {
-        final currentSelectedDate =
-            DateTime.parse(sharedPrefs.getRecurringSelectedDate());
-        add(LoadRecurringBills(currentSelectedDate));
-      }
+      add(LoadRecurringBills());
     });
 
     on<LoadRecurringBills>((event, emit) async {
+      final selectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
+      final selectedDateFilterType =
+          dateFilterTypeFromString(sharedPrefs.getSelectedDateFilterType());
       final allRecurringBills = await getRecurringBillList(
           currencyCode: sharedPrefs.getCurrencyCode(),
           currencyRate: sharedPrefs.getCurrencyRate(),
-          selectedDate: event.selectedDate);
+          selectedDate: selectedDate);
 
       final paidRecurringBills = await getPaidRecurringBillList(
           currencyCode: sharedPrefs.getCurrencyCode(),
           currencyRate: sharedPrefs.getCurrencyRate(),
-          selectedDate: event.selectedDate);
+          selectedDateFilterType: selectedDateFilterType,
+          selectedDate: selectedDate);
 
       //GET UPCOMING BILLS
       _setupWidget(recurringBills: allRecurringBills);
@@ -84,14 +75,14 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
         final allRecurringBills = await getRecurringBillList(
             currencyCode: event.currencyCode,
             currencyRate: event.currencyRate,
-            selectedDate:
-                DateTime.parse(sharedPrefs.getRecurringSelectedDate()));
+            selectedDate: DateTime.parse(sharedPrefs.getSelectedDate()));
 
         final paidRecurringBills = await getPaidRecurringBillList(
             currencyCode: event.currencyCode,
             currencyRate: event.currencyRate,
-            selectedDate:
-                DateTime.parse(sharedPrefs.getRecurringSelectedDate()));
+            selectedDateFilterType: dateFilterTypeFromString(
+                sharedPrefs.getSelectedDateFilterType()),
+            selectedDate: DateTime.parse(sharedPrefs.getSelectedDate()));
 
         //GET UPCOMING BILLS
         _setupWidget(recurringBills: allRecurringBills);
@@ -121,26 +112,23 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
       return notArchived;
     }).toList();
 
-    final convertedRecurringBills = filteredRecurringBills.map((bill) {
-      final convertedAmount = currencyCode == "USD"
-          ? (bill.amount ?? 0.00)
-          : (bill.amount ?? 0.00) * currencyRate;
-      return bill.copy(amount: convertedAmount);
-    }).toList();
-    convertedRecurringBills.sort((a, b) {
+    filteredRecurringBills.sort((a, b) {
       return a.reminderDate!.compareTo(b.reminderDate!);
     });
 
-    return convertedRecurringBills;
+    return filteredRecurringBills;
   }
 
   getPaidRecurringBillList({
     required String currencyCode,
     required double currencyRate,
+    required DateFilterType selectedDateFilterType,
     required DateTime selectedDate,
   }) async {
-    final paidRecurringBills =
-        await recurringBillsRepo.getPaidRecurringBills(selectedDate);
+    final paidRecurringBills = await recurringBillsRepo.getPaidRecurringBills(
+      selectedDateFilterType,
+      selectedDate,
+    );
 
     //Filter out monthly and yearly
     final filteredRecurringBills = paidRecurringBills.where((bill) {
@@ -152,16 +140,10 @@ class RecurringBillBloc extends Bloc<RecurringBillEvent, RecurringBillState> {
       return notArchived;
     }).toList();
 
-    final convertedPaidRecurringBills = filteredRecurringBills.map((bill) {
-      final convertedAmount = currencyCode == "USD"
-          ? (bill.amount ?? 0.00)
-          : (bill.amount ?? 0.00) * currencyRate;
-      return bill.copy(amount: convertedAmount);
-    }).toList();
-    convertedPaidRecurringBills
+    filteredRecurringBills
         .sort((a, b) => a.reminderDate!.compareTo(b.reminderDate!));
 
-    return convertedPaidRecurringBills;
+    return filteredRecurringBills;
   }
 
   getPaidRecurringBillTotal(List<RecurringBill> paidRecurringBills) {

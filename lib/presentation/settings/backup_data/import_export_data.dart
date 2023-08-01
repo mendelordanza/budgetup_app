@@ -48,8 +48,6 @@ class ImportExportData extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final isarService = getIt<IsarService>();
-    final sharedPrefs = getIt<SharedPrefs>();
-    final selectedDate = DateTime.parse(sharedPrefs.getRecurringSelectedDate());
 
     final isSubscribed = useState(false);
     useEffect(() {
@@ -99,7 +97,7 @@ class ImportExportData extends HookWidget {
                             .add(LoadExpenseCategories());
                         context
                             .read<RecurringBillBloc>()
-                            .add(LoadRecurringBills(selectedDate));
+                            .add(LoadRecurringBills());
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                                 content: Text("Data imported successfully")));

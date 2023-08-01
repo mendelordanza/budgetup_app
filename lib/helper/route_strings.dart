@@ -14,4 +14,5 @@ class RouteStrings {
   static const String subStatus = '/subStatus';
   static const String backup = '/backup';
   static const String allTxns = '/allTxns';
+  static const String contact = '/contact';
 }

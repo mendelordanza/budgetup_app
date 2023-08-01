@@ -1,13 +1,10 @@
-import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:budgetup_app/data/expenses_repository.dart';
 import 'package:budgetup_app/helper/shared_prefs.dart';
-import 'package:budgetup_app/presentation/recurring_modify/bloc/recurring_modify_bloc.dart';
-import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:meta/meta.dart';
 
 import '../../../data/recurring_bills_repository.dart';
+import '../../../data/salary_repository.dart';
 import '../../../domain/expense_category.dart';
 import '../../../domain/recurring_bill.dart';
 import '../../../helper/date_helper.dart';
@@ -18,32 +15,23 @@ class DashboardCubit extends Cubit<DashboardState> {
   final SharedPrefs sharedPrefs;
   final ExpensesRepository expensesRepository;
   final RecurringBillsRepository recurringBillsRepository;
-  final TransactionsModifyBloc transactionsModifyBloc;
-  final RecurringModifyBloc recurringModifyBloc;
-  StreamSubscription? _expenseTxnSubscription;
+  final SalaryRepository salaryRepository;
 
   DashboardCubit({
     required this.sharedPrefs,
     required this.expensesRepository,
     required this.recurringBillsRepository,
-    required this.transactionsModifyBloc,
-    required this.recurringModifyBloc,
+    required this.salaryRepository,
   }) : super(DashboardInitial());
-
-  @override
-  Future<void> close() async {
-    _expenseTxnSubscription?.cancel();
-    return super.close();
-  }
 
   getSummary(DateTime date) async {
     final dashboardCategories =
         await expensesRepository.getExpenseCategoriesByDate(date);
 
     //MOST SPENT CATEGORY
-    ExpenseCategory? convertedMostSpentCategory;
-    if(dashboardCategories.isNotEmpty) {
-      final mostSpentCategory = dashboardCategories.reduce((value, element) {
+    ExpenseCategory? mostSpentCategory;
+    if (dashboardCategories.isNotEmpty) {
+      mostSpentCategory = dashboardCategories.reduce((value, element) {
         final a = value.getTotalByDate(DateFilterType.monthly, date);
         final b = element.getTotalByDate(DateFilterType.monthly, date);
         if (a > b) {
@@ -52,78 +40,41 @@ class DashboardCubit extends Cubit<DashboardState> {
           return element;
         }
       });
-
-      convertedMostSpentCategory = mostSpentCategory.copy(
-          budget: sharedPrefs.getCurrencyCode() == "USD"
-              ? (mostSpentCategory.budget ?? 0.00)
-              : (mostSpentCategory.budget ?? 0.00) *
-              sharedPrefs.getCurrencyRate(),
-          expenseTransactions: mostSpentCategory.expenseTransactions?.map((txn) {
-            final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
-                ? (txn.amount ?? 0.00)
-                : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
-            final newTxn = txn.copy(
-              amount: convertedAmount,
-            );
-            return newTxn;
-          }).toList());
     }
 
-    //YOUR EXPENSES
-    final convertedCategories = dashboardCategories.map((category) {
-      final convertedBudget = sharedPrefs.getCurrencyCode() == "USD"
-          ? (category.budget ?? 0.00)
-          : (category.budget ?? 0.00) * sharedPrefs.getCurrencyRate();
-
-      final convertedTxns = category.expenseTransactions?.map((txn) {
-        final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
-            ? (txn.amount ?? 0.00)
-            : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
-        final newTxn = txn.copy(
-          amount: convertedAmount,
-        );
-        return newTxn;
-      }).toList();
-
-      final newCategory = category.copy(
-        budget: convertedBudget,
-        expenseTransactions: convertedTxns,
-      );
-
-      return newCategory;
-    }).toList();
-
     var expensesTotal = 0.0;
-    convertedCategories.forEach((element) {
+    dashboardCategories.forEach((element) {
       final totalByDate = element.getTotalByDate(DateFilterType.monthly, date);
       expensesTotal += totalByDate;
     });
 
-
-    //BILLS YOU'VE PAID
-    final paidRecurringBills =
-        await recurringBillsRepository.getPaidRecurringBills(date);
-
-    final convertedPaidRecurringBills = paidRecurringBills.map((bill) {
-      final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
-          ? (bill.amount ?? 0.00)
-          : (bill.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
-      return bill.copy(amount: convertedAmount);
-    }).toList();
+    final paidRecurringBills = await recurringBillsRepository
+        .getPaidRecurringBills(DateFilterType.monthly, date);
 
     var recurringBillTotal = 0.0;
-    convertedPaidRecurringBills.forEach((element) {
+    paidRecurringBills.forEach((element) {
       recurringBillTotal += element.amount ?? 0.0;
     });
+
+    //SALARY
+    var initialSalary = 0.00;
+    var remainingSalary = 0.00;
+    final salary = await salaryRepository.getSalaryByDate(date);
+    if (salary != null) {
+      initialSalary = salary.amount ?? 0.00;
+      remainingSalary = initialSalary - expensesTotal - recurringBillTotal;
+    }
 
     emit(
       DashboardLoaded(
         overallTotal: expensesTotal + recurringBillTotal,
-        mostSpentCategory: convertedMostSpentCategory,
-        expensesCategories: convertedCategories,
+        mostSpentCategory: mostSpentCategory,
+        expensesCategories: dashboardCategories,
         expensesTotal: expensesTotal,
-        paidRecurringBills: convertedPaidRecurringBills,
+        paidRecurringBills: paidRecurringBills,
         recurringBillTotal: recurringBillTotal,
+        initialSalary: initialSalary,
+        remainingSalary: remainingSalary,
       ),
     );
   }

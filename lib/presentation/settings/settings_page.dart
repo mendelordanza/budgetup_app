@@ -28,12 +28,6 @@ class SettingsPage extends HookWidget {
     }
   }
 
-  _launchEmail(String email) async {
-    if (!await launchUrl(Uri.parse("mailto:$email"))) {
-      throw Exception('Could not launch mailto:$email');
-    }
-  }
-
   showPaywall(BuildContext context) async {
     try {
       final offerings = await Purchases.getOfferings();
@@ -266,27 +260,29 @@ class SettingsPage extends HookWidget {
                           //     "assets/icons/ic_arrow_right.svg",
                           //   ),
                           // ),
+                          //Divider(),
+                          // SettingItem(
+                          //   onTap: () {
+                          //     _launchUrl("https://forms.gle/M5qmLiT2FSLXAz8Y7");
+                          //   },
+                          //   icon: SvgPicture.asset("assets/icons/ic_send.svg"),
+                          //   iconBackgroundColor: Color(0xFF0069B6),
+                          //   label: "Send feedback",
+                          //   suffix: SvgPicture.asset(
+                          //     "assets/icons/ic_arrow_right.svg",
+                          //   ),
+                          // ),
                           Divider(),
                           SettingItem(
                             onTap: () {
-                              _launchUrl("https://forms.gle/M5qmLiT2FSLXAz8Y7");
-                            },
-                            icon: SvgPicture.asset("assets/icons/ic_send.svg"),
-                            iconBackgroundColor: Color(0xFF0069B6),
-                            label: "Send feedback",
-                            suffix: SvgPicture.asset(
-                              "assets/icons/ic_arrow_right.svg",
-                            ),
-                          ),
-                          Divider(),
-                          SettingItem(
-                            onTap: () {
-                              _launchEmail("ralph@trybudgetup.com");
+                              //TODO open about page
+                              Navigator.pushNamed(
+                                  context, RouteStrings.contact);
                             },
                             icon:
                                 SvgPicture.asset("assets/icons/ic_contact.svg"),
                             iconBackgroundColor: Color(0xFFff9cf5),
-                            label: "Contact Us",
+                            label: "Contact",
                             suffix: SvgPicture.asset(
                               "assets/icons/ic_arrow_right.svg",
                             ),

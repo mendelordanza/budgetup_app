@@ -2,7 +2,6 @@ import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/helper/colors.dart';
 import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/helper/string.dart';
-import 'package:budgetup_app/presentation/custom/date_filter_bottom_sheet.dart';
 import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/expenses_modify/bloc/expenses_modify_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/add_expense_txn_page.dart';
@@ -23,7 +22,6 @@ import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
 import '../custom/balance.dart';
 import '../custom/custom_floating_button.dart';
-import '../custom/date_filter_button.dart';
 import '../custom/delete_dialog.dart';
 import '../paywall/paywall.dart';
 import 'bloc/expense_bloc.dart';
@@ -100,15 +98,7 @@ class ExpensesPage extends HookWidget {
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
 
-    final selectedFilterType = useState<DateFilterType>(
-        dateFilterTypeFromString(sharedPrefs.getSelectedDateFilterType()));
-    final selectedDate = useState<DateTime>(
-      sharedPrefs.getExpenseSelectedDate().isNotEmpty
-          ? DateTime.parse(sharedPrefs.getExpenseSelectedDate())
-          : DateTime.now(),
-    );
-    final currentSelectedDate =
-        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
+    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
     final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
 
     final editMode = useState(false);
@@ -141,16 +131,12 @@ class ExpensesPage extends HookWidget {
       child: Scaffold(
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              16.0,
-              16.0,
-              16.0,
-              0.0,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Expanded(
                       child: BlocBuilder<ExpenseBloc, ExpenseState>(
@@ -162,7 +148,6 @@ class ExpensesPage extends HookWidget {
                                     'Sum of all the categories for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), currentSelectedDate)}',
                                 textAlign: TextAlign.center,
                                 triggerMode: TooltipTriggerMode.tap,
-                                showDuration: Duration(seconds: 3),
                                 child: const Row(
                                   children: [
                                     Text("Total Spent"),
@@ -188,105 +173,104 @@ class ExpensesPage extends HookWidget {
                         },
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () {
-                          showModalBottomSheet(
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            context: context,
-                            builder: (context) {
-                              return StatefulBuilder(
-                                  builder: (context, setState) {
-                                return DateFilterBottomSheet(
-                                  types: types,
-                                  onSelectFilterType: (type) {
-                                    selectedFilterType.value = type;
-                                    context.read<ExpenseDateFilterBloc>().add(
-                                        ExpenseSelectDate(
-                                            type, selectedDate.value));
-                                    context.read<ExpenseBloc>().add(
-                                          LoadExpenseCategories(
-                                            dateFilterType: type,
-                                            selectedDate: selectedDate.value,
-                                          ),
-                                        );
-                                    setState(() {});
-                                  },
-                                  onSelectDate: (date) {
-                                    selectedDate.value = date;
-                                    context.read<ExpenseDateFilterBloc>().add(
-                                        ExpenseSelectDate(
-                                            selectedFilterType.value, date));
-                                    context.read<ExpenseBloc>().add(
-                                          LoadExpenseCategories(
-                                            dateFilterType:
-                                                selectedFilterType.value,
-                                            selectedDate: date,
-                                          ),
-                                        );
-                                    setState(() {});
-                                  },
-                                  onSelectYear: (year) {
-                                    context
-                                        .read<ExpenseDateFilterBloc>()
-                                        .add(ExpenseSelectDate(
-                                            selectedFilterType.value,
-                                            DateTime(
-                                              year,
-                                              selectedDate.value.month,
-                                              selectedDate.value.day,
-                                            )));
-                                    context.read<ExpenseBloc>().add(
-                                          LoadExpenseCategories(
-                                            dateFilterType:
-                                                selectedFilterType.value,
-                                            selectedDate: DateTime(
-                                              year,
-                                              selectedDate.value.month,
-                                              selectedDate.value.day,
-                                            ),
-                                          ),
-                                        );
-                                  },
-                                  selectedFilterType: selectedFilterType,
-                                  selectedDate: selectedDate,
-                                );
-                              });
-
-                              //return ExpenseDateBottomSheet();
-                            },
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            BlocBuilder<ExpenseDateFilterBloc,
-                                ExpenseDateFilterState>(
-                              builder: (context, state) {
-                                if (state is ExpenseDateFilterSelected) {
-                                  return DateFilterButton(
-                                    text: getMonthText(state.dateFilterType,
-                                        state.selectedDate),
-                                  );
-                                }
-                                return DateFilterButton(
-                                  text: getMonthText(
-                                      dateFilterTypeFromString(
-                                          currentDateFilterType),
-                                      currentSelectedDate),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    //   child: GestureDetector(
+                    //     behavior: HitTestBehavior.translucent,
+                    //     onTap: () {
+                    //       showModalBottomSheet(
+                    //         isScrollControlled: true,
+                    //         backgroundColor: Colors.transparent,
+                    //         context: context,
+                    //         builder: (context) {
+                    //           return StatefulBuilder(
+                    //               builder: (context, setState) {
+                    //             return DateFilterBottomSheet(
+                    //               types: types,
+                    //               onSelectFilterType: (type) {
+                    //                 selectedFilterType.value = type;
+                    //                 context.read<ExpenseDateFilterBloc>().add(
+                    //                     ExpenseSelectDate(
+                    //                         type, selectedDate.value));
+                    //                 context.read<ExpenseBloc>().add(
+                    //                       LoadExpenseCategories(
+                    //                         dateFilterType: type,
+                    //                         selectedDate: selectedDate.value,
+                    //                       ),
+                    //                     );
+                    //                 setState(() {});
+                    //               },
+                    //               onSelectDate: (date) {
+                    //                 selectedDate.value = date;
+                    //                 context.read<ExpenseDateFilterBloc>().add(
+                    //                     ExpenseSelectDate(
+                    //                         selectedFilterType.value, date));
+                    //                 context.read<ExpenseBloc>().add(
+                    //                       LoadExpenseCategories(
+                    //                         dateFilterType:
+                    //                             selectedFilterType.value,
+                    //                         selectedDate: date,
+                    //                       ),
+                    //                     );
+                    //                 setState(() {});
+                    //               },
+                    //               onSelectYear: (year) {
+                    //                 context
+                    //                     .read<ExpenseDateFilterBloc>()
+                    //                     .add(ExpenseSelectDate(
+                    //                         selectedFilterType.value,
+                    //                         DateTime(
+                    //                           year,
+                    //                           selectedDate.value.month,
+                    //                           selectedDate.value.day,
+                    //                         )));
+                    //                 context.read<ExpenseBloc>().add(
+                    //                       LoadExpenseCategories(
+                    //                         dateFilterType:
+                    //                             selectedFilterType.value,
+                    //                         selectedDate: DateTime(
+                    //                           year,
+                    //                           selectedDate.value.month,
+                    //                           selectedDate.value.day,
+                    //                         ),
+                    //                       ),
+                    //                     );
+                    //               },
+                    //               selectedFilterType: selectedFilterType,
+                    //               selectedDate: selectedDate,
+                    //             );
+                    //           });
+                    //
+                    //           //return ExpenseDateBottomSheet();
+                    //         },
+                    //       );
+                    //     },
+                    //     child: Row(
+                    //       mainAxisAlignment: MainAxisAlignment.center,
+                    //       children: [
+                    //         BlocBuilder<ExpenseDateFilterBloc,
+                    //             ExpenseDateFilterState>(
+                    //           builder: (context, state) {
+                    //             if (state is ExpenseDateFilterSelected) {
+                    //               return DateFilterButton(
+                    //                 text: getMonthText(state.dateFilterType,
+                    //                     state.selectedDate),
+                    //               );
+                    //             }
+                    //             return DateFilterButton(
+                    //               text: getMonthText(
+                    //                   dateFilterTypeFromString(
+                    //                       currentDateFilterType),
+                    //                   currentSelectedDate),
+                    //             );
+                    //           },
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
-                Divider(),
                 BlocBuilder<ExpenseBloc, ExpenseState>(
                   builder: (context, state) {
                     return Padding(
@@ -487,8 +471,7 @@ class ExpensesPage extends HookWidget {
     required Function() onLongPress,
   }) {
     final sharedPrefs = getIt<SharedPrefs>();
-    final currentSelectedDate =
-        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
+    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
     final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
 
     return Stack(

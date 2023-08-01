@@ -2,35 +2,62 @@ import 'package:budgetup_app/data/local/entities/recurring_bill_entity.dart';
 import 'package:budgetup_app/data/local/entities/recurring_bill_txn_entity.dart';
 import 'package:budgetup_app/domain/recurring_bill.dart';
 import 'package:budgetup_app/domain/recurring_bill_txn.dart';
+import 'package:budgetup_app/helper/shared_prefs.dart';
 
+import '../helper/date_helper.dart';
 import 'local/isar_service.dart';
 
 class RecurringBillsRepository {
-  final IsarService _isarService;
+  final IsarService isarService;
+  final SharedPrefs sharedPrefs;
 
   const RecurringBillsRepository({
-    required IsarService isarService,
-  }) : _isarService = isarService;
+    required this.isarService,
+    required this.sharedPrefs,
+  });
 
   Future<List<RecurringBill>> getRecurringBills() async {
-    final objects = await _isarService.getAllRecurringBills();
-    return objects.map((category) {
+    final objects = await isarService.getAllRecurringBills();
+    final recurringBills = objects.map((category) {
       return RecurringBill.fromJson(category.toJson());
     }).toList();
+
+    final convertedRecurringBills = recurringBills.map((bill) {
+      final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
+          ? (bill.amount ?? 0.00)
+          : (bill.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
+      return bill.copy(amount: convertedAmount);
+    }).toList();
+
+    return convertedRecurringBills;
   }
 
-  Future<List<RecurringBill>> getPaidRecurringBills(DateTime datePaid) async {
-    final objects = await _isarService.getPaidRecurringBills(datePaid);
-    return objects.map((category) {
+  Future<List<RecurringBill>> getPaidRecurringBills(
+    DateFilterType selectedDateFilterType,
+    DateTime datePaid,
+  ) async {
+    final objects = await isarService.getPaidRecurringBills(
+        selectedDateFilterType, datePaid);
+    final paidRecurringBills = objects.map((category) {
       return RecurringBill.fromJson(category.toJson());
     }).toList();
+
+    //CONVERT
+    final convertedPaidRecurringBills = paidRecurringBills.map((bill) {
+      final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
+          ? (bill.amount ?? 0.00)
+          : (bill.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
+      return bill.copy(amount: convertedAmount);
+    }).toList();
+
+    return convertedPaidRecurringBills;
   }
 
   Future<int> saveRecurringBill(
     RecurringBill recurringBill,
   ) async {
     final newRecurringBill = recurringBill.toIsar();
-    return await _isarService.saveRecurringBill(newRecurringBill);
+    return await isarService.saveRecurringBill(newRecurringBill);
   }
 
   Future<void> softDeleteRecurringBill(
@@ -38,7 +65,7 @@ class RecurringBillsRepository {
     DateTime selectedDate,
   ) async {
     final recurringBillEntity = recurringBill.toIsar();
-    await _isarService.softDeleteRecurringBill(
+    await isarService.softDeleteRecurringBill(
       recurringBillEntity,
       selectedDate,
     );
@@ -46,8 +73,8 @@ class RecurringBillsRepository {
 
   //TODO add identification for delete all
   Future<void> deleteRecurringBill(int recurringBillId) async {
-    await _isarService.deleteAllRecurringBillTxns(recurringBillId);
-    await _isarService.deleteRecurringBill(recurringBillId);
+    await isarService.deleteAllRecurringBillTxns(recurringBillId);
+    await isarService.deleteRecurringBill(recurringBillId);
   }
 
   Future<void> addRecurringBillTxn(
@@ -67,14 +94,14 @@ class RecurringBillsRepository {
       ..datePaid = recurringBillTxn.datePaid
       ..recurringBill.value = newRecurringBillObject;
 
-    _isarService.addRecurringBillTxn(txnObject);
+    isarService.addRecurringBillTxn(txnObject);
   }
 
   Future<void> deleteRecurringBillTxn(
     RecurringBillTxn recurringBillTxn,
   ) async {
     if (recurringBillTxn.id != null) {
-      _isarService.deleteRecurringBillTxn(recurringBillTxn.id!);
+      isarService.deleteRecurringBillTxn(recurringBillTxn.id!);
     }
   }
 }

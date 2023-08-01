@@ -4,6 +4,7 @@ import 'package:budgetup_app/helper/date_helper.dart';
 import 'package:budgetup_app/helper/string.dart';
 import 'package:equatable/equatable.dart';
 import 'package:isar/isar.dart';
+import 'package:collection/collection.dart';
 
 import '../data/local/entities/recurring_bill_entity.dart';
 
@@ -32,8 +33,64 @@ class RecurringBill extends Equatable {
     this.updatedAt,
   });
 
-  isPaid(DateTime selectedDate) {
-    final paid = recurringBillTxns?.where((element) {
+  RecurringBillTxn? getTxn(
+    DateFilterType dateFilterType,
+    DateTime selectedDate,
+  ) {
+    switch (dateFilterType) {
+      case DateFilterType.daily:
+        return recurringBillTxns?.firstWhereOrNull((element) {
+          return removeTimeFromDate(element.datePaid!) ==
+              removeTimeFromDate(selectedDate);
+        });
+      case DateFilterType.weekly:
+        return recurringBillTxns?.firstWhereOrNull((element) {
+          final txnDate = element.datePaid!;
+          final startDate = removeTimeFromDate(getStartOfWeek((selectedDate)));
+          final endDate = removeTimeFromDate(getEndOfWeek((selectedDate)));
+
+          return txnDate == startDate ||
+              txnDate == endDate ||
+              (txnDate.isAfter(startDate) && txnDate.isBefore(endDate));
+        });
+      case DateFilterType.monthly:
+        return recurringBillTxns?.firstWhereOrNull((element) {
+          return getMonthFromDate(element.datePaid!) ==
+              getMonthFromDate(selectedDate);
+        });
+    }
+  }
+
+  isPaid(DateFilterType dateFilterType, DateTime selectedDate) {
+    List<RecurringBillTxn>? filteredList;
+
+    switch (dateFilterType) {
+      case DateFilterType.daily:
+        filteredList = recurringBillTxns?.where((element) {
+          return removeTimeFromDate(element.datePaid!) ==
+              removeTimeFromDate(selectedDate);
+        }).toList();
+        break;
+      case DateFilterType.weekly:
+        filteredList = recurringBillTxns?.where((element) {
+          final txnDate = element.datePaid!;
+          final startDate = removeTimeFromDate(getStartOfWeek((selectedDate)));
+          final endDate = removeTimeFromDate(getEndOfWeek((selectedDate)));
+
+          return txnDate == startDate ||
+              txnDate == endDate ||
+              (txnDate.isAfter(startDate) && txnDate.isBefore(endDate));
+        }).toList();
+        break;
+      case DateFilterType.monthly:
+        filteredList = recurringBillTxns?.where((element) {
+          return getMonthFromDate(element.datePaid!) ==
+              getMonthFromDate(selectedDate);
+        }).toList();
+        break;
+    }
+
+    final paid = filteredList?.where((element) {
       return getMonthFromDate(element.datePaid!) ==
           getMonthFromDate(selectedDate);
     }).toList();

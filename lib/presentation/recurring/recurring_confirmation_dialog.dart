@@ -15,8 +15,8 @@ class RecurringConfirmationDialog extends HookWidget {
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
     final selectedDate = useState<DateTime>(
-      sharedPrefs.getRecurringSelectedDate().isNotEmpty
-          ? DateTime.parse(sharedPrefs.getRecurringSelectedDate())
+      sharedPrefs.getSelectedDate().isNotEmpty
+          ? DateTime.parse(sharedPrefs.getSelectedDate())
           : DateTime.now(),
     );
 

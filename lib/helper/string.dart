@@ -8,6 +8,9 @@ String decimalFormatterWithSymbol(double number) {
   final sharedPrefs = getIt<SharedPrefs>();
   double roundedNumber = double.parse(number.toStringAsFixed(2));
   final formatter = NumberFormat("#,##0.00");
+  if (number.isNegative) {
+    return "–${sharedPrefs.getCurrencySymbol()}${formatter.format(roundedNumber.abs())}";
+  }
   return "${sharedPrefs.getCurrencySymbol()}${formatter.format(roundedNumber)}";
 }
 

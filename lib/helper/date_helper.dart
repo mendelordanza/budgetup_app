@@ -1,7 +1,11 @@
 import 'package:intl/intl.dart';
 
-removeTimeFromDate(DateTime date) {
+DateTime removeTimeFromDate(DateTime date) {
   return DateTime(date.year, date.month, date.day);
+}
+
+getEndOfDay(DateTime dateTime) {
+  return DateTime(dateTime.year, dateTime.month, dateTime.day, 23, 59, 59);
 }
 
 getMonthFromDate(DateTime date) {
@@ -18,14 +22,14 @@ formatDate(DateTime date, String pattern) {
   return formatter.format(date);
 }
 
-getStartDate(DateTime date) {
+getStartOfWeek(DateTime date) {
   // Get the first day of the week (Sunday)
   final startOfWeek = date.subtract(Duration(days: date.weekday - 1));
 
   return startOfWeek;
 }
 
-getEndDate(DateTime date) {
+getEndOfWeek(DateTime date) {
   // Get the first day of the week (Sunday)
   final startOfWeek = date.subtract(Duration(days: date.weekday - 1));
 
@@ -52,11 +56,11 @@ String getMonthText(DateFilterType dateFilterType, DateTime date) {
         return "${formatDate(date, 'MMM dd, yyyy')}";
       }
     case DateFilterType.weekly:
-      if (DateTime.now().isAfter(getStartDate(date)) &&
-          DateTime.now().isBefore(getEndDate(date))) {
+      if (DateTime.now().isAfter(getStartOfWeek(date)) &&
+          DateTime.now().isBefore(getEndOfWeek(date))) {
         return "This week";
       } else {
-        return "${formatDate(getStartDate(date), 'MMM dd, yy')} -\n${formatDate(getEndDate(date), 'MMM dd, yy')}";
+        return "${formatDate(getStartOfWeek(date), 'MMM dd, yyyy')} - ${formatDate(getEndOfWeek(date), 'MMM dd, yyyy')}";
       }
     case DateFilterType.monthly:
       if (date.month == DateTime.now().month) {
@@ -139,4 +143,15 @@ int getQuarterFromMonth(int month) {
   }
 
   return ((month - 1) ~/ 3) + 1;
+}
+
+int getMyAge() {
+  final now = removeTimeFromDate(DateTime.now());
+  final birthday = DateTime(1998, 04, 19);
+
+  if (now.month == birthday.month && now.day > birthday.day) {
+    return (now.year - birthday.year) - 1;
+  } else {
+    return (now.year - birthday.year);
+  }
 }

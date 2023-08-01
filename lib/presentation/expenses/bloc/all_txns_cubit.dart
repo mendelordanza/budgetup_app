@@ -36,22 +36,12 @@ class AllTxnsCubit extends Cubit<AllTxnsState> {
   getTxns() async {
     final txns = await expensesRepository.getAllTransactions();
     final categories = await expensesRepository.getExpenseCategories();
-
-    final convertedTxns = txns.map((txn) {
-      final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
-          ? (txn.amount ?? 0.00)
-          : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
-      final newTxn = txn.copy(
-        amount: convertedAmount,
-      );
-      return newTxn;
-    }).toList();
-    convertedTxns.sort((a, b) => b.updatedAt!.compareTo(a.updatedAt!));
+    txns.sort((a, b) => b.updatedAt!.compareTo(a.updatedAt!));
 
     emit(
       AllTxnsLoaded(
         categories: categories,
-        transactions: convertedTxns,
+        transactions: txns,
       ),
     );
   }

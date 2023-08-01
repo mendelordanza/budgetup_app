@@ -17,6 +17,7 @@ class CustomTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final bool autofocus;
   final bool readOnly;
+  final Function(String)? onChanged;
 
   CustomTextField({
     this.autofocus = false,
@@ -32,6 +33,7 @@ class CustomTextField extends StatelessWidget {
     this.onTap,
     this.maxLines,
     this.inputFormatters,
+    this.onChanged,
   });
 
   @override
@@ -54,6 +56,7 @@ class CustomTextField extends StatelessWidget {
             textAlignVertical: TextAlignVertical.center,
             inputFormatters: inputFormatters,
             onTap: onTap,
+            onChanged: onChanged,
             controller: controller,
             validator: validator,
             keyboardType: textInputType,

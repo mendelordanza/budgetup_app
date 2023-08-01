@@ -4,7 +4,7 @@ import 'package:budgetup_app/helper/route_strings.dart';
 import 'package:budgetup_app/helper/string.dart';
 import 'package:budgetup_app/presentation/custom/balance.dart';
 import 'package:budgetup_app/presentation/custom/custom_action_dialog.dart';
-import 'package:budgetup_app/presentation/custom/date_filter_button.dart';
+import 'package:budgetup_app/presentation/expense_date_filter/bloc/date_filter_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/bloc/recurring_bill_bloc.dart';
 import 'package:budgetup_app/presentation/recurring/recurring_confirmation_dialog.dart';
 import 'package:budgetup_app/presentation/recurring_modify/add_recurring_bill_page.dart';
@@ -26,10 +26,8 @@ import '../../helper/date_helper.dart';
 import '../../helper/shared_prefs.dart';
 import '../../injection_container.dart';
 import '../custom/custom_button.dart';
-import '../custom/date_filter_bottom_sheet.dart';
 import '../custom/delete_dialog.dart';
 import '../paywall/paywall.dart';
-import '../recurring_date_filter/bloc/recurring_date_filter_bloc.dart';
 
 class AddRecurringBillArgs {
   final RecurringBillInterval initialIntervalValue;
@@ -104,19 +102,9 @@ class RecurringBillsPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
-
-    final selectedFilterType = useState<DateFilterType>(
-        dateFilterTypeFromString(
-            sharedPrefs.getRecurringSelectedDateFilterType()));
-    final selectedDate = useState<DateTime>(
-      sharedPrefs.getRecurringSelectedDate().isNotEmpty
-          ? DateTime.parse(sharedPrefs.getRecurringSelectedDate())
-          : DateTime.now(),
-    );
     final currentSelectedDate =
-        DateTime.parse(sharedPrefs.getRecurringSelectedDate());
-    final currentDateFilterType =
-        sharedPrefs.getRecurringSelectedDateFilterType();
+        DateTime.parse(sharedPrefs.getSelectedDate());
+    final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
 
     final tabController = useTabController(
       initialLength: 4,
@@ -125,9 +113,7 @@ class RecurringBillsPage extends HookWidget {
 
     final isSubscribed = useState(false);
     useEffect(() {
-      context
-          .read<RecurringBillBloc>()
-          .add(LoadRecurringBills(currentSelectedDate));
+      context.read<RecurringBillBloc>().add(LoadRecurringBills());
       Purchases.addCustomerInfoUpdateListener((customerInfo) {
         final entitlement = customerInfo.entitlements.active[entitlementId];
         isSubscribed.value =
@@ -148,147 +134,51 @@ class RecurringBillsPage extends HookWidget {
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          16.0,
-          16.0,
-          16.0,
-          0.0,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: NestedScrollView(
           headerSliverBuilder: (context, value) {
             return [
               SliverToBoxAdapter(
-                  child: Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child:
-                            BlocBuilder<RecurringBillBloc, RecurringBillState>(
-                          builder: (context, state) {
-                            if (state is RecurringBillsLoaded &&
-                                state.total != null) {
-                              return Balance(
-                                headerLabel: Tooltip(
-                                  message:
-                                      'Sum of all paid recurring bills for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), currentSelectedDate)}',
-                                  textAlign: TextAlign.center,
-                                  triggerMode: TooltipTriggerMode.tap,
-                                  showDuration: Duration(seconds: 3),
-                                  child: const Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text("Total Paid"),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Icon(
-                                        Iconsax.info_circle,
-                                        size: 16,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                total: state.total!,
-                              );
-                            }
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: BlocBuilder<RecurringBillBloc, RecurringBillState>(
+                        builder: (context, state) {
+                          if (state is RecurringBillsLoaded &&
+                              state.total != null) {
                             return Balance(
-                              headerLabel: Text("Total Paid"),
-                              total: 0.00,
+                              headerLabel: Tooltip(
+                                message:
+                                    'Sum of all paid recurring bills for ${getMonthText(dateFilterTypeFromString(currentDateFilterType), currentSelectedDate)}',
+                                textAlign: TextAlign.center,
+                                triggerMode: TooltipTriggerMode.tap,
+                                showDuration: Duration(seconds: 3),
+                                child: const Row(
+                                  children: [
+                                    Text("Total Paid"),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Icon(
+                                      Iconsax.info_circle,
+                                      size: 16,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              total: state.total!,
                             );
-                          },
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                            backgroundColor: Colors.transparent,
-                            context: context,
-                            builder: (context) {
-                              return StatefulBuilder(
-                                  builder: (context, setState) {
-                                return DateFilterBottomSheet(
-                                  types: types,
-                                  onSelectFilterType: (type) {
-                                    selectedFilterType.value = type;
-                                    context.read<RecurringDateFilterBloc>().add(
-                                        RecurringSelectDate(
-                                            type, selectedDate.value));
-                                    context.read<RecurringBillBloc>().add(
-                                          LoadRecurringBills(
-                                              selectedDate.value),
-                                        );
-                                    setState(() {});
-                                  },
-                                  onSelectDate: (date) {
-                                    selectedDate.value = date;
-                                    context.read<RecurringDateFilterBloc>().add(
-                                        RecurringSelectDate(
-                                            selectedFilterType.value, date));
-                                    context.read<RecurringBillBloc>().add(
-                                          LoadRecurringBills(date),
-                                        );
-                                    setState(() {});
-                                  },
-                                  onSelectYear: (year) {
-                                    context
-                                        .read<RecurringDateFilterBloc>()
-                                        .add(RecurringSelectDate(
-                                            selectedFilterType.value,
-                                            DateTime(
-                                              year,
-                                              selectedDate.value.month,
-                                              selectedDate.value.day,
-                                            )));
-                                    context.read<RecurringBillBloc>().add(
-                                          LoadRecurringBills(
-                                            DateTime(
-                                              year,
-                                              selectedDate.value.month,
-                                              selectedDate.value.day,
-                                            ),
-                                          ),
-                                        );
-                                  },
-                                  selectedFilterType: selectedFilterType,
-                                  selectedDate: selectedDate,
-                                );
-                              });
-                              //return RecurringDateBottomSheet();
-                            },
-                            isScrollControlled: true,
+                          }
+                          return Balance(
+                            headerLabel: Text("Total Paid"),
+                            total: 0.00,
                           );
                         },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            BlocBuilder<RecurringDateFilterBloc,
-                                RecurringDateFilterState>(
-                              builder: (context, state) {
-                                if (state is RecurringDateFilterSelected) {
-                                  return DateFilterButton(
-                                    text: getMonthText(state.dateFilterType,
-                                        state.selectedDate),
-                                  );
-                                }
-                                return DateFilterButton(
-                                  text: getMonthText(
-                                      dateFilterTypeFromString(
-                                          currentDateFilterType),
-                                      currentSelectedDate),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
                       ),
-                    ],
-                  ),
-                ],
-              )),
+                    ),
+                  ],
+                ),
+              ),
               SliverToBoxAdapter(
                 child: Column(
                   children: [
@@ -452,8 +342,9 @@ class RecurringBillsPage extends HookWidget {
         itemCount: state.recurringBills.length,
         itemBuilder: (context, index) {
           final item = state.recurringBills[index];
-          final txn = item.recurringBillTxns?.firstWhereOrNull(
-            (element) => element.datePaid?.month == currentSelectedDate.month,
+          final txn = item.getTxn(
+            dateFilterTypeFromString(currentDateFilterType),
+            currentSelectedDate,
           );
           return _recurringBillItem(
             context,
@@ -541,13 +432,12 @@ class RecurringBillsPage extends HookWidget {
             ),
           );
         },
-        child: BlocBuilder<RecurringDateFilterBloc, RecurringDateFilterState>(
+        child: BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
           builder: (context, state) {
-            if (state is RecurringDateFilterSelected) {
-              final txn = item.recurringBillTxns?.firstWhereOrNull(
-                (element) =>
-                    getMonthFromDate(element.datePaid!) ==
-                    getMonthFromDate(state.selectedDate),
+            if (state is ExpenseDateFilterSelected) {
+              final txn = item.getTxn(
+                state.dateFilterType,
+                state.selectedDate,
               );
               return _checkboxItem(context,
                   selectedDate: state.selectedDate,
@@ -755,9 +645,16 @@ class RecurringBillsPage extends HookWidget {
                     3.0,
                   ),
                 ),
-                value: item.isPaid(selectedDate) ? true : false,
+                value: item.isPaid(
+                        dateFilterTypeFromString(currentDateFilterType),
+                        selectedDate)
+                    ? true
+                    : false,
                 onChanged: (checked) async {
-                  if (item.isPaid(selectedDate) && txn != null) {
+                  if (item.isPaid(
+                          dateFilterTypeFromString(currentDateFilterType),
+                          selectedDate) &&
+                      txn != null) {
                     context.read<RecurringModifyBloc>().add(
                           RemoveRecurringBillTxn(
                             selectedDate: selectedDate,
@@ -829,7 +726,11 @@ class RecurringBillsPage extends HookWidget {
                                   ),
                               ],
                             ),
-                            if (item.isPaid(selectedDate) && txn != null)
+                            if (item.isPaid(
+                                    dateFilterTypeFromString(
+                                        currentDateFilterType),
+                                    selectedDate) &&
+                                txn != null)
                               Text(
                                 "paid ${formatDate(txn.datePaid!, "MMM dd, yyyy")}",
                                 style: const TextStyle(

@@ -23,16 +23,14 @@ class TransactionsPage extends HookWidget {
 
     final sharedPrefs = getIt<SharedPrefs>();
     final expensesCurrentSelectedDate =
-        DateTime.parse(sharedPrefs.getExpenseSelectedDate());
-    final recurringCurrentSelectedDate =
-        DateTime.parse(sharedPrefs.getRecurringSelectedDate());
+        DateTime.parse(sharedPrefs.getSelectedDate());
 
     useEffect(() {
       context.read<ExpenseBloc>().add(
           LoadExpenseCategories(selectedDate: expensesCurrentSelectedDate));
       context
           .read<RecurringBillBloc>()
-          .add(LoadRecurringBills(recurringCurrentSelectedDate));
+          .add(LoadRecurringBills());
 
       HomeWidget.setAppGroupId('group.G53UVF44L3.com.ralphordanza.budgetupapp');
 

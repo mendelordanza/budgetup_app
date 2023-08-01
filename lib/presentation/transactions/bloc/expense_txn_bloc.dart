@@ -47,47 +47,27 @@ class ExpenseTxnBloc extends Bloc<ExpenseTxnEvent, ExpenseTxnState> {
     on<LoadExpenseTxns>((event, emit) async {
       final txns = await expensesRepository.getExpenseTxns(event.categoryId);
 
-      final convertedTxns = txns.map((txn) {
-        final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
-            ? (txn.amount ?? 0.00)
-            : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
-        final newTxn = txn.copy(
-          amount: convertedAmount,
-        );
-        return newTxn;
-      }).toList();
-
       var total = 0.00;
-      convertedTxns.forEach((e) {
+      txns.forEach((e) {
         total += e.amount ?? 0.00;
       });
 
       emit(ExpenseTxnLoaded(
         total: total,
-        expenseTxns: convertedTxns,
+        expenseTxns: txns,
       ));
     });
     on<ConvertTxn>((event, emit) async {
       if (state is ExpenseTxnLoaded) {
         final currentState = state as ExpenseTxnLoaded;
 
-        final convertedTxns = currentState.expenseTxns.map((txn) {
-          final convertedAmount = event.currencyCode == "USD"
-              ? (txn.amount ?? 0.00)
-              : (txn.amount ?? 0.00) * event.currencyRate;
-          final newTxn = txn.copy(
-            amount: convertedAmount,
-          );
-          return newTxn;
-        }).toList();
-
         var total = 0.00;
-        convertedTxns.forEach((e) {
+        currentState.expenseTxns.forEach((e) {
           total += e.amount ?? 0.00;
         });
 
         emit(ExpenseTxnLoaded(
-          expenseTxns: convertedTxns,
+          expenseTxns: currentState.expenseTxns,
           total: total,
         ));
       }

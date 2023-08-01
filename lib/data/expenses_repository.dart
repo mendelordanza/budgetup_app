@@ -3,56 +3,135 @@ import 'package:budgetup_app/data/local/entities/expense_txn_entity.dart';
 import 'package:budgetup_app/data/local/isar_service.dart';
 import 'package:budgetup_app/domain/expense_category.dart';
 import 'package:budgetup_app/domain/expense_txn.dart';
+import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:isar/isar.dart';
 
 class ExpensesRepository {
-  final IsarService _isarService;
+  final IsarService isarService;
+  final SharedPrefs sharedPrefs;
 
-  const ExpensesRepository({
-    required IsarService isarService,
-  }) : _isarService = isarService;
+  ExpensesRepository({
+    required this.isarService,
+    required this.sharedPrefs,
+  });
 
   Future<List<ExpenseTxn>> getAllTransactions() async {
-    final objects = await _isarService.getAllTransactions();
-    return objects.map((txn) {
+    final objects = await isarService.getAllTransactions();
+    final txns = objects.map((txn) {
       return ExpenseTxn.fromJson(txn.toJson()).copy(
         categoryId: txn.category.value?.id,
         categoryTitle:
             "${txn.category.value?.icon} ${txn.category.value?.title}",
       );
     }).toList();
+
+    final convertedTxns = txns.map((txn) {
+      final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
+          ? (txn.amount ?? 0.00)
+          : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
+      final newTxn = txn.copy(
+        amount: convertedAmount,
+      );
+      return newTxn;
+    }).toList();
+
+    return convertedTxns;
   }
 
   Future<List<ExpenseCategory>> getExpenseCategories() async {
-    final objects = await _isarService.getAllExpenseCategories();
-    return objects.map((category) {
+    final objects = await isarService.getAllExpenseCategories();
+    final dashboardCategories = objects.map((category) {
       return ExpenseCategory.fromJson(category.toJson());
     }).toList();
+
+    //CONVERT CURRENCY
+    final convertedCategories = dashboardCategories.map((category) {
+      final convertedBudget = sharedPrefs.getCurrencyCode() == "USD"
+          ? (category.budget ?? 0.00)
+          : (category.budget ?? 0.00) * sharedPrefs.getCurrencyRate();
+
+      final convertedTxns = category.expenseTransactions?.map((txn) {
+        final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
+            ? (txn.amount ?? 0.00)
+            : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
+        final newTxn = txn.copy(
+          amount: convertedAmount,
+        );
+        return newTxn;
+      }).toList();
+
+      final newCategory = category.copy(
+        budget: convertedBudget,
+        expenseTransactions: convertedTxns,
+      );
+
+      return newCategory;
+    }).toList();
+
+    return convertedCategories;
   }
 
   Future<ExpenseCategory> getExpenseCategoryById(int categoryId) async {
-    final category = await _isarService.getCategoryById(categoryId);
+    final category = await isarService.getCategoryById(categoryId);
     return ExpenseCategory.fromJson(category!.toJson());
   }
 
   Future<List<ExpenseCategory>> getExpenseCategoriesByDate(
       DateTime date) async {
-    final objects = await _isarService.getAllExpenseCategoriesByDate(date);
-    return objects.map((category) {
+    final objects = await isarService.getAllExpenseCategoriesByDate(date);
+    final dashboardCategories = objects.map((category) {
       return ExpenseCategory.fromJson(category.toJson());
     }).toList();
+
+    //CONVERT CURRENCY
+    final convertedCategories = dashboardCategories.map((category) {
+      final convertedBudget = sharedPrefs.getCurrencyCode() == "USD"
+          ? (category.budget ?? 0.00)
+          : (category.budget ?? 0.00) * sharedPrefs.getCurrencyRate();
+
+      final convertedTxns = category.expenseTransactions?.map((txn) {
+        final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
+            ? (txn.amount ?? 0.00)
+            : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
+        final newTxn = txn.copy(
+          amount: convertedAmount,
+        );
+        return newTxn;
+      }).toList();
+
+      final newCategory = category.copy(
+        budget: convertedBudget,
+        expenseTransactions: convertedTxns,
+      );
+
+      return newCategory;
+    }).toList();
+
+    return convertedCategories;
   }
 
   Future<List<ExpenseTxn>> getExpenseTxns(int categoryId) async {
-    final objects = await _isarService.getExpenseTxnFor(categoryId);
-    return objects.map((category) {
+    final objects = await isarService.getExpenseTxnFor(categoryId);
+    final txns = objects.map((category) {
       return ExpenseTxn.fromJson(category.toJson());
     }).toList();
+
+    final convertedTxns = txns.map((txn) {
+      final convertedAmount = sharedPrefs.getCurrencyCode() == "USD"
+          ? (txn.amount ?? 0.00)
+          : (txn.amount ?? 0.00) * sharedPrefs.getCurrencyRate();
+      final newTxn = txn.copy(
+        amount: convertedAmount,
+      );
+      return newTxn;
+    }).toList();
+
+    return convertedTxns;
   }
 
   Future<void> deleteCategory(int categoryId) async {
-    await _isarService.deleteAllTxns(categoryId);
-    await _isarService.deleteExpenseCategory(categoryId);
+    await isarService.deleteAllTxns(categoryId);
+    await isarService.deleteExpenseCategory(categoryId);
   }
 
   Future<void> saveCategory(ExpenseCategory category) async {
@@ -63,13 +142,13 @@ class ExpensesRepository {
       ..budget = category.budget
       ..createdAt = category.createdAt
       ..updatedAt = category.updatedAt;
-    await _isarService.saveExpenseCategory(isarObject);
+    await isarService.saveExpenseCategory(isarObject);
   }
 
   Future<void> addTransaction(
       ExpenseCategory category, ExpenseTxn expenseTxn) async {
     if (category.id != null) {
-      await _isarService.addTransaction(expenseTxn.toIsar(category: category));
+      await isarService.addTransaction(expenseTxn.toIsar(category: category));
     }
   }
 
@@ -81,10 +160,10 @@ class ExpensesRepository {
       ..createdAt = expenseTxn.createdAt
       ..updatedAt = expenseTxn.updatedAt;
 
-    await _isarService.editTransaction(txnObject);
+    await isarService.editTransaction(txnObject);
   }
 
   Future<void> deleteTransaction(int txnId) async {
-    await _isarService.deleteTransaction(txnId);
+    await isarService.deleteTransaction(txnId);
   }
 }
