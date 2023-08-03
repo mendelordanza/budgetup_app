@@ -36,6 +36,8 @@ class TransactionCurrencyBloc
       ));
     });
     on<SelectTxnCurrency>((event, emit) async {
+      emit(LoadingTxnCurrency());
+
       currentTxnCurrencyCode = event.currencyCode;
       currentTxnCurrencySymbol = event.currencySymbol;
 

@@ -6,6 +6,7 @@ import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/custom/custom_button.dart';
 import 'package:budgetup_app/presentation/custom/custom_text_field.dart';
+import 'package:budgetup_app/presentation/custom/platform_progress_indicator.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transaction_currency_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:currency_picker/currency_picker.dart';
@@ -151,19 +152,8 @@ class AddTransaction extends HookWidget {
                         key: _formKey,
                         child: Column(
                           children: [
-                            BlocBuilder<TransactionCurrencyBloc,
-                                    TransactionCurrencyState>(
-                                builder: (context, state) {
-                              if (state is TxnCurrencyLoaded) {
-                                return currencyConvert(
-                                    context, state.currencyCode);
-                              }
-                              return currencyConvert(
-                                  context, sharedPrefs.getCurrencyCode());
-                            }),
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 16.0),
+                              padding: const EdgeInsets.only(bottom: 16.0),
                               child: Column(
                                 children: [
                                   if (args.expenseCategory != null)
@@ -206,10 +196,10 @@ class AddTransaction extends HookWidget {
                                       return const Text("No category");
                                     }),
                                   const SizedBox(
-                                    height: 5.0,
+                                    height: 10.0,
                                   ),
                                   SizedBox(
-                                    height: 70.0,
+                                    height: 100.0,
                                     child: KeyboardActions(
                                       tapOutsideBehavior:
                                           TapOutsideBehavior.translucentDismiss,
@@ -219,19 +209,36 @@ class AddTransaction extends HookWidget {
                                               TransactionCurrencyBloc,
                                               TransactionCurrencyState>(
                                           builder: (context, state) {
-                                        if (state is TxnCurrencyLoaded) {
-                                          return amountField(
-                                            amountFocusNode: amountFocusNode,
-                                            amountTextController:
-                                                amountTextController,
-                                            currencySymbol:
-                                                state.currencySymbol,
+                                        if (state is LoadingTxnCurrency) {
+                                          return PlatformProgressIndicator();
+                                        } else if (state is TxnCurrencyLoaded) {
+                                          return Column(
+                                            children: [
+                                              currencyConvert(
+                                                  context, state.currencyCode),
+                                              amountField(
+                                                amountFocusNode:
+                                                    amountFocusNode,
+                                                amountTextController:
+                                                    amountTextController,
+                                                currencySymbol:
+                                                    state.currencySymbol,
+                                              ),
+                                            ],
                                           );
                                         }
-                                        return amountField(
-                                          amountFocusNode: amountFocusNode,
-                                          amountTextController:
-                                              amountTextController,
+                                        return Column(
+                                          children: [
+                                            currencyConvert(
+                                              context,
+                                              sharedPrefs.getCurrencyCode(),
+                                            ),
+                                            amountField(
+                                              amountFocusNode: amountFocusNode,
+                                              amountTextController:
+                                                  amountTextController,
+                                            ),
+                                          ],
                                         );
                                       }),
                                     ),
@@ -341,8 +348,7 @@ class AddTransaction extends HookWidget {
                           currencyRate: currencyRate.value,
                         ),
                         notes: notesTextController.text,
-                        updatedAt:
-                            removeTimeFromDate(currentTransactionDate.value),
+                        updatedAt: currentTransactionDate.value,
                       );
                       if (args.expenseCategory != null) {
                         context.read<TransactionsModifyBloc>().add(
@@ -365,10 +371,8 @@ class AddTransaction extends HookWidget {
                           currencyRate: currencyRate.value,
                         ),
                         notes: notesTextController.text,
-                        createdAt:
-                            removeTimeFromDate(currentTransactionDate.value),
-                        updatedAt:
-                            removeTimeFromDate(currentTransactionDate.value),
+                        createdAt: currentTransactionDate.value,
+                        updatedAt: currentTransactionDate.value,
                       );
                       if (args.expenseCategory != null) {
                         context.read<TransactionsModifyBloc>().add(
