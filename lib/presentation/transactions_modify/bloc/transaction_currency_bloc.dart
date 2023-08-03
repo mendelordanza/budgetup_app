@@ -24,7 +24,7 @@ class TransactionCurrencyBloc
       currentTxnCurrencySymbol = sharedPrefs.getCurrencySymbol();
 
       //Get Currency Rate
-      final currencies = await currencyRepository.loadCurrencies();
+      final currencies = await currencyRepository.callExchangeRateApi();
       currentTxnCurrencyRate = currencies
               .singleWhere((e) => e.country == currentTxnCurrencyCode)
               .rate ??
@@ -40,7 +40,7 @@ class TransactionCurrencyBloc
       currentTxnCurrencySymbol = event.currencySymbol;
 
       //Get Currency
-      final currencies = await currencyRepository.loadCurrencies();
+      final currencies = await currencyRepository.callExchangeRateApi();
       currentTxnCurrencyRate = currencies
               .singleWhere((e) => e.country == currentTxnCurrencyCode)
               .rate ??

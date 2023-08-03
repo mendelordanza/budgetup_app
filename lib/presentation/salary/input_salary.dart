@@ -49,6 +49,7 @@ class InputSalary extends HookWidget {
             SizedBox(
               height: 80.0,
               child: KeyboardActions(
+                tapOutsideBehavior: TapOutsideBehavior.translucentDismiss,
                 config: buildConfig(_numberNode, context),
                 child: CustomTextField(
                   focusNode: _numberNode,

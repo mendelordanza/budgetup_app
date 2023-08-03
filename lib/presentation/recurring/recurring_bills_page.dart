@@ -279,7 +279,7 @@ class RecurringBillsPage extends HookWidget {
                           .toList();
                       if (list.isNotEmpty) {
                         return ListView.builder(
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: list.length,
                           itemBuilder: (context, index) {

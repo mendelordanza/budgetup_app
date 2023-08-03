@@ -160,6 +160,7 @@ class AddExpenseCategoryPage extends HookWidget {
                         SizedBox(
                           height: 100.0,
                           child: KeyboardActions(
+                            tapOutsideBehavior: TapOutsideBehavior.translucentDismiss,
                             config: buildConfig(_numberNode, context),
                             child: CustomTextField(
                               focusNode: _numberNode,

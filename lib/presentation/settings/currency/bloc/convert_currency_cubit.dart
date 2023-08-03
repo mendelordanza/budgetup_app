@@ -19,11 +19,6 @@ class ConvertCurrencyCubit extends Cubit<ConvertCurrencyState> {
     await currencyRepository.loadCurrencies();
   }
 
-  getCurrencyRate(String currencyCode) async {
-    final currencyRate = await currencyRepository.getCurrencyRate(currencyCode);
-    emit(ConvertedCurrencyLoaded(currencyCode, currencyRate?.rate ?? 0.00));
-  }
-
   changeCurrency(
     String currencySymbol,
     String currencyCode,

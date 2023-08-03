@@ -23,7 +23,6 @@ import '../../helper/route_strings.dart';
 import '../../helper/string.dart';
 import '../expenses/bloc/expense_bloc.dart';
 import '../expenses/bloc/single_category_cubit.dart';
-import '../settings/currency/bloc/convert_currency_cubit.dart';
 
 class ExpenseTxnArgs {
   final ExpenseCategory? expenseCategory;
@@ -152,17 +151,16 @@ class AddTransaction extends HookWidget {
                         key: _formKey,
                         child: Column(
                           children: [
-                            if (args.expenseTxn == null)
-                              BlocBuilder<TransactionCurrencyBloc,
-                                      TransactionCurrencyState>(
-                                  builder: (context, state) {
-                                if (state is TxnCurrencyLoaded) {
-                                  return currencyConvert(
-                                      context, state.currencyCode);
-                                }
+                            BlocBuilder<TransactionCurrencyBloc,
+                                    TransactionCurrencyState>(
+                                builder: (context, state) {
+                              if (state is TxnCurrencyLoaded) {
                                 return currencyConvert(
-                                    context, sharedPrefs.getCurrencyCode());
-                              }),
+                                    context, state.currencyCode);
+                              }
+                              return currencyConvert(
+                                  context, sharedPrefs.getCurrencyCode());
+                            }),
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 16.0),
@@ -213,6 +211,8 @@ class AddTransaction extends HookWidget {
                                   SizedBox(
                                     height: 70.0,
                                     child: KeyboardActions(
+                                      tapOutsideBehavior:
+                                          TapOutsideBehavior.translucentDismiss,
                                       config:
                                           buildConfig(amountFocusNode, context),
                                       child: BlocBuilder<
@@ -434,31 +434,31 @@ class AddTransaction extends HookWidget {
     BuildContext context,
     String currencyCode,
   ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: 4.0,
-        horizontal: 8.0,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16.0),
-        color: secondaryColor,
-      ),
-      child: GestureDetector(
-        onTap: () {
-          showCurrencyPicker(
-            context: context,
-            showFlag: true,
-            showCurrencyName: true,
-            showCurrencyCode: true,
-            onSelect: (Currency currency) {
-              context.read<TransactionCurrencyBloc>().add(SelectTxnCurrency(
-                    currency.code,
-                    currency.symbol,
-                  ));
-            },
-          );
-        },
-        behavior: HitTestBehavior.translucent,
+    return GestureDetector(
+      onTap: () {
+        showCurrencyPicker(
+          context: context,
+          showFlag: true,
+          showCurrencyName: true,
+          showCurrencyCode: true,
+          onSelect: (Currency currency) {
+            context.read<TransactionCurrencyBloc>().add(SelectTxnCurrency(
+                  currency.code,
+                  currency.symbol,
+                ));
+          },
+        );
+      },
+      behavior: HitTestBehavior.translucent,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: 4.0,
+          horizontal: 8.0,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.0),
+          color: secondaryColor,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
