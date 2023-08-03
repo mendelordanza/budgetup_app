@@ -73,12 +73,11 @@ class _MyAppState extends State<MyApp> {
 
   shouldShowReview() async {
     var counter = sharedPrefs.getShouldShowReview();
-    if (counter >= 5) {
+    if (counter == 5) {
       final inAppReview = InAppReview.instance;
       if (await inAppReview.isAvailable()) {
         inAppReview.requestReview();
       }
-      sharedPrefs.setShouldShowReview(0);
     } else {
       sharedPrefs.setShouldShowReview(counter++);
     }
