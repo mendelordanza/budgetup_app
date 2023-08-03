@@ -35,7 +35,7 @@ class AddExpenseCategoryPage extends HookWidget {
         text: expenseCategory != null ? expenseCategory!.title : "");
     final budgetTextController = useTextEditingController(
         text: expenseCategory != null
-            ? decimalFormatterWithSymbol(expenseCategory!.budget ?? 0.00)
+            ? decimalFormatterWithSymbol(number: expenseCategory!.budget ?? 0.00)
             : "${sharedPrefs.getCurrencySymbol()} 0.00");
     final selectedEmoji = useState(
         expenseCategory != null && expenseCategory!.icon != null

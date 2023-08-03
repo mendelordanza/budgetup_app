@@ -19,10 +19,12 @@ class PaywallView extends HookWidget {
   restorePurchase(BuildContext context) async {
     try {
       await Purchases.restorePurchases().then((value) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("You are now a Pro!")));
         Navigator.pop(context);
       }).onError((error, stackTrace) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("No previous purchase found.")));
+            const SnackBar(content: Text("No previous purchase found.")));
       });
     } on PlatformException catch (e) {
       ScaffoldMessenger.of(context)

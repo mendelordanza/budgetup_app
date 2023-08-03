@@ -16,10 +16,12 @@ import 'package:budgetup_app/presentation/salary/bloc/salary_bloc.dart';
 import 'package:budgetup_app/presentation/settings/appearance/bloc/appearance_cubit.dart';
 import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currency_cubit.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
+import 'package:budgetup_app/presentation/transactions_modify/bloc/transaction_currency_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'helper/constant.dart';
@@ -49,6 +51,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final notificationService = getIt<NotificationService>();
+  final sharedPrefs = getIt<SharedPrefs>();
 
   initPlatformState() async {
     await Purchases.setLogLevel(LogLevel.debug);
@@ -68,11 +71,25 @@ class _MyAppState extends State<MyApp> {
         ?.requestPermission();
   }
 
+  shouldShowReview() async {
+    var counter = sharedPrefs.getShouldShowReview();
+    if (counter >= 10) {
+      final inAppReview = InAppReview.instance;
+      if (await inAppReview.isAvailable()) {
+        inAppReview.requestReview();
+      }
+      sharedPrefs.setShouldShowReview(0);
+    } else {
+      sharedPrefs.setShouldShowReview(counter++);
+    }
+  }
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       initPlatformState();
       notificationPermission();
+      shouldShowReview();
       notificationService.initNotification();
     });
     super.initState();
@@ -127,6 +144,9 @@ class _MyAppState extends State<MyApp> {
           ),
           BlocProvider(
             create: (context) => getIt<SalaryBloc>(),
+          ),
+          BlocProvider(
+            create: (context) => getIt<TransactionCurrencyBloc>(),
           ),
         ],
         child: BlocBuilder<AppearanceCubit, AppearanceState>(

@@ -48,7 +48,7 @@ class AddRecurringBillPage extends HookWidget {
         text: args.recurringBill != null ? args.recurringBill!.title : "");
     final amountTextController = useTextEditingController(
         text: args.recurringBill != null
-            ? decimalFormatterWithSymbol(args.recurringBill!.amount ?? 0.00)
+            ? decimalFormatterWithSymbol(number: args.recurringBill!.amount ?? 0.00)
             : "0.00");
     final amountFocusNode = FocusNode();
     final dateFocusNode = FocusNode();

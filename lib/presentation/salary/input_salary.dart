@@ -25,7 +25,7 @@ class InputSalary extends HookWidget {
     final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
     final salaryTextController = useTextEditingController(
         text: currSalary != null
-            ? decimalFormatterWithSymbol(currSalary!.amount ?? 0.00)
+            ? decimalFormatterWithSymbol(number: currSalary!.amount ?? 0.00)
             : "0.00");
     final _numberNode = useFocusNode();
 
@@ -138,7 +138,7 @@ class InputSalary extends HookWidget {
             children: [
               Expanded(child: Text("Total Expenses")),
               Text(
-                "– ${decimalFormatterWithSymbol(totalExpense)}",
+                "– ${decimalFormatterWithSymbol(number: totalExpense)}",
                 style: const TextStyle(
                   color: Colors.red,
                   fontWeight: FontWeight.w600,
@@ -153,7 +153,7 @@ class InputSalary extends HookWidget {
             children: [
               Expanded(child: Text("Total Paid Bills")),
               Text(
-                "– ${decimalFormatterWithSymbol(totalPaidBills)}",
+                "– ${decimalFormatterWithSymbol(number: totalPaidBills)}",
                 style: const TextStyle(
                   color: Colors.red,
                   fontWeight: FontWeight.w600,
@@ -172,7 +172,7 @@ class InputSalary extends HookWidget {
             children: [
               Expanded(child: Text("Remaining Salary")),
               Text(
-                "${decimalFormatterWithSymbol(remainingSalary)}",
+                "${decimalFormatterWithSymbol(number: remainingSalary)}",
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                 ),

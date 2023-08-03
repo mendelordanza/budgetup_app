@@ -126,11 +126,11 @@ class ExpenseTxnPage extends HookWidget {
                   icon: Icon(Iconsax.more),
                   itemBuilder: (context) {
                     return [
-                      PopupMenuItem<int>(
+                      const PopupMenuItem<int>(
                         value: 0,
                         child: Text("Edit"),
                       ),
-                      PopupMenuItem<int>(
+                      const PopupMenuItem<int>(
                         value: 1,
                         child: Text("Delete"),
                       ),
@@ -150,7 +150,7 @@ class ExpenseTxnPage extends HookWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
+              const Text(
                 "Overall Total",
                 textAlign: TextAlign.center,
               ),
@@ -158,15 +158,15 @@ class ExpenseTxnPage extends HookWidget {
                 builder: (context, state) {
                   if (state is ExpenseTxnLoaded) {
                     return Text(
-                      decimalFormatterWithSymbol(state.total),
+                      decimalFormatterWithSymbol(number: state.total),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 24.0,
                         fontWeight: FontWeight.w700,
                       ),
                     );
                   }
-                  return Text(
+                  return const Text(
                     "USD 0.00",
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -176,7 +176,7 @@ class ExpenseTxnPage extends HookWidget {
                   );
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 height: 24.0,
               ),
               Expanded(
@@ -222,7 +222,7 @@ class ExpenseTxnPage extends HookWidget {
                                 children: [
                                   Text(
                                     formatDate(value, "MMMM yyyy"),
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 16.0,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -230,12 +230,15 @@ class ExpenseTxnPage extends HookWidget {
                                   Text(
                                     "----------------",
                                     style: TextStyle(
-                                      color: Colors.white24,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
                                     ),
                                   ),
                                   Text(
-                                    decimalFormatterWithSymbol(totalByMonth),
-                                    style: TextStyle(
+                                    decimalFormatterWithSymbol(
+                                        number: totalByMonth),
+                                    style: const TextStyle(
                                       fontSize: 16.0,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -404,7 +407,7 @@ class ExpenseTxnPage extends HookWidget {
                     ),
                   ),
                   Text(
-                    decimalFormatterWithSymbol(item.amount ?? 0.00),
+                    decimalFormatterWithSymbol(number: item.amount ?? 0.00),
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       color: Colors.red,

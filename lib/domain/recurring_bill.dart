@@ -133,7 +133,7 @@ class RecurringBill extends Equatable {
   Map<String, dynamic> toJson() => {
         "id": id,
         "title": title,
-        "amount": decimalFormatterWithSymbol(amount ?? 0.00),
+        "amount": decimalFormatterWithSymbol(number: amount ?? 0.00),
         "interval": interval,
         "recurringBillTxns": recurringBillTxns?.map((e) => e.toJson()).toList(),
         "reminderDate": reminderDate?.toIso8601String(),
