@@ -22,6 +22,7 @@ class TransactionCurrencyBloc
     on<LoadTxnCurrency>((event, emit) async {
       currentTxnCurrencyCode = sharedPrefs.getCurrencyCode();
       currentTxnCurrencySymbol = sharedPrefs.getCurrencySymbol();
+      currentTxnCurrencyRate = sharedPrefs.getCurrencyRate();
 
       //Get Currency Rate
       final currencies = await currencyRepository.loadCurrencies();
@@ -38,15 +39,22 @@ class TransactionCurrencyBloc
     on<SelectTxnCurrency>((event, emit) async {
       emit(LoadingTxnCurrency());
 
-      currentTxnCurrencyCode = event.currencyCode;
-      currentTxnCurrencySymbol = event.currencySymbol;
+      if (event.currencyCode == sharedPrefs.getCurrencyCode()) {
+        currentTxnCurrencyCode = sharedPrefs.getCurrencyCode();
+        currentTxnCurrencySymbol = sharedPrefs.getCurrencySymbol();
+        currentTxnCurrencyRate = sharedPrefs.getCurrencyRate();
+      } else {
+        currentTxnCurrencyCode = event.currencyCode;
+        currentTxnCurrencySymbol = event.currencySymbol;
 
-      //Get Currency
-      final currencies = await currencyRepository.callExchangeRateApi();
-      currentTxnCurrencyRate = currencies
-              .singleWhere((e) => e.country == currentTxnCurrencyCode)
-              .rate ??
-          0.00;
+        //Get Currency
+        final currencies = await currencyRepository.callExchangeRateApi();
+        currentTxnCurrencyRate = currencies
+                .singleWhere((e) => e.country == currentTxnCurrencyCode)
+                .rate ??
+            0.00;
+      }
+
       emit(TxnCurrencyLoaded(
         currentTxnCurrencyCode,
         currentTxnCurrencySymbol,

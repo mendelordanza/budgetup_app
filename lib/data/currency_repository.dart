@@ -19,6 +19,7 @@ class CurrencyRepository {
     if (await shouldUpdateCurrencies()) {
       try {
         currencies = await callExchangeRateApi();
+        saveToDB(currencies: currencies);
       } catch (e) {
         // Handle any error occurred during API call or saving currencies
         print("Error updating currencies: $e");
@@ -46,18 +47,24 @@ class CurrencyRepository {
     final currencyData =
         await httpService.getCurrencies(baseCurrencyCode: "USD");
 
-    //DELETE ALL
-    isarService.deleteAllCurrencies();
-
-    final currencies = currencyData.conversionRates.entries.map((entry) {
+    return currencyData.conversionRates.entries.map((entry) {
       final currencyEntity = CurrencyRateEntity()
         ..country = entry.key
         ..rate = double.parse(entry.value.toString());
-      isarService.addCurrency(currencyEntity);
       return currencyEntity;
     }).toList();
+  }
 
-    return currencies;
+  Future<void> saveToDB({required List<CurrencyRateEntity> currencies}) async {
+    //DELETE ALL
+    isarService.deleteAllCurrencies();
+
+    currencies.forEach((entry) {
+      final currencyEntity = CurrencyRateEntity()
+        ..country = entry.country
+        ..rate = double.parse(entry.rate.toString());
+      isarService.addCurrency(currencyEntity);
+    });
   }
 
   Future<CurrencyRateEntity?> getCurrencyRate(String currencyCode) async {
