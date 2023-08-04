@@ -210,7 +210,7 @@ class AddTransaction extends HookWidget {
                                               TransactionCurrencyState>(
                                           builder: (context, state) {
                                         if (state is LoadingTxnCurrency) {
-                                          return PlatformProgressIndicator();
+                                          return Center(child: PlatformProgressIndicator());
                                         } else if (state is TxnCurrencyLoaded) {
                                           return Column(
                                             children: [

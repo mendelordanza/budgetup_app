@@ -184,7 +184,7 @@ class PaywallView extends HookWidget {
                     ? Colors.grey.shade400
                     : primaryColor,
                 child: isLoading.value
-                    ? PlatformProgressIndicator()
+                    ? Center(child: PlatformProgressIndicator())
                     : Text(
                         selectedIndex.value == -1
                             ? "Buy"

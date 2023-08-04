@@ -62,11 +62,6 @@ class SettingsPage extends HookWidget {
     return packageInfo.version;
   }
 
-  Future<String> getPackageName() async {
-    final packageInfo = await PackageInfo.fromPlatform();
-    return packageInfo.packageName;
-  }
-
   @override
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
@@ -82,16 +77,6 @@ class SettingsPage extends HookWidget {
       }
       return null;
     }, [version.data]);
-
-    final currentPackageName = useState("com.ralphordanza.budgetupapp");
-    final futurePackageName = useMemoized(() => getPackageName());
-    final packageName = useFuture(futurePackageName, initialData: "");
-    useEffect(() {
-      if (packageName.data != null) {
-        currentPackageName.value = packageName.data!;
-      }
-      return null;
-    }, [packageName.data]);
 
     useEffect(() {
       Purchases.addCustomerInfoUpdateListener((customerInfo) {
@@ -295,7 +280,7 @@ class SettingsPage extends HookWidget {
                               final InAppReview inAppReview =
                                   InAppReview.instance;
                               inAppReview.openStoreListing(
-                                appStoreId: currentPackageName.value,
+                                appStoreId: "6450363173",
                               );
                             },
                             icon: SvgPicture.asset("assets/icons/ic_star.svg"),
