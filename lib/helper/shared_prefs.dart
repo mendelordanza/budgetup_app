@@ -22,6 +22,8 @@ class SharedPrefs {
   static const String KEY_CURRENCY_RATE = "key_currency_rate";
   static const String KEY_APPEARANCE = "key_appearance";
   static const String KEY_WHATS_NEW = "key_whats_new";
+  static const String KEY_CURRENCY_UPDATE_DATE = "key_currency_update_date";
+  static const String KEY_SHOULD_SHOW_REVIEW = "key_should_show_review";
 
   Future setFinishedOnboarding(bool isFinished) async {
     await _preferences?.setBool(KEY_IS_FINISHED, isFinished);
@@ -78,4 +80,18 @@ class SharedPrefs {
   }
 
   bool? getSeenWhatsNew() => _preferences?.getBool(KEY_WHATS_NEW);
+
+  Future setCurrencyUpdateDate(String updateDate) async {
+    await _preferences?.setString(KEY_CURRENCY_UPDATE_DATE, updateDate);
+  }
+
+  String? getCurrencyUpdateDate() =>
+      _preferences?.getString(KEY_CURRENCY_UPDATE_DATE);
+
+  Future setShouldShowReview(int counter) async {
+    await _preferences?.setInt(KEY_SHOULD_SHOW_REVIEW, counter);
+  }
+
+  int getShouldShowReview() =>
+      _preferences?.getInt(KEY_SHOULD_SHOW_REVIEW) ?? 0;
 }

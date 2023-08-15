@@ -29,7 +29,7 @@ class RecurringModifyBloc
       notificationService.scheduleNotification(
         id,
         "Have you paid your bill yet?",
-        "${event.recurringBill.title} amounting to ${decimalFormatterWithSymbol(convertToCurrency(event.recurringBill.amount ?? 0.00))}",
+        "${event.recurringBill.title} amounting to ${decimalFormatterWithSymbol(number: convertToCurrency(event.recurringBill.amount ?? 0.00))}",
         event.recurringBill.reminderDate!.toIso8601String(),
         event.recurringBill.interval!,
       );
@@ -44,7 +44,7 @@ class RecurringModifyBloc
       notificationService.scheduleNotification(
         id,
         "Have you paid your bill yet?",
-        "${event.recurringBill.title} amounting to ${decimalFormatterWithSymbol(convertToCurrency(event.recurringBill.amount ?? 0.00))}",
+        "${event.recurringBill.title} amounting to ${decimalFormatterWithSymbol(number: convertToCurrency(event.recurringBill.amount ?? 0.00))}",
         event.recurringBill.reminderDate!.toIso8601String(),
         event.recurringBill.interval!,
       );

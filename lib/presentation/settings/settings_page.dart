@@ -1,4 +1,6 @@
 import 'package:budgetup_app/helper/route_strings.dart';
+import 'package:budgetup_app/helper/shared_prefs.dart';
+import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/paywall/paywall.dart';
 import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currency_cubit.dart';
 import 'package:currency_picker/currency_picker.dart';
@@ -62,6 +64,8 @@ class SettingsPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sharedPrefs = getIt<SharedPrefs>();
+
     final isSubscribed = useState(false);
 
     final currentVersion = useState("");
@@ -166,32 +170,68 @@ class SettingsPage extends HookWidget {
                             ),
                           ),
                           Divider(),
-                          SettingItem(
-                            onTap: () {
-                              showCurrencyPicker(
-                                context: context,
-                                showFlag: true,
-                                showCurrencyName: true,
-                                showCurrencyCode: true,
-                                onSelect: (Currency currency) {
-                                  context
-                                      .read<ConvertCurrencyCubit>()
-                                      .changeCurrency(
-                                          currency.symbol, currency.code);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
-                                              "Curreny updated to ${currency.code}")));
+                          BlocBuilder<ConvertCurrencyCubit,
+                              ConvertCurrencyState>(
+                            builder: (context, state) {
+                              if (state is ConvertedCurrencyLoaded) {
+                                return SettingItem(
+                                  onTap: () {
+                                    showCurrencyPicker(
+                                      context: context,
+                                      showFlag: true,
+                                      showCurrencyName: true,
+                                      showCurrencyCode: true,
+                                      onSelect: (Currency currency) {
+                                        context
+                                            .read<ConvertCurrencyCubit>()
+                                            .changeCurrency(
+                                                currency.symbol, currency.code);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                content: Text(
+                                                    "Currency updated to ${currency.code}")));
+                                      },
+                                    );
+                                  },
+                                  icon: SvgPicture.asset(
+                                      "assets/icons/ic_currency.svg"),
+                                  iconBackgroundColor: const Color(0xFF00A61B),
+                                  label: "Currency",
+                                  subtitle: state.currencyCode,
+                                  suffix: SvgPicture.asset(
+                                    "assets/icons/ic_arrow_right.svg",
+                                  ),
+                                );
+                              }
+                              return SettingItem(
+                                onTap: () {
+                                  showCurrencyPicker(
+                                    context: context,
+                                    showFlag: true,
+                                    showCurrencyName: true,
+                                    showCurrencyCode: true,
+                                    onSelect: (Currency currency) {
+                                      context
+                                          .read<ConvertCurrencyCubit>()
+                                          .changeCurrency(
+                                              currency.symbol, currency.code);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              content: Text(
+                                                  "Currency updated to ${currency.code}")));
+                                    },
+                                  );
                                 },
+                                icon: SvgPicture.asset(
+                                    "assets/icons/ic_currency.svg"),
+                                iconBackgroundColor: const Color(0xFF00A61B),
+                                label: "Currency",
+                                subtitle: sharedPrefs.getCurrencyCode(),
+                                suffix: SvgPicture.asset(
+                                  "assets/icons/ic_arrow_right.svg",
+                                ),
                               );
                             },
-                            icon: SvgPicture.asset(
-                                "assets/icons/ic_currency.svg"),
-                            iconBackgroundColor: Color(0xFF00A61B),
-                            label: "Currency",
-                            suffix: SvgPicture.asset(
-                              "assets/icons/ic_arrow_right.svg",
-                            ),
                           ),
                           Divider(),
                           // SettingItem(
@@ -239,9 +279,9 @@ class SettingsPage extends HookWidget {
                             onTap: () async {
                               final InAppReview inAppReview =
                                   InAppReview.instance;
-                              if (await inAppReview.isAvailable()) {
-                                inAppReview.requestReview();
-                              }
+                              inAppReview.openStoreListing(
+                                appStoreId: "6450363173",
+                              );
                             },
                             icon: SvgPicture.asset("assets/icons/ic_star.svg"),
                             iconBackgroundColor: Color(0xFFFFC700),

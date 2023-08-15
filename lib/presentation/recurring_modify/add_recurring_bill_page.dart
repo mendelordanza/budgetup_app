@@ -5,6 +5,7 @@ import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/custom/custom_button.dart';
 import 'package:budgetup_app/presentation/custom/custom_text_field.dart';
 import 'package:budgetup_app/presentation/recurring/recurring_bills_page.dart';
+import 'package:currency_picker/currency_picker.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +19,7 @@ import '../../helper/colors.dart';
 import '../../helper/date_helper.dart';
 import '../../helper/keyboard_helper.dart';
 import '../custom/delete_dialog.dart';
+import '../transactions_modify/bloc/transaction_currency_bloc.dart';
 import 'bloc/recurring_modify_bloc.dart';
 
 enum RecurringBillInterval {
@@ -42,30 +44,52 @@ class AddRecurringBillPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<TransactionCurrencyBloc>().add(LoadTxnCurrency());
+      });
+      return null;
+    }, []);
+
     final sharedPrefs = getIt<SharedPrefs>();
 
     final titleTextController = useTextEditingController(
         text: args.recurringBill != null ? args.recurringBill!.title : "");
+
+    //AMOUNT
     final amountTextController = useTextEditingController(
         text: args.recurringBill != null
-            ? decimalFormatterWithSymbol(args.recurringBill!.amount ?? 0.00)
+            ? decimalFormatterWithSymbol(
+                number: args.recurringBill?.amount ?? 0.00)
             : "0.00");
-    final amountFocusNode = FocusNode();
-    final dateFocusNode = FocusNode();
-    final timeFocusNode = FocusNode();
+    final amountFocusNode = useFocusNode();
 
+    //DATE
+    final dateFocusNode = useFocusNode();
     final dateTextController = useTextEditingController();
     final currentSelectedDate = useState<DateTime>(
         args.recurringBill != null && args.recurringBill!.reminderDate != null
             ? args.recurringBill!.reminderDate!
             : DateTime.now());
+    useEffect(() {
+      dateTextController.text = formatDate(currentSelectedDate.value, "MMMM d");
+      return null;
+    }, [currentSelectedDate.value]);
 
+    //TIME
+    final timeFocusNode = useFocusNode();
     final timeTextController = useTextEditingController();
     final currentSelectedTime = useState<TimeOfDay>(
         args.recurringBill != null && args.recurringBill!.reminderDate != null
             ? TimeOfDay.fromDateTime(args.recurringBill!.reminderDate!)
             : TimeOfDay.now());
+    useEffect(() {
+      timeTextController.text =
+          "${currentSelectedTime.value.hour.toString().padLeft(2, "0")}:${currentSelectedTime.value.minute.toString().padLeft(2, "0")}";
+      return null;
+    }, [currentSelectedTime.value]);
 
+    //INTERVAL
     final selectedInterval = useState<RecurringBillInterval>(
       args.recurringBill != null && args.recurringBill!.interval != null
           ? RecurringBillInterval.values.firstWhere(
@@ -73,16 +97,24 @@ class AddRecurringBillPage extends HookWidget {
           : RecurringBillInterval.monthly,
     );
 
+    //CHANGE CURRENCY SYMBOL
+    final currencyCode = useState(sharedPrefs.getCurrencyCode());
+    final currencySymbol = useState(sharedPrefs.getCurrencySymbol());
+    final currencyRate = useState(sharedPrefs.getCurrencyRate());
+    final txnCurrencyState = context.watch<TransactionCurrencyBloc>().state;
     useEffect(() {
-      dateTextController.text = formatDate(currentSelectedDate.value, "MMMM d");
+      if (txnCurrencyState is TxnCurrencyLoaded) {
+        currencyCode.value = txnCurrencyState.currencyCode;
+        currencySymbol.value = txnCurrencyState.currencySymbol;
+        currencyRate.value = txnCurrencyState.currencyRate;
+        amountTextController.text = decimalFormatterWithSymbol(
+            number: args.recurringBill?.amount ?? 0.00,
+            currencySymbol: currencySymbol.value);
+        amountTextController.selection = TextSelection.fromPosition(
+            TextPosition(offset: amountTextController.text.length));
+      }
       return null;
-    }, [currentSelectedDate.value]);
-
-    useEffect(() {
-      timeTextController.text =
-          "${currentSelectedTime.value.hour.toString().padLeft(2, "0")}:${currentSelectedTime.value.minute.toString().padLeft(2, "0")}";
-      return null;
-    }, [currentSelectedTime.value]);
+    }, [txnCurrencyState]);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -148,46 +180,79 @@ class AddRecurringBillPage extends HookWidget {
                       key: _formKey,
                       child: Column(
                         children: [
+                          BlocBuilder<TransactionCurrencyBloc,
+                                  TransactionCurrencyState>(
+                              builder: (context, state) {
+                            if (state is TxnCurrencyLoaded) {
+                              return currencyConvert(
+                                context,
+                                state.currencyCode,
+                              );
+                            }
+                            return currencyConvert(
+                              context,
+                              sharedPrefs.getCurrencyCode(),
+                            );
+                          }),
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 16.0),
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
                             child: Column(
                               children: [
-                                Text("${sharedPrefs.getCurrencyCode()}"),
                                 SizedBox(
                                   height: 70.0,
                                   child: KeyboardActions(
+                                    tapOutsideBehavior: TapOutsideBehavior.translucentDismiss,
                                     config:
                                         buildConfig(amountFocusNode, context),
-                                    child: TextFormField(
-                                      focusNode: amountFocusNode,
-                                      controller: amountTextController,
-                                      decoration: InputDecoration(
-                                        fillColor: Colors.transparent,
-                                        filled: true,
-                                        border: InputBorder.none,
-                                        contentPadding: EdgeInsets.zero,
-                                      ),
-                                      style: TextStyle(
-                                        fontSize: 24.0,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                      textInputAction: TextInputAction.next,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.digitsOnly,
-                                        NumberInputFormatter(),
-                                      ],
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Amount is required';
-                                        } else if (removeFormatting(value) ==
-                                            "0.0") {
-                                          return 'Please enter a valid number';
-                                        }
-                                        return null;
-                                      },
-                                    ),
+                                    isDialog: true,
+                                    child: BlocBuilder<TransactionCurrencyBloc,
+                                            TransactionCurrencyState>(
+                                        builder: (context, state) {
+                                      if (state is TxnCurrencyLoaded) {
+                                        return amountField(
+                                          amountFocusNode: amountFocusNode,
+                                          amountTextController:
+                                              amountTextController,
+                                          currencySymbol: state.currencySymbol,
+                                        );
+                                      }
+                                      return amountField(
+                                        amountFocusNode: amountFocusNode,
+                                        amountTextController:
+                                            amountTextController,
+                                      );
+                                    }),
+
+                                    // TextFormField(
+                                    //   focusNode: amountFocusNode,
+                                    //   controller: amountTextController,
+                                    //   decoration: InputDecoration(
+                                    //     fillColor: Colors.transparent,
+                                    //     filled: true,
+                                    //     border: InputBorder.none,
+                                    //     contentPadding: EdgeInsets.zero,
+                                    //   ),
+                                    //   style: TextStyle(
+                                    //     fontSize: 24.0,
+                                    //     fontWeight: FontWeight.w600,
+                                    //   ),
+                                    //   textAlign: TextAlign.center,
+                                    //   textInputAction: TextInputAction.next,
+                                    //   keyboardType: TextInputType.number,
+                                    //   inputFormatters: [
+                                    //     FilteringTextInputFormatter.digitsOnly,
+                                    //     NumberInputFormatter(),
+                                    //   ],
+                                    //   validator: (value) {
+                                    //     if (value == null || value.isEmpty) {
+                                    //       return 'Amount is required';
+                                    //     } else if (removeFormatting(value) ==
+                                    //         "0.0") {
+                                    //       return 'Please enter a valid number';
+                                    //     }
+                                    //     return null;
+                                    //   },
+                                    // ),
                                   ),
                                 ),
                               ],
@@ -381,8 +446,12 @@ class AddRecurringBillPage extends HookWidget {
                       //Edit
                       final editedRecurringBill = args.recurringBill!.copy(
                         title: titleTextController.text,
-                        amount: convertRecurringBill(sharedPrefs,
-                            amount: amountTextController.text),
+                        amount: convertRecurringBill(
+                          sharedPrefs,
+                          amount: amountTextController.text,
+                          currencyCode: currencyCode.value,
+                          currencyRate: currencyRate.value,
+                        ),
                         interval: selectedInterval.value.name,
                         reminderDate: currentSelectedDate.value.copyWith(
                             hour: currentSelectedTime.value.hour,
@@ -395,8 +464,12 @@ class AddRecurringBillPage extends HookWidget {
                       //Add
                       final newRecurringBill = RecurringBill(
                         title: titleTextController.text,
-                        amount: convertRecurringBill(sharedPrefs,
-                            amount: amountTextController.text),
+                        amount: convertRecurringBill(
+                          sharedPrefs,
+                          amount: amountTextController.text,
+                          currencyCode: currencyCode.value,
+                          currencyRate: currencyRate.value,
+                        ),
                         interval: selectedInterval.value.name,
                         reminderDate: currentSelectedDate.value.copyWith(
                             hour: currentSelectedTime.value.hour,
@@ -421,11 +494,114 @@ class AddRecurringBillPage extends HookWidget {
     );
   }
 
-  convertRecurringBill(SharedPrefs sharedPrefs, {required String amount}) {
-    return sharedPrefs.getCurrencyCode() == "USD"
+  // convertRecurringBill(SharedPrefs sharedPrefs, {required String amount}) {
+  //   return sharedPrefs.getCurrencyCode() == "USD"
+  //       ? double.parse(removeFormatting(amount))
+  //       : double.parse(removeFormatting(amount)) /
+  //           sharedPrefs.getCurrencyRate();
+  // }
+
+  convertRecurringBill(
+    SharedPrefs sharedPrefs, {
+    required String currencyCode,
+    required double currencyRate,
+    required String amount,
+  }) {
+    print("CURRENCY RATE: $currencyRate");
+    return currencyCode == "USD"
         ? double.parse(removeFormatting(amount))
-        : double.parse(removeFormatting(amount)) /
-            sharedPrefs.getCurrencyRate();
+        : double.parse(removeFormatting(amount)) / currencyRate;
+  }
+
+  Widget amountField({
+    required FocusNode amountFocusNode,
+    required TextEditingController amountTextController,
+    String? currencySymbol,
+  }) {
+    return TextFormField(
+      focusNode: amountFocusNode,
+      controller: amountTextController,
+      decoration: const InputDecoration(
+        fillColor: Colors.transparent,
+        filled: true,
+        border: InputBorder.none,
+        contentPadding: EdgeInsets.zero,
+      ),
+      autofocus: true,
+      style: const TextStyle(
+        fontSize: 24.0,
+        fontWeight: FontWeight.w600,
+        decoration: TextDecoration.underline,
+      ),
+      textAlign: TextAlign.center,
+      textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        NumberInputFormatter(
+          currentCurrencySymbol: currencySymbol,
+        ),
+      ],
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Amount is required';
+        } else if (removeFormatting(value) == "0.00") {
+          return 'Please enter a valid number';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget currencyConvert(
+    BuildContext context,
+    String currencyCode,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        showCurrencyPicker(
+          context: context,
+          showFlag: true,
+          showCurrencyName: true,
+          showCurrencyCode: true,
+          onSelect: (Currency currency) {
+            context.read<TransactionCurrencyBloc>().add(SelectTxnCurrency(
+                  currency.code,
+                  currency.symbol,
+                ));
+          },
+        );
+      },
+      behavior: HitTestBehavior.translucent,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: 4.0,
+          horizontal: 8.0,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.0),
+          color: secondaryColor,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "in $currencyCode",
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(
+              width: 5.0,
+            ),
+            SvgPicture.asset(
+              "assets/icons/ic_arrow_down.svg",
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _tab(

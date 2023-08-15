@@ -74,7 +74,7 @@ class HomePage extends HookWidget {
                   onPressed: () {
                     Navigator.pushNamed(context, RouteStrings.summary);
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     Iconsax.menu_board,
                   ),
                 ),
@@ -95,7 +95,7 @@ class HomePage extends HookWidget {
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Column(
                 children: [
-                  Text(
+                  const Text(
                     "Remaining Salary",
                     textAlign: TextAlign.center,
                   ),
@@ -121,14 +121,14 @@ class HomePage extends HookWidget {
                             children: [
                               Text(
                                 decimalFormatterWithSymbol(
-                                    state.remainingSalary),
-                                style: TextStyle(
+                                    number: state.remainingSalary),
+                                style: const TextStyle(
                                   fontSize: 16.0,
                                   fontWeight: FontWeight.w600,
                                   decoration: TextDecoration.underline,
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 5.0,
                               ),
                               Icon(
@@ -141,8 +141,8 @@ class HomePage extends HookWidget {
                         );
                       }
                       return Text(
-                        decimalFormatterWithSymbol(0.00),
-                        style: TextStyle(
+                        decimalFormatterWithSymbol(number: 0.00),
+                        style: const TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.w600,
                           decoration: TextDecoration.underline,

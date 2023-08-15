@@ -28,9 +28,7 @@ class TransactionsPage extends HookWidget {
     useEffect(() {
       context.read<ExpenseBloc>().add(
           LoadExpenseCategories(selectedDate: expensesCurrentSelectedDate));
-      context
-          .read<RecurringBillBloc>()
-          .add(LoadRecurringBills());
+      context.read<RecurringBillBloc>().add(LoadRecurringBills());
 
       HomeWidget.setAppGroupId('group.G53UVF44L3.com.ralphordanza.budgetupapp');
 

@@ -262,7 +262,7 @@ class AllTransactionsPage extends HookWidget {
                       )
                     ],
                   ),
-                  Text(decimalFormatterWithSymbol(item.amount!))
+                  Text(decimalFormatterWithSymbol(number: item.amount!))
                 ],
               ),
             ),

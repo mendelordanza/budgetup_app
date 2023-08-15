@@ -131,7 +131,7 @@ class ExpensesPage extends HookWidget {
       child: Scaffold(
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -278,35 +278,29 @@ class ExpensesPage extends HookWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          BlocBuilder<ExpenseBloc, ExpenseState>(
-                            builder: (context, state) {
-                              if (state is ExpenseCategoryLoaded &&
-                                  state.expenseCategories.isNotEmpty) {
-                                return GestureDetector(
-                                  onTap: () async {
-                                    Navigator.pushNamed(
-                                        context, RouteStrings.allTxns);
-                                  },
-                                  behavior: HitTestBehavior.translucent,
-                                  child: const Row(
-                                    children: [
-                                      Icon(
-                                        Iconsax.document_text,
-                                        size: 18.0,
-                                      ),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Text(
-                                        "All Transactions",
-                                      ),
-                                    ],
+                          if (state is ExpenseCategoryLoaded &&
+                              state.expenseCategories.isNotEmpty)
+                            GestureDetector(
+                              onTap: () async {
+                                Navigator.pushNamed(
+                                    context, RouteStrings.allTxns);
+                              },
+                              behavior: HitTestBehavior.translucent,
+                              child: const Row(
+                                children: [
+                                  Icon(
+                                    Iconsax.document_text,
+                                    size: 18.0,
                                   ),
-                                );
-                              }
-                              return Container();
-                            },
-                          ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    "All Transactions",
+                                  ),
+                                ],
+                              ),
+                            ),
                           GestureDetector(
                             onTap: () async {
                               final customerInfo =
@@ -476,72 +470,74 @@ class ExpensesPage extends HookWidget {
 
     return Stack(
       children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              RouteStrings.transactions,
-              arguments: item,
-            );
-          },
-          onLongPress: onLongPress,
-          child: Material(
-            shape: SmoothRectangleBorder(
-              borderRadius: SmoothBorderRadius(
-                cornerRadius: 24,
-                cornerSmoothing: 1.0,
-              ),
+        Material(
+          shape: SmoothRectangleBorder(
+            borderRadius: SmoothBorderRadius(
+              cornerRadius: 24,
+              cornerSmoothing: 1.0,
             ),
-            color: Theme.of(context).cardColor,
+          ),
+          color: Theme.of(context).cardColor,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                RouteStrings.transactions,
+                arguments: item,
+              );
+            },
+            onLongPress: onLongPress,
+            behavior: HitTestBehavior.translucent,
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 16.0,
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          item.icon ?? Emoji.objects[49],
-                          style: const TextStyle(
-                            fontSize: 20.0,
-                          ),
+                  Column(
+                    children: [
+                      Text(
+                        item.icon ?? Emoji.objects[49],
+                        style: const TextStyle(
+                          fontSize: 20.0,
                         ),
-                        Text(
-                          item.title ?? "Category",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        BlocBuilder<ExpenseDateFilterBloc,
-                            ExpenseDateFilterState>(
-                          builder: (context, state) {
-                            if (state is ExpenseDateFilterSelected) {
-                              return Text(
-                                decimalFormatterWithSymbol(
-                                  item.getTotalByDate(
-                                      state.dateFilterType, state.selectedDate),
-                                ),
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              );
-                            }
+                      ),
+                      Text(
+                        item.title ?? "Category",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      BlocBuilder<ExpenseDateFilterBloc,
+                          ExpenseDateFilterState>(
+                        builder: (context, state) {
+                          if (state is ExpenseDateFilterSelected) {
                             return Text(
-                              decimalFormatterWithSymbol(item.getTotalByDate(
-                                  dateFilterTypeFromString(
-                                      currentDateFilterType),
-                                  currentSelectedDate)),
+                              decimalFormatterWithSymbol(
+                                number: item.getTotalByDate(
+                                    state.dateFilterType, state.selectedDate),
+                              ),
                               style: TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.w600,
                               ),
                             );
-                          },
-                        ),
-                      ],
-                    ),
+                          }
+                          return Text(
+                            decimalFormatterWithSymbol(
+                                number: item.getTotalByDate(
+                                    dateFilterTypeFromString(
+                                        currentDateFilterType),
+                                    currentSelectedDate)),
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                   Column(
                     children: [
@@ -552,51 +548,38 @@ class ExpensesPage extends HookWidget {
                         ),
                       ),
                       Text(
-                        decimalFormatterWithSymbol(item.budget ?? 0.00),
+                        decimalFormatterWithSymbol(number: item.budget ?? 0.00),
                         style: TextStyle(
                           fontSize: 12.0,
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: BlocBuilder<ExpenseDateFilterBloc,
-                            ExpenseDateFilterState>(
-                          builder: (context, state) {
-                            if (state is ExpenseDateFilterSelected) {
-                              final percentage = item.getTotalPercentage(
-                                  state.dateFilterType, state.selectedDate);
-                              return _budgetProgress(
-                                value: percentage.isNaN ? 0.0 : percentage,
-                                isExceeded: item.isExceeded(
-                                    state.dateFilterType, state.selectedDate),
-                                isHalf: item.isMoreThanEighty(
-                                    state.dateFilterType, state.selectedDate),
-                              );
-                            }
-                            final percentage = item.getTotalPercentage(
-                                dateFilterTypeFromString(currentDateFilterType),
-                                currentSelectedDate);
-                            return _budgetProgress(
-                                value: percentage.isNaN ? 0.0 : percentage,
-                                isHalf: item.isMoreThanEighty(
-                                    dateFilterTypeFromString(
-                                        currentDateFilterType),
-                                    currentSelectedDate),
-                                isExceeded: item.isExceeded(
-                                    dateFilterTypeFromString(
-                                        currentDateFilterType),
-                                    currentSelectedDate));
-                          },
-                        ),
-                      ),
-                    ],
+                  BlocBuilder<ExpenseDateFilterBloc, ExpenseDateFilterState>(
+                    builder: (context, state) {
+                      if (state is ExpenseDateFilterSelected) {
+                        final percentage = item.getTotalPercentage(
+                            state.dateFilterType, state.selectedDate);
+                        return _budgetProgress(
+                          value: percentage.isNaN ? 0.0 : percentage,
+                          isExceeded: item.isExceeded(
+                              state.dateFilterType, state.selectedDate),
+                          isHalf: item.isMoreThanEighty(
+                              state.dateFilterType, state.selectedDate),
+                        );
+                      }
+                      final percentage = item.getTotalPercentage(
+                          dateFilterTypeFromString(currentDateFilterType),
+                          currentSelectedDate);
+                      return _budgetProgress(
+                          value: percentage.isNaN ? 0.0 : percentage,
+                          isHalf: item.isMoreThanEighty(
+                              dateFilterTypeFromString(currentDateFilterType),
+                              currentSelectedDate),
+                          isExceeded: item.isExceeded(
+                              dateFilterTypeFromString(currentDateFilterType),
+                              currentSelectedDate));
+                    },
                   ),
                 ],
               ),

@@ -156,11 +156,11 @@ class ExpenseBloc extends Bloc<ExpenseEvent, ExpenseState> {
       print("SEND!");
       Future.wait([
         HomeWidget.saveWidgetData<String>(
-            'todayTotal', decimalFormatterWithSymbol(todayTotal)),
+            'todayTotal', decimalFormatterWithSymbol(number: todayTotal)),
         HomeWidget.saveWidgetData<String>(
-            'thisMonthTotal', decimalFormatterWithSymbol(thisMonthTotal)),
+            'thisMonthTotal', decimalFormatterWithSymbol(number: thisMonthTotal)),
         HomeWidget.saveWidgetData<String>(
-            'thisWeekTotal', decimalFormatterWithSymbol(thisWeekTotal)),
+            'thisWeekTotal', decimalFormatterWithSymbol(number: thisWeekTotal)),
         HomeWidget.saveWidgetData<bool>('isSubscribed', isSubscribed),
       ]);
     } on PlatformException catch (exception) {

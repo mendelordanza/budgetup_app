@@ -6,7 +6,10 @@ import 'package:budgetup_app/helper/shared_prefs.dart';
 import 'package:budgetup_app/injection_container.dart';
 import 'package:budgetup_app/presentation/custom/custom_button.dart';
 import 'package:budgetup_app/presentation/custom/custom_text_field.dart';
+import 'package:budgetup_app/presentation/custom/platform_progress_indicator.dart';
+import 'package:budgetup_app/presentation/transactions_modify/bloc/transaction_currency_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
+import 'package:currency_picker/currency_picker.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,6 +49,7 @@ class AddExpenseTxnPage extends HookWidget {
               .read<SingleCategoryCubit>()
               .getCategory(args.expenseCategory!);
         }
+        context.read<TransactionCurrencyBloc>().add(LoadTxnCurrency());
       });
       return null;
     }, []);
@@ -63,37 +67,54 @@ class AddTransaction extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
-    final dateFocusNode = useFocusNode();
-    final amountFocusNode = useFocusNode();
+
+    //NOTES
     final notesFocusNode = useFocusNode();
     final notesTextController = useTextEditingController(
         text: args.expenseTxn != null ? args.expenseTxn!.notes : "");
+
+    //AMOUNT
+    final amountFocusNode = useFocusNode();
     final amountTextController = useTextEditingController(
         text: args.expenseTxn != null
-            ? decimalFormatterWithSymbol(args.expenseTxn!.amount ?? 0.00)
-            : "${sharedPrefs.getCurrencySymbol()} 0.00");
+            ? decimalFormatterWithSymbol(
+                number: args.expenseTxn?.amount ?? 0.00)
+            : "${sharedPrefs.getCurrencySymbol()}0.00");
+
+    //DATE
+    final dateFocusNode = useFocusNode();
     final dateTextController = useTextEditingController();
     final currentTransactionDate = useState<DateTime>(
         args.expenseTxn != null && args.expenseTxn!.updatedAt != null
             ? args.expenseTxn!.updatedAt!
             : DateTime.now());
-    final selectedCategory = useState<ExpenseCategory?>(null);
-
     useEffect(() {
       dateTextController.text =
           formatDate(currentTransactionDate.value, "MMM dd, yyyy");
       return null;
     }, [currentTransactionDate.value]);
 
-    // useEffect(() {
-    //   pageController?.addListener(() {
-    //     if (pageController?.page == 1) {
-    //       amountFocusNode.unfocus();
-    //       notesFocusNode.unfocus();
-    //     }
-    //   });
-    //   return null;
-    // }, []);
+    //CATEGORY
+    final selectedCategory = useState<ExpenseCategory?>(null);
+
+    //CHANGE CURRENCY SYMBOL
+    final currencyCode = useState(sharedPrefs.getCurrencyCode());
+    final currencySymbol = useState(sharedPrefs.getCurrencySymbol());
+    final currencyRate = useState(sharedPrefs.getCurrencyRate());
+    final txnCurrencyState = context.watch<TransactionCurrencyBloc>().state;
+    useEffect(() {
+      if (txnCurrencyState is TxnCurrencyLoaded) {
+        currencyCode.value = txnCurrencyState.currencyCode;
+        currencySymbol.value = txnCurrencyState.currencySymbol;
+        currencyRate.value = txnCurrencyState.currencyRate;
+        amountTextController.text = decimalFormatterWithSymbol(
+            number: args.expenseTxn?.amount ?? 0.00,
+            currencySymbol: currencySymbol.value);
+        amountTextController.selection = TextSelection.fromPosition(
+            TextPosition(offset: amountTextController.text.length));
+      }
+      return null;
+    }, [txnCurrencyState]);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -157,14 +178,14 @@ class AddTransaction extends HookWidget {
                                             children: [
                                               Text(
                                                 "${state.expenseCategory.icon} ${state.expenseCategory.title}",
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                   fontSize: 16.0,
                                                 ),
                                               ),
-                                              SizedBox(
+                                              const SizedBox(
                                                 width: 5.0,
                                               ),
-                                              Icon(
+                                              const Icon(
                                                 Iconsax.edit,
                                                 size: 14,
                                               )
@@ -172,49 +193,54 @@ class AddTransaction extends HookWidget {
                                           ),
                                         );
                                       }
-                                      return Text("No category");
+                                      return const Text("No category");
                                     }),
-                                  SizedBox(
-                                    height: 5.0,
+                                  const SizedBox(
+                                    height: 10.0,
                                   ),
                                   SizedBox(
-                                    height: 70.0,
+                                    height: 100.0,
                                     child: KeyboardActions(
+                                      tapOutsideBehavior:
+                                          TapOutsideBehavior.translucentDismiss,
                                       config:
                                           buildConfig(amountFocusNode, context),
-                                      child: TextFormField(
-                                        focusNode: amountFocusNode,
-                                        controller: amountTextController,
-                                        decoration: const InputDecoration(
-                                          fillColor: Colors.transparent,
-                                          filled: true,
-                                          border: InputBorder.none,
-                                          contentPadding: EdgeInsets.zero,
-                                        ),
-                                        autofocus: true,
-                                        style: const TextStyle(
-                                          fontSize: 24.0,
-                                          fontWeight: FontWeight.w600,
-                                          decoration: TextDecoration.underline,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                        textInputAction: TextInputAction.next,
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                          NumberInputFormatter(),
-                                        ],
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Amount is required';
-                                          } else if (removeFormatting(value) ==
-                                              "0.0") {
-                                            return 'Please enter a valid number';
-                                          }
-                                          return null;
-                                        },
-                                      ),
+                                      child: BlocBuilder<
+                                              TransactionCurrencyBloc,
+                                              TransactionCurrencyState>(
+                                          builder: (context, state) {
+                                        if (state is LoadingTxnCurrency) {
+                                          return Center(child: PlatformProgressIndicator());
+                                        } else if (state is TxnCurrencyLoaded) {
+                                          return Column(
+                                            children: [
+                                              currencyConvert(
+                                                  context, state.currencyCode),
+                                              amountField(
+                                                amountFocusNode:
+                                                    amountFocusNode,
+                                                amountTextController:
+                                                    amountTextController,
+                                                currencySymbol:
+                                                    state.currencySymbol,
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                        return Column(
+                                          children: [
+                                            currencyConvert(
+                                              context,
+                                              sharedPrefs.getCurrencyCode(),
+                                            ),
+                                            amountField(
+                                              amountFocusNode: amountFocusNode,
+                                              amountTextController:
+                                                  amountTextController,
+                                            ),
+                                          ],
+                                        );
+                                      }),
                                     ),
                                   ),
                                   // Padding(
@@ -236,7 +262,7 @@ class AddTransaction extends HookWidget {
                               controller: dateTextController,
                               textInputType: TextInputType.datetime,
                               label: "Transaction Date",
-                              prefixIcon: Icon(
+                              prefixIcon: const Icon(
                                 Iconsax.calendar,
                                 size: 16,
                               ),
@@ -260,7 +286,7 @@ class AddTransaction extends HookWidget {
                               textInputAction: TextInputAction.done,
                               label: "Notes (optional)",
                               maxLines: null,
-                              prefixIcon: Icon(
+                              prefixIcon: const Icon(
                                 Iconsax.receipt_edit,
                                 size: 16,
                               ),
@@ -315,11 +341,14 @@ class AddTransaction extends HookWidget {
                     if (args.expenseTxn != null) {
                       //Edit
                       final editedTxn = args.expenseTxn!.copy(
-                        amount: convertAmount(sharedPrefs,
-                            amount: amountTextController.text),
+                        amount: convertAmount(
+                          sharedPrefs,
+                          amount: amountTextController.text,
+                          currencyCode: currencyCode.value,
+                          currencyRate: currencyRate.value,
+                        ),
                         notes: notesTextController.text,
-                        updatedAt:
-                            removeTimeFromDate(currentTransactionDate.value),
+                        updatedAt: currentTransactionDate.value,
                       );
                       if (args.expenseCategory != null) {
                         context.read<TransactionsModifyBloc>().add(
@@ -335,13 +364,15 @@ class AddTransaction extends HookWidget {
                     } else {
                       //Add
                       final newTxn = ExpenseTxn(
-                        amount: convertAmount(sharedPrefs,
-                            amount: amountTextController.text),
+                        amount: convertAmount(
+                          sharedPrefs,
+                          amount: amountTextController.text,
+                          currencyCode: currencyCode.value,
+                          currencyRate: currencyRate.value,
+                        ),
                         notes: notesTextController.text,
-                        createdAt:
-                            removeTimeFromDate(currentTransactionDate.value),
-                        updatedAt:
-                            removeTimeFromDate(currentTransactionDate.value),
+                        createdAt: currentTransactionDate.value,
+                        updatedAt: currentTransactionDate.value,
                       );
                       if (args.expenseCategory != null) {
                         context.read<TransactionsModifyBloc>().add(
@@ -380,7 +411,7 @@ class AddTransaction extends HookWidget {
                     notesTextController.clear();
                   }
                 },
-                child: Text(
+                child: const Text(
                   "Save",
                 ),
               ),
@@ -391,11 +422,107 @@ class AddTransaction extends HookWidget {
     );
   }
 
-  convertAmount(SharedPrefs sharedPrefs, {required String amount}) {
-    return sharedPrefs.getCurrencyCode() == "USD"
+  convertAmount(
+    SharedPrefs sharedPrefs, {
+    required String currencyCode,
+    required double currencyRate,
+    required String amount,
+  }) {
+    print("CURRENCY RATE: $currencyRate");
+    return currencyCode == "USD"
         ? double.parse(removeFormatting(amount))
-        : double.parse(removeFormatting(amount)) /
-            sharedPrefs.getCurrencyRate();
+        : double.parse(removeFormatting(amount)) / currencyRate;
+  }
+
+  Widget currencyConvert(
+    BuildContext context,
+    String currencyCode,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        showCurrencyPicker(
+          context: context,
+          showFlag: true,
+          showCurrencyName: true,
+          showCurrencyCode: true,
+          onSelect: (Currency currency) {
+            context.read<TransactionCurrencyBloc>().add(SelectTxnCurrency(
+                  currency.code,
+                  currency.symbol,
+                ));
+          },
+        );
+      },
+      behavior: HitTestBehavior.translucent,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: 4.0,
+          horizontal: 8.0,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.0),
+          color: secondaryColor,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "in $currencyCode",
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(
+              width: 5.0,
+            ),
+            SvgPicture.asset(
+              "assets/icons/ic_arrow_down.svg",
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget amountField({
+    required FocusNode amountFocusNode,
+    required TextEditingController amountTextController,
+    String? currencySymbol,
+  }) {
+    return TextFormField(
+      focusNode: amountFocusNode,
+      controller: amountTextController,
+      decoration: const InputDecoration(
+        fillColor: Colors.transparent,
+        filled: true,
+        border: InputBorder.none,
+        contentPadding: EdgeInsets.zero,
+      ),
+      autofocus: true,
+      style: const TextStyle(
+        fontSize: 24.0,
+        fontWeight: FontWeight.w600,
+        decoration: TextDecoration.underline,
+      ),
+      textAlign: TextAlign.center,
+      textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        NumberInputFormatter(
+          currentCurrencySymbol: currencySymbol,
+        ),
+      ],
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Amount is required';
+        } else if (removeFormatting(value) == "0.00") {
+          return 'Please enter a valid number';
+        }
+        return null;
+      },
+    );
   }
 
   Widget categoryDropdown(BuildContext context,
@@ -405,8 +532,8 @@ class AddTransaction extends HookWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
+        const Padding(
+          padding: EdgeInsets.only(bottom: 8.0),
           child: Text(
             "Category",
           ),
@@ -432,8 +559,8 @@ class AddTransaction extends HookWidget {
             ),
             filled: true,
             fillColor: Theme.of(context).cardColor,
-            contentPadding: EdgeInsets.all(16.0),
-            prefixIcon: Icon(
+            contentPadding: const EdgeInsets.all(16.0),
+            prefixIcon: const Icon(
               Iconsax.category,
               size: 15.0,
             ),
@@ -444,10 +571,7 @@ class AddTransaction extends HookWidget {
                 (item) => DropdownMenuItem<int>(
                   value: item.id,
                   child: Text(
-                    item.title ?? "",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    "${item.icon} ${item.title ?? ""}",
                   ),
                 ),
               )

@@ -208,10 +208,10 @@ class SummaryDetailPage extends HookWidget {
         builder: (context, state) {
           if (state is DashboardLoaded) {
             final initialSalary =
-                decimalFormatterWithSymbol(state.initialSalary);
-            final total = decimalFormatterWithSymbol(state.overallTotal);
+                decimalFormatterWithSymbol(number: state.initialSalary);
+            final total = decimalFormatterWithSymbol(number: state.overallTotal);
             final remainingSalary =
-                decimalFormatterWithSymbol(state.remainingSalary);
+                decimalFormatterWithSymbol(number: state.remainingSalary);
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -332,7 +332,7 @@ class SummaryDetailPage extends HookWidget {
       child: BlocBuilder<DashboardCubit, DashboardState>(
         builder: (context, state) {
           if (state is DashboardLoaded && state.mostSpentCategory != null) {
-            final total = decimalFormatterWithSymbol(state.mostSpentCategory!
+            final total = decimalFormatterWithSymbol(number: state.mostSpentCategory!
                 .getTotalByDate(DateFilterType.monthly, date));
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -481,8 +481,8 @@ class SummaryDetailPage extends HookWidget {
                                 ),
                               ),
                               right: Text(
-                                decimalFormatterWithSymbol(
-                                  item.getTotalByDate(
+                                decimalFormatterWithSymbol(number:
+                                item.getTotalByDate(
                                       DateFilterType.monthly, date),
                                 ),
                               ),
@@ -501,7 +501,7 @@ class SummaryDetailPage extends HookWidget {
                             ),
                           ),
                           right: Text(
-                            decimalFormatterWithSymbol(state.expensesTotal),
+                            decimalFormatterWithSymbol(number: state.expensesTotal),
                             style: const TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.w600,
@@ -597,7 +597,7 @@ class SummaryDetailPage extends HookWidget {
                               ),
                             ),
                             right: Text(
-                              decimalFormatterWithSymbol(item.amount ?? 0.00),
+                              decimalFormatterWithSymbol(number: item.amount ?? 0.00),
                             ),
                           );
                         },
@@ -615,8 +615,8 @@ class SummaryDetailPage extends HookWidget {
                               ),
                             ),
                             Text(
-                              decimalFormatterWithSymbol(
-                                  state.recurringBillTotal),
+                              decimalFormatterWithSymbol(number:
+                              state.recurringBillTotal),
                               style: const TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.w600,

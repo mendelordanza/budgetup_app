@@ -21,6 +21,7 @@ import 'package:budgetup_app/presentation/salary/bloc/salary_bloc.dart';
 import 'package:budgetup_app/presentation/settings/appearance/bloc/appearance_cubit.dart';
 import 'package:budgetup_app/presentation/settings/currency/bloc/convert_currency_cubit.dart';
 import 'package:budgetup_app/presentation/transactions/bloc/expense_txn_bloc.dart';
+import 'package:budgetup_app/presentation/transactions_modify/bloc/transaction_currency_bloc.dart';
 import 'package:budgetup_app/presentation/transactions_modify/bloc/transactions_modify_bloc.dart';
 import 'package:get_it/get_it.dart';
 
@@ -122,6 +123,12 @@ Future<void> setup() async {
       recurringModifyBloc: getIt(),
     ),
   );
+  getIt.registerLazySingleton(
+    () => TransactionCurrencyBloc(
+      sharedPrefs: getIt(),
+      currencyRepository: getIt(),
+    ),
+  );
 
   //Repository
   getIt.registerLazySingleton(() => ExpensesRepository(
@@ -133,6 +140,7 @@ Future<void> setup() async {
   getIt.registerLazySingleton(() => CurrencyRepository(
         httpService: getIt(),
         isarService: getIt(),
+        sharedPrefs: getIt(),
       ));
   getIt.registerLazySingleton(() => SalaryRepository(
         isarService: getIt(),

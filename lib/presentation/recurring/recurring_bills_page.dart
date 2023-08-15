@@ -102,8 +102,7 @@ class RecurringBillsPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final sharedPrefs = getIt<SharedPrefs>();
-    final currentSelectedDate =
-        DateTime.parse(sharedPrefs.getSelectedDate());
+    final currentSelectedDate = DateTime.parse(sharedPrefs.getSelectedDate());
     final currentDateFilterType = sharedPrefs.getSelectedDateFilterType();
 
     final tabController = useTabController(
@@ -134,7 +133,7 @@ class RecurringBillsPage extends HookWidget {
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: NestedScrollView(
           headerSliverBuilder: (context, value) {
             return [
@@ -280,7 +279,7 @@ class RecurringBillsPage extends HookWidget {
                           .toList();
                       if (list.isNotEmpty) {
                         return ListView.builder(
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: list.length,
                           itemBuilder: (context, index) {
@@ -768,7 +767,7 @@ class RecurringBillsPage extends HookWidget {
                         ),
                       ),
                       Text(
-                        decimalFormatterWithSymbol(item.amount ?? 0.00),
+                        decimalFormatterWithSymbol(number: item.amount ?? 0.00),
                         style: const TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.w600,

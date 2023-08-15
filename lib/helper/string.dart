@@ -4,14 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-String decimalFormatterWithSymbol(double number) {
+String decimalFormatterWithSymbol(
+    {required double number, String? currencySymbol}) {
   final sharedPrefs = getIt<SharedPrefs>();
   double roundedNumber = double.parse(number.toStringAsFixed(2));
   final formatter = NumberFormat("#,##0.00");
-  if (number.isNegative) {
-    return "–${sharedPrefs.getCurrencySymbol()}${formatter.format(roundedNumber.abs())}";
+  var symbol = sharedPrefs.getCurrencySymbol();
+
+  if (currencySymbol != null) {
+    symbol = currencySymbol;
+  } else {
+    symbol = sharedPrefs.getCurrencySymbol();
   }
-  return "${sharedPrefs.getCurrencySymbol()}${formatter.format(roundedNumber)}";
+
+  if (number.isNegative) {
+    return "–$symbol${formatter.format(roundedNumber.abs())}";
+  }
+  return "$symbol${formatter.format(roundedNumber)}";
 }
 
 String decimalFormatter(double number) {
@@ -29,7 +38,11 @@ removeFormatting(String formattedValue) {
 
 class NumberInputFormatter extends TextInputFormatter {
   final sharedPrefs = getIt<SharedPrefs>();
+  final String? currentCurrencySymbol;
 
+  NumberInputFormatter({this.currentCurrencySymbol});
+
+  @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
     if (newValue.selection.baseOffset == 0) {
@@ -43,8 +56,14 @@ class NumberInputFormatter extends TextInputFormatter {
     }
 
     final formatter = NumberFormat('#,##0.00');
-    final newText =
-        "${sharedPrefs.getCurrencySymbol()} ${formatter.format(number / 100)}";
+    var newText = "";
+
+    if (currentCurrencySymbol != null) {
+      newText = "$currentCurrencySymbol${formatter.format(number / 100)}";
+    } else {
+      newText =
+          "${sharedPrefs.getCurrencySymbol()}${formatter.format(number / 100)}";
+    }
 
     return newValue.copyWith(
       text: newText,

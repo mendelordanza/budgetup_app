@@ -27,7 +27,7 @@ class Balance extends HookWidget {
             height: 5.0,
           ),
           Text(
-            decimalFormatterWithSymbol(total),
+            decimalFormatterWithSymbol(number: total),
             textAlign: totalAlign,
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
