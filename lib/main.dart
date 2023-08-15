@@ -77,8 +77,8 @@ class _MyAppState extends State<MyApp> {
       final inAppReview = InAppReview.instance;
       if (await inAppReview.isAvailable()) {
         inAppReview.requestReview();
+        sharedPrefs.setShouldShowReview(0);
       }
-      sharedPrefs.setShouldShowReview(0);
     } else {
       sharedPrefs.setShouldShowReview(counter++);
     }
